@@ -1,0 +1,10 @@
+name: covid
+dependencies:
+  - python=3.8
+  - ipython
+  - ipykernel
+  - pandas
+  - matplotlib
+  - seaborn
+  - flake8
+  - black
