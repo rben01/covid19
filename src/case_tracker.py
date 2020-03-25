@@ -256,6 +256,40 @@ def plot_regions(
     )
 
 
+class DataOrigin(enum.Enum):
+    USE_LOCAL_UNCONDITIONALLY = enum.auto()
+    USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB = enum.auto()
+    FETCH_FROM_WEB_UNCONDITIONALLY = enum.auto()
+
+    def should_try_to_use_local(self) -> bool:
+        return self in [
+            DataOrigin.USE_LOCAL_UNCONDITIONALLY,
+            DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB,
+        ]
+
+
+def get_full_dataset(data_origin: DataOrigin) -> pd.DataFrame:
+    local_df_path = Paths.DATA / "covid_long_data_all_countries_states_counties.csv"
+    if data_origin.should_try_to_use_local():
+        try:
+            return pd.read_csv(local_df_path, low_memory=False, dtype=str,)
+        except FileNotFoundError:
+            if data_origin == DataOrigin.USE_LOCAL_UNCONDITIONALLY:
+                raise
+            return get_full_dataset(DataOrigin.FETCH_FROM_WEB_UNCONDITIONALLY)
+
+    df = pd.read_csv(
+        "https://coronadatascraper.com/timeseries-tidy.csv", low_memory=False, dtype=str
+    )
+    df.to_csv(local_df_path, index=False)
+    return df
+
+
+get_full_dataset(DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB)
+
+# %%
+
+
 def get_country_cases_df(filepath: Path, *, case_type: str):
     case_type = case_type.title()
 
