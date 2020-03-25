@@ -3,7 +3,7 @@ import enum
 import itertools
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Mapping, Tuple, Set
+from typing import List, Mapping, Set, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,7 +14,7 @@ from matplotlib import rcParams
 from matplotlib.dates import DateFormatter, DayLocator
 from matplotlib.ticker import LogLocator, NullFormatter, ScalarFormatter
 
-from constants import CaseTypes, Columns, Locations, Paths
+from constants import USA_STATE_CODES, CaseTypes, Columns, Locations, Paths
 
 DATA_PATH = Paths.ROOT / "csse_covid_19_data" / "csse_covid_19_time_series"
 
@@ -268,24 +268,292 @@ class DataOrigin(enum.Enum):
         ]
 
 
-def get_full_dataset(data_origin: DataOrigin) -> pd.DataFrame:
-    local_df_path = Paths.DATA / "covid_long_data_all_countries_states_counties.csv"
+class SaveFormats(enum.Enum):
+    CSV = ".csv"
+    PARQUET = ".parquet"
+
+    def path_with_fmt_suffix(self, path: Path) -> Path:
+        return path.with_suffix(self.value)
+
+    def read(self, path, *, from_web) -> pd.DataFrame:
+        if self == SaveFormats.CSV:
+            df = pd.read_csv(path, low_memory=False, dtype="string")
+            df: pd.DataFrame
+
+            if from_web:
+                df = df.rename(
+                    columns={
+                        "type": Columns.CASE_TYPE,
+                        "value": Columns.CASE_COUNT,
+                        "country": Columns.THREE_LETTER_COUNTRY_CODE,
+                        "state": Columns.TWO_LETTER_STATE_CODE,
+                    }
+                ).rename(columns=str.title)
+
+                df[Columns.STATE] = df.merge(
+                    pd.read_csv(
+                        Paths.DATA / "usa_state_abbreviations.csv", dtype="string"
+                    ),
+                    how="left",
+                    left_on=Columns.TWO_LETTER_STATE_CODE,
+                    right_on="Abbreviation:",
+                )["US State:"]
+                df[Columns.STATE] = df[Columns.STATE].fillna(
+                    df[Columns.TWO_LETTER_STATE_CODE]
+                )
+
+                df[Columns.COUNTRY] = df.merge(
+                    pd.read_csv(Paths.DATA / "country_codes.csv", dtype="string"),
+                    how="left",
+                    left_on=Columns.THREE_LETTER_COUNTRY_CODE,
+                    right_on="A3 (UN)",
+                )["COUNTRY"]
+                df[Columns.COUNTRY] = df[Columns.COUNTRY].fillna(
+                    df[Columns.THREE_LETTER_COUNTRY_CODE]
+                )
+                col_order = df.columns.tolist()
+                country_col_index = (
+                    col_order.index(Columns.THREE_LETTER_COUNTRY_CODE) + 1
+                )
+                # Place state and country (currently last columns) after country code
+                col_order = [
+                    *col_order[:country_col_index],
+                    Columns.STATE,
+                    Columns.COUNTRY,
+                    *col_order[country_col_index:-2],
+                ]
+                df = df.reindex(col_order, axis=1)
+
+                df[Columns.CASE_TYPE] = df[Columns.CASE_TYPE].map(
+                    lambda s: s[0].upper() + s[1:]
+                )
+
+            df[Columns.DATE] = pd.to_datetime(df[Columns.DATE])
+            df[Columns.CASE_COUNT] = df[Columns.CASE_COUNT].fillna("0").astype(float)
+
+            # As much as these should be categorical, for whatever reason groupby on
+            # categorical data has absolutely terrible performance
+            # Somehow groupby on ordinary strings is much better
+            # At some point I'll revisit this and see if the performance is fixed
+            for col in [
+                Columns.CITY,
+                Columns.COUNTY_NOT_COUNTRY,
+                Columns.STATE,
+                Columns.THREE_LETTER_COUNTRY_CODE,
+                Columns.COUNTRY,
+                Columns.URL,
+                Columns.LATITUDE,
+                Columns.LONGITUDE,
+                Columns.CASE_TYPE,
+            ]:
+                pass
+                # df[col] = df[col].astype("category")
+
+            return df
+        elif self == SaveFormats.PARQUET:
+            df = pd.read_parquet(path)
+            # parquet seems to store pd.StringType() cols as orindary str
+            for col in Columns.string_cols:
+                try:
+                    df[col] = df[col].astype("string")
+                except KeyError:
+                    continue
+            return df
+        else:
+            raise ValueError(f"Unhandled case {self} when reading")
+
+    def save(self, df: pd.DataFrame, path: Path):
+        if self == SaveFormats.CSV:
+            df.to_csv(path, index=False)
+        elif self == SaveFormats.PARQUET:
+            df.to_parquet(path, index=False, compression="brotli")
+        else:
+            raise ValueError(f"Unhandled case {self} when writing")
+
+
+def get_full_dataset(data_origin: DataOrigin, *, fmt: SaveFormats) -> pd.DataFrame:
+
+    local_data_path = fmt.path_with_fmt_suffix(
+        Paths.DATA / "covid_long_data_all_countries_states_counties"
+    )
     if data_origin.should_try_to_use_local():
         try:
-            return pd.read_csv(local_df_path, low_memory=False, dtype=str,)
-        except FileNotFoundError:
+            df = fmt.read(local_data_path, from_web=False)
+        except (FileNotFoundError, IOError):
             if data_origin == DataOrigin.USE_LOCAL_UNCONDITIONALLY:
                 raise
-            return get_full_dataset(DataOrigin.FETCH_FROM_WEB_UNCONDITIONALLY)
+            return get_full_dataset(DataOrigin.FETCH_FROM_WEB_UNCONDITIONALLY, fmt=fmt)
 
-    df = pd.read_csv(
-        "https://coronadatascraper.com/timeseries-tidy.csv", low_memory=False, dtype=str
-    )
-    df.to_csv(local_df_path, index=False)
+    else:
+        df = SaveFormats.CSV.read(
+            "https://coronadatascraper.com/timeseries-tidy.csv", from_web=True
+        )
+        fmt.save(df, local_data_path)
+
     return df
 
 
-get_full_dataset(DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB)
+def remove_extraneous_rows(df: pd.DataFrame) -> pd.DataFrame:
+    # For some reason USA is listed twice, once under country code 'US' and once
+    # under 'USA'. 'US' is garbage data so remove it
+    df = df[df[Columns.THREE_LETTER_COUNTRY_CODE] != "US"]
+
+    # Cache isna() calculations
+    is_null = {
+        col: df[col].isna()
+        for col in [Columns.CITY, Columns.COUNTY_NOT_COUNTRY, Columns.STATE]
+    }
+    df = df[
+        (
+            # For most countries, only keep country-level data
+            (~df[Columns.COUNTRY].isin([Locations.USA, Locations.CHINA]))
+            & is_null[Columns.CITY]
+            & is_null[Columns.COUNTY_NOT_COUNTRY]
+            & is_null[Columns.STATE]
+        )
+        | (  # For China, keep only province-level data
+            # (State and province are the same column)
+            (df[Columns.COUNTRY] == Locations.CHINA)
+            & (~is_null[Columns.STATE])
+        )
+        | (
+            # For USA, keep only state-level data, excluding territories like Guam
+            (df[Columns.COUNTRY] == Locations.USA)
+            & is_null[Columns.CITY]
+            & is_null[Columns.COUNTY_NOT_COUNTRY]
+            & df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES)
+        )
+    ]
+
+    # We don't need these statistics
+    df = df[~df[Columns.CASE_TYPE].isin([CaseTypes.GROWTH_FACTOR, CaseTypes.TESTED])]
+
+    return df
+
+
+def append_aggregates(df: pd.DataFrame) -> pd.DataFrame:
+    groupby_cols = [Columns.DATE, Columns.CASE_TYPE]
+
+    world_case_counts = df.groupby(groupby_cols)[Columns.CASE_COUNT].sum()
+
+    china_case_counts = (
+        df[df[Columns.COUNTRY] == Locations.CHINA]
+        .groupby(groupby_cols)[Columns.CASE_COUNT]
+        .sum()
+    )
+
+    usa_case_counts = (
+        df[df[Columns.COUNTRY] == Locations.USA]
+        .groupby(groupby_cols)[Columns.CASE_COUNT]
+        .sum()
+    )
+
+    world_minus_china_case_counts = world_case_counts.sub(china_case_counts)
+    world_minus_china_case_counts
+
+    dfs = [df]
+    for country, case_count_series in {
+        Locations.WORLD: world_case_counts,
+        Locations.CHINA: china_case_counts,
+        Locations.USA: usa_case_counts,
+        Locations.WORLD_MINUS_CHINA: world_minus_china_case_counts,
+    }.items():
+        case_count_df = case_count_series.reset_index()
+
+        # I assume it's a problem with groupby not supporting StringDType indices
+        case_count_df[Columns.CASE_TYPE] = case_count_df[Columns.CASE_TYPE].astype(
+            "string"
+        )
+
+        case_count_df[Columns.COUNTRY] = country
+        case_count_df[Columns.COUNTRY] = case_count_df[Columns.COUNTRY].astype("string")
+
+        # case_count_df now has four columns: country, date, case type, count
+        for col in [
+            Columns.CITY,
+            Columns.COUNTY_NOT_COUNTRY,
+            Columns.TWO_LETTER_STATE_CODE,
+            Columns.STATE,
+            Columns.THREE_LETTER_COUNTRY_CODE,
+            Columns.URL,
+            Columns.POPULATION,
+            Columns.LATITUDE,
+            Columns.LONGITUDE,
+        ]:
+            case_count_df[col] = pd.NA
+            case_count_df[col] = case_count_df[col].astype("string")
+
+        dfs.append(case_count_df)
+
+    return pd.concat(dfs, axis=0, sort=False)
+
+
+def assign_location_names(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df[Columns.COUNTRY] = (
+        df[Columns.COUNTRY]
+        .replace(
+            {
+                "Iran, Islamic Republic of": Locations.IRAN,
+                "Korea, Republic of": Locations.SOUTH_KOREA,
+                "Georgia": "Georgia (country)",
+                "Viet Nam": "Vietnam",
+                "XKX": "Kosovo",
+            }
+        )
+        .astype("string")
+    )
+    df[Columns.IS_STATE] = df[Columns.STATE].notna()
+    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
+    return df
+
+
+def clean_up(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    # Fill NAs for groupby purposes
+    for col in Columns.string_cols:
+        df[col] = df[col].fillna("")
+
+    # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
+    # to get current (or most recent known) situation per location
+    df = df.sort_values(
+        [Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE], ascending=True
+    )
+
+    return df
+
+
+df = get_full_dataset(
+    DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB, fmt=SaveFormats.PARQUET
+)
+df = remove_extraneous_rows(df)
+
+df = append_aggregates(df)
+df = assign_location_names(df)
+df = clean_up(df)
+df.dtypes
+# %%
+xx = df.groupby([Columns.LOCATION_NAME], as_index=False).last()
+
+
+# %%
+
+
+def aggregate_countries(df: pd.DataFrame, countries: List[Locations]) -> pd.DataFrame:
+    df = df[
+        (~df[Columns.COUNTRY].isin(countries))
+        | (
+            df[Columns.CITY].isna()
+            & df[Columns.COUNTY_NOT_COUNTRY].isna()
+            & df[Columns.STATE].notna()
+        )
+    ]
+    return df
+
+
+df = aggregate_countries(df, ["USA", "CHN"])
+df[df[Columns.COUNTRY] == "USA"]
 
 # %%
 
@@ -388,7 +656,7 @@ def join_dfs() -> pd.DataFrame:
         df[Columns.STATE] != df[Columns.COUNTRY]
     )
     # Use state as location name for states, else use country name
-    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
+    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[df[Columns.COUNTRY]])
 
     # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
     # to get current (or most recent known) situation per location
@@ -451,3 +719,6 @@ plot_regions(get_states_df(df, 10))
 plot_regions(get_chinese_provinces_df(df, 10))
 
 plt.show()
+
+
+# %%
