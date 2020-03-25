@@ -1,9 +1,15 @@
 name: covid
+channels:
+  - default
+  - anaconda
+  - conda-forge
 dependencies:
   - python=3.8
   - ipython
   - ipykernel
   - pandas
+  - lxml
+  - pyarrow
   - matplotlib
   - seaborn
   - flake8
