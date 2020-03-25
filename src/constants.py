@@ -94,9 +94,11 @@ class Columns:
         CASE_TYPE,
     ]
 
+    id_cols = [COUNTRY, STATE, LOCATION_NAME]
+
 
 class CaseTypes:
-    CONFIRMED = "Confirmed"
+    CONFIRMED = "Cases"
     RECOVERED = "Recovered"
     DEATHS = "Deaths"
     MORTALITY = "Mortality"
