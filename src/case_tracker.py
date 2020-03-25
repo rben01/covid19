@@ -524,157 +524,32 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-df = get_full_dataset(
-    DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB, fmt=SaveFormats.PARQUET
-)
-df = remove_extraneous_rows(df)
-
-df = append_aggregates(df)
-df = assign_location_names(df)
-df = clean_up(df)
-df.dtypes
-# %%
-xx = df.groupby([Columns.LOCATION_NAME], as_index=False).last()
-
-
-# %%
-
-
-def aggregate_countries(df: pd.DataFrame, countries: List[Locations]) -> pd.DataFrame:
-    df = df[
-        (~df[Columns.COUNTRY].isin(countries))
-        | (
-            df[Columns.CITY].isna()
-            & df[Columns.COUNTY_NOT_COUNTRY].isna()
-            & df[Columns.STATE].notna()
-        )
-    ]
+def get_df() -> pd.DataFrame:
+    df = get_full_dataset(
+        DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB, fmt=SaveFormats.PARQUET
+    )
+    df = remove_extraneous_rows(df)
+    df = append_aggregates(df)
+    df = assign_location_names(df)
+    df = clean_up(df)
     return df
 
 
-df = aggregate_countries(df, ["USA", "CHN"])
-df[df[Columns.COUNTRY] == "USA"]
-
-# %%
+def convert_to_days_since_outbreak(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
+    pass
 
 
-def get_country_cases_df(filepath: Path, *, case_type: str):
-    case_type = case_type.title()
-
-    df = pd.read_csv(filepath, dtype=str)
-    df: pd.DataFrame
-    df = df.melt(
-        id_vars=[Columns.STATE, Columns.COUNTRY, Columns.LATITUDE, Columns.LONGITUDE],
-        var_name=Columns.DATE,
-        value_name=Columns.CASE_COUNT,
-    )
-    df[Columns.DATE] = pd.to_datetime(df[Columns.DATE])
-    df[Columns.CASE_TYPE] = case_type
-    df[Columns.CASE_COUNT] = (
-        df[Columns.CASE_COUNT].str.replace(",", "").fillna(0).astype(int)
-    )
-
-    return df
-
-
-def get_world_cases_df(filepath: Path, *, case_type: str):
-    df = get_country_cases_df(filepath, case_type=case_type)
-
-    world_df = (
-        df.drop(columns=[Columns.LATITUDE, Columns.LONGITUDE])
-        .groupby([Columns.DATE, Columns.CASE_TYPE])[Columns.CASE_COUNT]
-        .sum()
-    )
-
-    china_df = (
-        df[df[Columns.COUNTRY] == Locations.CHINA]
-        .drop(columns=[Columns.LATITUDE, Columns.LONGITUDE])
-        .groupby([Columns.DATE, Columns.CASE_TYPE])[Columns.CASE_COUNT]
-        .sum()
-    )
-
-    world_minus_china_df = world_df.sub(china_df)
-
-    world_df = world_df.reset_index()
-    china_df = china_df.reset_index()
-    world_minus_china_df = world_minus_china_df.reset_index()
-
-    world_df[Columns.COUNTRY] = Locations.WORLD
-    china_df[Columns.COUNTRY] = Locations.CHINA
-    world_minus_china_df[Columns.COUNTRY] = Locations.WORLD_MINUS_CHINA
-
-    df = pd.concat([df, world_df, china_df, world_minus_china_df], axis=0)
-
-    return df
-
-
-def join_dfs() -> pd.DataFrame:
-    dfs = []
-    dfs: List[pd.DataFrame]
-
-    # Use this for US states only
-    for csv in DATA_PATH.glob("time_series_19*.csv"):
-        case_type = csv.stem.replace("time_series_19-covid-", "")
-        df = get_country_cases_df(csv, case_type=case_type)
-        df = df[
-            df[Columns.COUNTRY].isin([Locations.USA])
-            & (df[Columns.STATE].notna())
-            & (df[Columns.STATE] != df[Columns.COUNTRY])
-        ]
-        dfs.append(df)
-
-    # Use this for countries (including Chinese provinces)
-    for csv in DATA_PATH.glob("time_series_covid19_*_global.csv"):
-        case_type = csv.stem.replace("time_series_covid19_", "").replace("_global", "")
-        df = get_world_cases_df(csv, case_type=case_type)
-        dfs.append(df)
-
-    df = pd.concat(dfs, axis=0)
-
-    # Remove cities in US (eg "New York, NY")
-    df = df[~df[Columns.STATE].str.contains(",").fillna(False)]
-
-    # For countries other than the US and China don't include their
-    # states/discontiguous regions
-    # E.g., Gibraltar, Isle of Man, French Polynesia, etc
-    # Do keep US states and Chinese provinces
-    df = df[
-        df[Columns.COUNTRY].isin([Locations.USA, Locations.CHINA])
-        | (df[Columns.STATE] == df[Columns.COUNTRY])  # France is like this, idk why
-        | df[Columns.STATE].isna()
-    ]
-
-    # Minor cleanup
-    df[Columns.COUNTRY] = df[Columns.COUNTRY].replace(
-        "Korea, South", Locations.SOUTH_KOREA
-    )
-    df.loc[
-        df[Columns.COUNTRY] == "Georgia", Columns.COUNTRY
-    ] = "Georgia (country)"  # not the state
-
-    df[Columns.IS_STATE] = df[Columns.STATE].notna() & (
-        df[Columns.STATE] != df[Columns.COUNTRY]
-    )
-    # Use state as location name for states, else use country name
-    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[df[Columns.COUNTRY]])
-
-    # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
-    # to get current (or most recent known) situation per location
-    df = df.sort_values([Columns.LOCATION_NAME, Columns.DATE])
-    return df
-
-
-def keep_only_n_largest_locations(df, n):
-    def get_n_largest_locations(df, n):
+def keep_only_n_largest_locations(df: pd.DataFrame, n: int) -> pd.DataFrame:
+    def get_n_largest_locations(df: pd.DataFrame, n: int) -> pd.Series:
         return (
             df[df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED]
-            .groupby(Columns.LOCATION_NAME)
+            .groupby([Columns.LOCATION_NAME, Columns.COUNTRY, Columns.STATE])
             .apply(lambda g: g[Columns.CASE_COUNT].iloc[-1])
             .nlargest(n)
             .rename(CaseTypes.CONFIRMED)
         )
 
-    def keep_only_above_cutoff(df, cutoff):
+    def keep_only_above_cutoff(df: pd.DataFrame, cutoff: float) -> pd.DataFrame:
         return df.groupby(Columns.LOCATION_NAME).filter(
             lambda g: (
                 g.loc[
@@ -689,7 +564,7 @@ def keep_only_n_largest_locations(df, n):
     return keep_only_above_cutoff(df, case_count_cutoff)
 
 
-def get_countries_df(df, n):
+def get_countries_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
     df = df[
         (~df[Columns.IS_STATE])
         & (
@@ -701,21 +576,21 @@ def get_countries_df(df, n):
     return keep_only_n_largest_locations(df, n)
 
 
-def get_states_df(df, n):
+def get_usa_states_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
     return keep_only_n_largest_locations(df, n)
 
 
-def get_chinese_provinces_df(df, n):
+def get_chinese_provinces_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
     df = df[(df[Columns.COUNTRY] == Locations.CHINA) & df[Columns.IS_STATE]]
     return keep_only_n_largest_locations(df, n)
 
 
-df = join_dfs()
+df = get_df()
 
 plot_world_and_china(df)
 plot_regions(get_countries_df(df, 10))
-plot_regions(get_states_df(df, 10))
+plot_regions(get_usa_states_df(df, 10))
 plot_regions(get_chinese_provinces_df(df, 10))
 
 plt.show()
