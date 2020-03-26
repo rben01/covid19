@@ -55,6 +55,8 @@ USA_STATE_CODES = [
     "WY",
 ]
 
+CASE_THRESHOLD = 100
+
 
 class Paths:
     ROOT = Path("..")

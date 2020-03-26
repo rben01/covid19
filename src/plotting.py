@@ -18,7 +18,7 @@ from matplotlib.ticker import (
     ScalarFormatter,
 )
 
-from constants import CaseTypes, Columns, Locations, Paths
+from constants import CASE_THRESHOLD, CaseTypes, Columns, Locations, Paths
 
 FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
@@ -134,10 +134,6 @@ def _plot_helper(
     config_df = pd.DataFrame.from_records(case_type_config_list)
     config_df = config_df[config_df[ConfigFields.INCLUDE]]
 
-    display(hue_order)
-    display(config_df[ConfigFields.CASE_TYPE].tolist())
-    display(config_df[ConfigFields.DASH_STYLE].tolist())
-
     style = style or "default"
     with plt.style.context(style):
         g = sns.lineplot(
@@ -162,6 +158,7 @@ def _plot_helper(
         elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
+            ax.set_xlabel(f"Days Since Reaching {CASE_THRESHOLD} Cases")
 
         # Y axis
         ax.set_yscale("log", basey=2, nonposy="mask")
