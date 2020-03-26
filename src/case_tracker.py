@@ -8,7 +8,10 @@ from IPython.display import display  # noqa F401
 
 import read_in_old_data
 from constants import USA_STATE_CODES, CaseTypes, Columns, Locations, Paths
-from plotting import plot_regions, plot_world_and_china
+from plotting import (
+    plot_cases_from_fixed_date,
+    plot_cases_by_days_since_first_widespread_locally,
+)
 
 DATA_PATH = Paths.ROOT / "csse_covid_19_data" / "csse_covid_19_time_series"
 
@@ -190,9 +193,24 @@ def remove_extraneous_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 def fill_gaps_with_old_data(df: pd.DataFrame) -> pd.DataFrame:
     old_data = read_in_old_data.get_old_data()
-    df = pd.concat([df, old_data], axis=0).drop_duplicates(
-        [Columns.COUNTRY, Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE],
-        keep="first",
+    old_data = old_data[old_data[Columns.DATE] <= pd.Timestamp("2020-03-20")]
+    # Ordinarily we'd use Columns.LOCATION_NAME as an identifier column, but it hasn't
+    # been assigned yet. Since it's determined by COUNTRY and STATE we can use
+    # those instead (and we need at least one of them anyway in case location
+    # names aren't unique)
+    df = pd.concat(
+        [
+            df.assign(**{Columns.SOURCE: "new"}),
+            old_data.assign(**{Columns.SOURCE: "old"}),
+        ],
+        axis=0,
+        ignore_index=True,
+    )
+    for col in Columns.string_cols:
+        df[col] = df[col].astype("string")
+
+    df = df.drop_duplicates(
+        [Columns.COUNTRY, Columns.STATE, Columns.DATE, Columns.CASE_TYPE], keep="last",
     )
     return df
 
@@ -248,10 +266,11 @@ def append_aggregates(df: pd.DataFrame) -> pd.DataFrame:
         ]:
             case_count_df[col] = pd.NA
             case_count_df[col] = case_count_df[col].astype("string")
+            case_count_df[Columns.SOURCE] = "new"
 
         dfs.append(case_count_df)
 
-    return pd.concat(dfs, axis=0, sort=False)
+    return pd.concat(dfs, axis=0, sort=False, ignore_index=True)
 
 
 def assign_location_names(df: pd.DataFrame) -> pd.DataFrame:
@@ -290,6 +309,27 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def get_df_with_days_since_n_confirmed_cases(
+    df: pd.DataFrame, confirmed_case_threshold: int
+) -> pd.DataFrame:
+    OUTBREAK_START_DATE_COL = "Outbreak start date"
+    outbreak_start_dates = (
+        df[
+            (df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED)
+            & (df[Columns.CASE_COUNT] >= confirmed_case_threshold)
+        ]
+        .groupby(Columns.id_cols)[Columns.DATE]
+        .min()
+        .rename(OUTBREAK_START_DATE_COL)
+    )
+    df = df.merge(outbreak_start_dates, how="left", on=Columns.id_cols)
+    df[Columns.DAYS_SINCE_OUTBREAK] = (
+        df[Columns.DATE] - df[OUTBREAK_START_DATE_COL]
+    ).dt.days
+
+    return df
+
+
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     if refresh_local_data:
         origin = DataOrigin.FETCH_FROM_WEB_UNCONDITIONALLY
@@ -302,35 +342,12 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = append_aggregates(df)
     df = assign_location_names(df)
     df = clean_up(df)
-    return df
-
-
-def get_df_with_days_since_outbreak(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
-    OUTBREAK_START_DATE_COL = "Outbreak start date"
-    outbreak_start_dates = (
-        df[
-            (df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED)
-            & (df[Columns.CASE_COUNT] >= threshold)
-        ]
-        .groupby(Columns.id_cols)[Columns.DATE]
-        .min()
-        .rename(OUTBREAK_START_DATE_COL)
-    )
-    df = df.merge(outbreak_start_dates, how="inner", on=Columns.id_cols)
-    df[Columns.DAYS_SINCE_OUTBREAK] = (
-        df[Columns.DATE] - df[OUTBREAK_START_DATE_COL]
-    ).dt.days
-    df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
+    df = get_df_with_days_since_n_confirmed_cases(df, 100)
     return df
 
 
 def keep_only_n_largest_locations(df: pd.DataFrame, n: int) -> pd.DataFrame:
     def get_n_largest_locations(df: pd.DataFrame, n: int) -> pd.Series:
-        display(
-            df[df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED]
-            .groupby(Columns.id_cols)
-            .apply(lambda g: g[Columns.CASE_COUNT].iloc[-1])
-        )
         return (
             df[df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED]
             .groupby(Columns.id_cols)
@@ -352,6 +369,14 @@ def keep_only_n_largest_locations(df: pd.DataFrame, n: int) -> pd.DataFrame:
     n_largest_location_case_counts = get_n_largest_locations(df, n)
     case_count_cutoff = n_largest_location_case_counts.min()
     return keep_only_above_cutoff(df, case_count_cutoff)
+
+
+def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
+    return df[
+        df[Columns.LOCATION_NAME].isin(
+            [Locations.WORLD, Locations.WORLD_MINUS_CHINA, Locations.CHINA]
+        )
+    ]
 
 
 def get_countries_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
@@ -378,15 +403,16 @@ def get_chinese_provinces_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 df = get_df(refresh_local_data=False)
 display(df)
-# %%
-plot_world_and_china(df)
-# %%
-plot_regions(get_countries_df(df, 10))
-# %%
-get_usa_states_df(df, 10)
-# %%
-plot_regions(get_usa_states_df(df, 10))
-# %%
-plot_regions(get_chinese_provinces_df(df, 10))
+
+plot_cases_from_fixed_date(get_world_df(df))
+plot_cases_from_fixed_date(get_countries_df(df, 10))
+plot_cases_from_fixed_date(get_usa_states_df(df, 10))
+plot_cases_from_fixed_date(get_chinese_provinces_df(df, 10))
+
+plot_cases_by_days_since_first_widespread_locally(get_countries_df(df, 10))
+plot_cases_by_days_since_first_widespread_locally(get_usa_states_df(df, 10))
+
+# days_since_outbreak_df = get_df_with_days_since_local_outbreak(df,)
 
 # %%
+plt.show()

@@ -63,7 +63,7 @@ def get_old_data() -> pd.DataFrame:
         df = get_world_cases_df(csv, case_type=case_type)
         dfs.append(df)
 
-    df = pd.concat(dfs, axis=0)
+    df = pd.concat(dfs, axis=0, ignore_index=True)
 
     # Remove cities in US (eg "New York, NY")
     df = df[~df[Columns.STATE].str.contains(",").fillna(False)]
@@ -92,22 +92,27 @@ def get_old_data() -> pd.DataFrame:
     )
 
     # Minor cleanup
-    df[Columns.COUNTRY] = df[Columns.COUNTRY].replace(
-        "Korea, South", Locations.SOUTH_KOREA
+    df[Columns.COUNTRY] = (
+        df[Columns.COUNTRY]
+        .map(
+            {
+                "US": Locations.USA,
+                "Korea, South": Locations.SOUTH_KOREA,
+                "Georgia": "Georgia (country)",
+            }
+        )
+        .fillna(df[Columns.COUNTRY])
     )
-    df.loc[
-        df[Columns.COUNTRY] == "Georgia", Columns.COUNTRY
-    ] = "Georgia (country)"  # not the state
 
     df[Columns.IS_STATE] = df[Columns.STATE].notna() & (
         df[Columns.STATE] != df[Columns.COUNTRY]
     )
     # Use state as location name for states, else use country name
-    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
+    # df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
 
     # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
     # to get current (or most recent known) situation per location
-    df = df.sort_values([Columns.LOCATION_NAME, Columns.DATE])
+    # df = df.sort_values([Columns.LOCATION_NAME, Columns.DATE])
 
     for col in Columns.string_cols:
         if col not in df.columns:
