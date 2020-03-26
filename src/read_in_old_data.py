@@ -1,3 +1,4 @@
+# %%
 # ***
 # WARNING: The code style in this file will seem awful. It is. This used to get the
 # old data format, and since it worked and the old data won't be seeing any further
@@ -39,6 +40,32 @@ def get_country_cases_df(filepath: Path, *, case_type: str):
 
 def get_world_cases_df(filepath: Path, *, case_type: str):
     df = get_country_cases_df(filepath, case_type=case_type)
+
+    world_df = (
+        df.drop(columns=[Columns.LATITUDE, Columns.LONGITUDE])
+        .groupby([Columns.DATE, Columns.CASE_TYPE])[Columns.CASE_COUNT]
+        .sum()
+    )
+
+    china_df = (
+        df[df[Columns.COUNTRY] == Locations.CHINA]
+        .drop(columns=[Columns.LATITUDE, Columns.LONGITUDE])
+        .groupby([Columns.DATE, Columns.CASE_TYPE])[Columns.CASE_COUNT]
+        .sum()
+    )
+
+    world_minus_china_df = world_df.sub(china_df)
+
+    world_df = world_df.reset_index()
+    china_df = china_df.reset_index()
+    world_minus_china_df = world_minus_china_df.reset_index()
+
+    world_df[Columns.COUNTRY] = Locations.WORLD
+    china_df[Columns.COUNTRY] = Locations.CHINA
+    world_minus_china_df[Columns.COUNTRY] = Locations.WORLD_MINUS_CHINA
+
+    df = pd.concat([df, world_df, china_df, world_minus_china_df], axis=0)
+
     return df
 
 
@@ -51,8 +78,8 @@ def get_old_data() -> pd.DataFrame:
         case_type = csv.stem.replace("time_series_19-covid-", "")
         df = get_country_cases_df(csv, case_type=case_type)
         df = df[
-            df[Columns.COUNTRY].isin([Locations.USA])
-            & (df[Columns.STATE].notna())
+            df[Columns.COUNTRY].isin(["US"])
+            & df[Columns.STATE].notna()
             & (df[Columns.STATE] != df[Columns.COUNTRY])
         ]
         dfs.append(df)
@@ -65,6 +92,19 @@ def get_old_data() -> pd.DataFrame:
 
     df = pd.concat(dfs, axis=0, ignore_index=True)
 
+    # Rename countries
+    df[Columns.COUNTRY] = (
+        df[Columns.COUNTRY]
+        .map(
+            {
+                "US": Locations.USA,
+                "Korea, South": Locations.SOUTH_KOREA,
+                "Georgia": "Georgia (country)",
+            }
+        )
+        .fillna(df[Columns.COUNTRY])
+    )
+
     # Remove cities in US (eg "New York, NY")
     df = df[~df[Columns.STATE].str.contains(",").fillna(False)]
 
@@ -76,6 +116,7 @@ def get_old_data() -> pd.DataFrame:
         df[Columns.COUNTRY].isin([Locations.USA, Locations.CHINA])
         | (df[Columns.STATE] == df[Columns.COUNTRY])  # France is like this, idk why
         | df[Columns.STATE].isna()
+        | (df[Columns.STATE].str.strip() == "")
     ]
 
     # Convert to new case type names
@@ -91,21 +132,10 @@ def get_old_data() -> pd.DataFrame:
         .astype("string")
     )
 
-    # Minor cleanup
-    df[Columns.COUNTRY] = (
-        df[Columns.COUNTRY]
-        .map(
-            {
-                "US": Locations.USA,
-                "Korea, South": Locations.SOUTH_KOREA,
-                "Georgia": "Georgia (country)",
-            }
-        )
-        .fillna(df[Columns.COUNTRY])
-    )
-
-    df[Columns.IS_STATE] = df[Columns.STATE].notna() & (
-        df[Columns.STATE] != df[Columns.COUNTRY]
+    df[Columns.IS_STATE] = (
+        df[Columns.STATE].notna()
+        & (df[Columns.STATE].str.strip() != "")
+        & (df[Columns.STATE] != df[Columns.COUNTRY])
     )
     # Use state as location name for states, else use country name
     # df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
@@ -121,3 +151,8 @@ def get_old_data() -> pd.DataFrame:
         df[col] = df[col].astype("string")
 
     return df
+
+
+if __name__ == "__main__":
+    od = get_old_data()
+    od
