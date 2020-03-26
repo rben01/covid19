@@ -202,7 +202,7 @@ def remove_extraneous_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 def fill_gaps_with_old_data(df: pd.DataFrame) -> pd.DataFrame:
     old_data = read_in_old_data.get_old_data()
-    old_data = old_data[old_data[Columns.DATE] <= pd.Timestamp("2020-03-20")]
+    old_data = old_data[old_data[Columns.DATE] <= pd.Timestamp("2020-03-21")]
     # Ordinarily we'd use Columns.LOCATION_NAME as an identifier column, but it hasn't
     # been assigned yet. Since it's determined by COUNTRY and STATE we can use
     # those instead (and we need at least one of them anyway in case location
@@ -235,11 +235,11 @@ def append_aggregates(df: pd.DataFrame) -> pd.DataFrame:
         .sum()
     )
 
-    usa_case_counts = (
-        df[df[Columns.COUNTRY] == Locations.USA]
-        .groupby(groupby_cols)[Columns.CASE_COUNT]
-        .sum()
-    )
+    # usa_case_counts = (
+    #     df[df[Columns.COUNTRY] == Locations.USA]
+    #     .groupby(groupby_cols)[Columns.CASE_COUNT]
+    #     .sum()
+    # )
 
     world_minus_china_case_counts = world_case_counts.sub(china_case_counts)
     world_minus_china_case_counts
@@ -248,7 +248,7 @@ def append_aggregates(df: pd.DataFrame) -> pd.DataFrame:
     for country, case_count_series in {
         Locations.WORLD: world_case_counts,
         Locations.CHINA: china_case_counts,
-        Locations.USA: usa_case_counts,
+        # Locations.USA: usa_case_counts,
         Locations.WORLD_MINUS_CHINA: world_minus_china_case_counts,
     }.items():
         case_count_df = case_count_series.reset_index()
@@ -273,7 +273,7 @@ def append_aggregates(df: pd.DataFrame) -> pd.DataFrame:
             Columns.LATITUDE,
             Columns.LONGITUDE,
         ]:
-            case_count_df[col] = pd.NA
+            case_count_df[col] = ""
             case_count_df[col] = case_count_df[col].astype("string")
             case_count_df[Columns.SOURCE] = "new"
 
@@ -352,8 +352,8 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
 
     df = get_full_dataset(origin, fmt=SaveFormats.PARQUET)
     df = remove_extraneous_rows(df)
-    df = fill_gaps_with_old_data(df)
     df = append_aggregates(df)
+    df = fill_gaps_with_old_data(df)
     df = assign_location_names(df)
     df = get_df_with_days_since_n_confirmed_cases(df, CASE_THRESHOLD)
     df = clean_up(df)
@@ -423,8 +423,10 @@ plot_cases_from_fixed_date(get_countries_df(df, 10))
 plot_cases_from_fixed_date(get_usa_states_df(df, 10))
 plot_cases_from_fixed_date(get_chinese_provinces_df(df, 10))
 
+plot_cases_by_days_since_first_widespread_locally(get_world_df(df))
 plot_cases_by_days_since_first_widespread_locally(get_countries_df(df, 10))
 plot_cases_by_days_since_first_widespread_locally(get_usa_states_df(df, 10))
+plot_cases_by_days_since_first_widespread_locally(get_chinese_provinces_df(df, 10))
 
 # days_since_outbreak_df = get_df_with_days_since_local_outbreak(df,)
 

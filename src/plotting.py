@@ -187,8 +187,10 @@ def _plot_helper(
         right_str = ")"
 
         # Add number format to legend title (the first item in the legend)
-        legend_fields = [*config_df[ConfigFields.CASE_TYPE], CaseTypes.MORTALITY]
-        if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+        legend_fields = list(config_df[ConfigFields.CASE_TYPE])
+        if x_axis_col == Columns.DATE:
+            legend_fields.append(CaseTypes.MORTALITY)
+        elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
             legend_fields.append("Start Date")
 
         fmt_str = sep_str.join(legend_fields)
@@ -205,12 +207,14 @@ def _plot_helper(
             current_case_counts[col].map(r"{:,}".format)
             for col in config_df[ConfigFields.CASE_TYPE]
         ]
-        case_count_str_cols.append(
-            current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
-        )
-        case_count_str_cols.append(
-            current_case_counts[START_DATE].dt.strftime(r"%b %-d")
-        )
+        if x_axis_col == Columns.DATE:
+            case_count_str_cols.append(
+                current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
+            )
+        elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+            case_count_str_cols.append(
+                current_case_counts[START_DATE].dt.strftime(r"%b %-d")
+            )
 
         labels = (
             current_case_counts[Columns.LOCATION_NAME]
@@ -239,7 +243,7 @@ def get_savefile_name_and_location_heading(
     df: pd.DataFrame, description: str
 ) -> Tuple[str, str]:
 
-    if Locations.WORLD in df[Columns.COUNTRY]:
+    if Locations.WORLD in df[Columns.COUNTRY].values:
         savefile_basename = "world"
         location_heading = None
     elif df[Columns.COUNTRY].iloc[0] == Locations.CHINA:
