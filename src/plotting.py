@@ -79,14 +79,15 @@ def _plot_helper(
     savefile_name: Union[Path, str],
     location_heading: str = None,
 ):
+    df = df[df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)]
+
     if plot_size is None:
         plot_size = (12, 12)
-    fig, ax = plt.subplots(figsize=plot_size, dpi=400, facecolor="white")
+    fig, ax = plt.subplots(figsize=plot_size, dpi=100, facecolor="white")
     fig: plt.Figure
     ax: plt.Axes
 
     START_DATE = "start_date"
-
     current_case_counts = (
         df.groupby(Columns.id_cols)
         .apply(
@@ -132,6 +133,10 @@ def _plot_helper(
 
     config_df = pd.DataFrame.from_records(case_type_config_list)
     config_df = config_df[config_df[ConfigFields.INCLUDE]]
+
+    display(hue_order)
+    display(config_df[ConfigFields.CASE_TYPE].tolist())
+    display(config_df[ConfigFields.DASH_STYLE].tolist())
 
     style = style or "default"
     with plt.style.context(style):
@@ -256,42 +261,10 @@ def get_savefile_name_and_location_heading(
     return savefile_name, location_heading
 
 
-def plot_world_and_china(df: pd.DataFrame, *, style=None, start_date=None):
-    if start_date is not None:
-        df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
-
-    df = df[
-        df[Columns.LOCATION_NAME].isin(
-            [Locations.WORLD, Locations.WORLD_MINUS_CHINA, Locations.CHINA]
-        )
-        & df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)
-    ]
-    df = remove_empty_leading_dates(df)
-
-    configs = [
-        {ConfigFields.CASE_TYPE: CaseTypes.CONFIRMED, ConfigFields.DASH_STYLE: (1, 0)},
-        {ConfigFields.CASE_TYPE: CaseTypes.DEATHS, ConfigFields.DASH_STYLE: (1, 1,)},
-    ]
-
-    savefile_name, location_heading = get_savefile_name_and_location_heading(
-        df, FROM_FIXED_DATE_DESC
-    )
-
-    return _plot_helper(
-        df,
-        x_axis_col=Columns.DATE,
-        style=style,
-        case_type_config_list=configs,
-        savefile_name=savefile_name,
-        location_heading=location_heading,
-    )
-
-
 def plot_cases_from_fixed_date(df: pd.DataFrame, *, style=None, start_date=None):
     if start_date is not None:
         df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
-    df = df[df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)]
     df = remove_empty_leading_dates(df)
 
     configs = [

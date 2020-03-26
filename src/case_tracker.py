@@ -58,8 +58,10 @@ class SaveFormats(enum.Enum):
                     left_on=Columns.TWO_LETTER_STATE_CODE,
                     right_on="Abbreviation:",
                 )["US State:"]
-                df[Columns.STATE] = df[Columns.STATE].fillna(
-                    df[Columns.TWO_LETTER_STATE_CODE]
+                df[Columns.STATE] = (
+                    df[Columns.STATE]
+                    .fillna(df[Columns.TWO_LETTER_STATE_CODE])
+                    .astype("string")
                 )
 
                 df[Columns.COUNTRY] = df.merge(
@@ -207,7 +209,7 @@ def fill_gaps_with_old_data(df: pd.DataFrame) -> pd.DataFrame:
         ignore_index=True,
     )
     for col in Columns.string_cols:
-        df[col] = df[col].astype("string")
+        df[col] = df[col].fillna("").astype("string")
 
     df = df.drop_duplicates(
         [Columns.COUNTRY, Columns.STATE, Columns.DATE, Columns.CASE_TYPE], keep="last",
@@ -288,24 +290,13 @@ def assign_location_names(df: pd.DataFrame) -> pd.DataFrame:
         )
         .astype("string")
     )
-    df[Columns.IS_STATE] = df[Columns.STATE].notna()
-    df[Columns.LOCATION_NAME] = df[Columns.STATE].fillna(df[Columns.COUNTRY])
-    return df
-
-
-def clean_up(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    # Fill NAs for groupby purposes
-    for col in Columns.string_cols:
-        df[col] = df[col].fillna("")
-
-    # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
-    # to get current (or most recent known) situation per location
-    df = df.sort_values(
-        [Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE], ascending=True
+    df[Columns.IS_STATE] = df[Columns.STATE].notna() & (
+        df[Columns.STATE].str.strip() != ""
     )
-
+    df[Columns.LOCATION_NAME] = df[Columns.STATE].where(
+        df[Columns.STATE].notna() & (df[Columns.STATE].str.strip() != ""),
+        df[Columns.COUNTRY],
+    )
     return df
 
 
@@ -330,6 +321,22 @@ def get_df_with_days_since_n_confirmed_cases(
     return df
 
 
+def clean_up(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    # Fill NAs for groupby purposes
+    for col in Columns.string_cols:
+        df[col] = df[col].fillna("").astype("string")
+
+    # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
+    # to get current (or most recent known) situation per location
+    df = df.sort_values(
+        [Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE], ascending=True
+    )
+
+    return df
+
+
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     if refresh_local_data:
         origin = DataOrigin.FETCH_FROM_WEB_UNCONDITIONALLY
@@ -341,8 +348,8 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = fill_gaps_with_old_data(df)
     df = append_aggregates(df)
     df = assign_location_names(df)
-    df = clean_up(df)
     df = get_df_with_days_since_n_confirmed_cases(df, 100)
+    df = clean_up(df)
     return df
 
 
