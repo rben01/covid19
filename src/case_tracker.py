@@ -7,10 +7,17 @@ import pandas as pd
 from IPython.display import display  # noqa F401
 
 import read_in_old_data
-from constants import USA_STATE_CODES, CaseTypes, Columns, Locations, Paths
+from constants import (
+    CASE_THRESHOLD,
+    USA_STATE_CODES,
+    CaseTypes,
+    Columns,
+    Locations,
+    Paths,
+)
 from plotting import (
-    plot_cases_from_fixed_date,
     plot_cases_by_days_since_first_widespread_locally,
+    plot_cases_from_fixed_date,
 )
 
 DATA_PATH = Paths.ROOT / "csse_covid_19_data" / "csse_covid_19_time_series"
@@ -348,7 +355,7 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = fill_gaps_with_old_data(df)
     df = append_aggregates(df)
     df = assign_location_names(df)
-    df = get_df_with_days_since_n_confirmed_cases(df, 100)
+    df = get_df_with_days_since_n_confirmed_cases(df, CASE_THRESHOLD)
     df = clean_up(df)
     return df
 
