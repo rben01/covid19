@@ -82,6 +82,7 @@ class Columns:
     CASE_COUNT = "Cases"
     CASE_TYPE = "Case Type"
     DAYS_SINCE_OUTBREAK = "Days Since Outbreak"
+    SOURCE = "Source"
 
     string_cols = [
         LATITUDE,

@@ -1,7 +1,8 @@
 import enum
 import itertools
 from datetime import datetime, timezone
-from typing import List, Mapping, Set, Tuple
+from pathlib import Path
+from typing import List, Mapping, Set, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,9 +11,19 @@ import seaborn as sns
 from IPython.display import display  # noqa F401
 from matplotlib import rcParams
 from matplotlib.dates import DateFormatter, DayLocator
-from matplotlib.ticker import LogLocator, NullFormatter, ScalarFormatter
+from matplotlib.ticker import (
+    LogLocator,
+    MultipleLocator,
+    NullFormatter,
+    ScalarFormatter,
+)
 
 from constants import CaseTypes, Columns, Locations, Paths
+
+FROM_FIXED_DATE_DESC = "from_fixed_date"
+FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
+
+PLOTTED_CASE_TYPES = [CaseTypes.CONFIRMED, CaseTypes.DEATHS]
 
 rcParams["font.family"] = "Arial"
 rcParams["font.size"] = 16
@@ -24,13 +35,15 @@ class ConfigFields(enum.Enum):
     INCLUDE = enum.auto()
 
     # https://docs.python.org/3/library/enum.html#omitting-values
+    # Note that the VSCode interactive window has a bug where text between <> is
+    # omitted; if you try to print this and are getting empty output, that might be why
     def __repr__(self):
         return "<%s.%s>" % (self.__class__.__name__, self.name)
 
     @classmethod
     def validate_fields(cls, fields):
         given_fields = set(fields)
-        expected_fields = set(cls)
+        expected_fields = set(cls)  # Magic; Enum is iterable and produces its cases
         given_fields: Set[ConfigFields]
         expected_fields: Set[ConfigFields]
 
@@ -58,40 +71,39 @@ class ConfigFields(enum.Enum):
 def _plot_helper(
     df: pd.DataFrame,
     *,
+    x_axis_col: str,
     style=None,
     palette=None,
     case_type_config_list: List[Mapping],
-    plot_size: Tuple[float],
-    filename,
-    location_heading=None,
+    plot_size: Tuple[float] = None,
+    savefile_name: Union[Path, str],
+    location_heading: str = None,
 ):
+    if plot_size is None:
+        plot_size = (12, 12)
     fig, ax = plt.subplots(figsize=plot_size, dpi=400, facecolor="white")
     fig: plt.Figure
     ax: plt.Axes
 
-    start_date = df.loc[
-        (df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED) & (df[Columns.CASE_COUNT] > 0),
-        Columns.DATE,
-    ].iloc[0]
-
-    df = df[df[Columns.DATE] >= start_date]
+    START_DATE = "start_date"
 
     current_case_counts = (
-        df.groupby(Columns.LOCATION_NAME).apply(
+        df.groupby(Columns.id_cols)
+        .apply(
             lambda g: pd.Series(
                 {
-                    Columns.LOCATION_NAME: g.name,
-                    # Get last case count of each case type for each location
+                    START_DATE: g.loc[
+                        g[Columns.CASE_TYPE] == CaseTypes.CONFIRMED, Columns.DATE
+                    ].min(),
+                    # Get last case count of each case type for current group
                     # .tail(1).sum() is a trick to get the last value if it exists,
                     # else 0
-                    **(
-                        g.groupby(Columns.CASE_TYPE)[Columns.CASE_COUNT]
-                        .apply(lambda h: h.tail(1).sum())
-                        .to_dict()
-                    ),
+                    **g.groupby(Columns.CASE_TYPE)[Columns.CASE_COUNT]
+                    .apply(lambda h: h.tail(1).sum())
+                    .to_dict(),
                 },
                 index=[
-                    Columns.LOCATION_NAME,
+                    START_DATE,
                     CaseTypes.CONFIRMED,
                     CaseTypes.DEATHS,
                     CaseTypes.ACTIVE,
@@ -104,6 +116,7 @@ def _plot_helper(
         # so the location with the most current cases is first in the legend and the
         # least is last
         .sort_values(CaseTypes.CONFIRMED, ascending=False)
+        .reset_index()
     )
 
     current_case_counts[CaseTypes.MORTALITY] = (
@@ -124,7 +137,7 @@ def _plot_helper(
     with plt.style.context(style):
         g = sns.lineplot(
             data=df,
-            x=Columns.DATE,
+            x=x_axis_col,
             y=Columns.CASE_COUNT,
             hue=Columns.LOCATION_NAME,
             hue_order=hue_order,
@@ -136,13 +149,18 @@ def _plot_helper(
 
         # Configure axes and ticks
         # X axis
-        ax.xaxis.set_minor_locator(DayLocator())
-        ax.xaxis.set_major_formatter(DateFormatter("%b %-d"))
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(80)
+        if x_axis_col == Columns.DATE:  # Update this if other date columns appear
+            ax.xaxis.set_major_formatter(DateFormatter(r"%b %-d"))
+            ax.xaxis.set_minor_locator(DayLocator())
+            for tick in ax.get_xticklabels():
+                tick.set_rotation(80)
+        elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+            ax.xaxis.set_major_locator(MultipleLocator(5))
+            ax.xaxis.set_minor_locator(MultipleLocator(1))
+
         # Y axis
-        ax.set_ylim(bottom=1)
         ax.set_yscale("log", basey=2, nonposy="mask")
+        ax.set_ylim(bottom=1)
         ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
         ax.yaxis.set_major_formatter(ScalarFormatter())
         ax.yaxis.set_minor_locator(
@@ -157,7 +175,8 @@ def _plot_helper(
 
         for line in g.lines:
             line.set_linewidth(3)
-        ax.grid(b=True, which="both", axis="both")
+        ax.grid(True, which="minor", axis="both", color="0.9")
+        ax.grid(True, which="major", axis="both", color="0.75")
 
         # Add case counts of the different categories to the legend (next few blocks)
         legend = plt.legend(loc="best", framealpha=0.9)
@@ -167,7 +186,11 @@ def _plot_helper(
 
         # Add number format to legend title (the first item in the legend)
         legend_fields = [*config_df[ConfigFields.CASE_TYPE], CaseTypes.MORTALITY]
+        if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+            legend_fields.append("Start Date")
+
         fmt_str = sep_str.join(legend_fields)
+
         if location_heading is None:
             location_heading = Columns.LOCATION_NAME
 
@@ -183,6 +206,10 @@ def _plot_helper(
         case_count_str_cols.append(
             current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
         )
+        case_count_str_cols.append(
+            current_case_counts[START_DATE].dt.strftime(r"%b %-d")
+        )
+
         labels = (
             current_case_counts[Columns.LOCATION_NAME]
             + left_str
@@ -193,7 +220,40 @@ def _plot_helper(
             text.set_text(label)
 
         # Save
-        fig.savefig(Paths.FIGURES / filename, bbox_inches="tight")
+        fig.savefig(Paths.FIGURES / savefile_name, bbox_inches="tight")
+
+
+def remove_empty_leading_dates(df: pd.DataFrame) -> pd.DataFrame:
+    start_date = df.loc[
+        (df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED) & (df[Columns.CASE_COUNT] > 0),
+        Columns.DATE,
+    ].iloc[0]
+
+    df = df[df[Columns.DATE] >= start_date]
+    return df
+
+
+def get_savefile_name_and_location_heading(
+    df: pd.DataFrame, description: str
+) -> Tuple[str, str]:
+
+    if Locations.WORLD in df[Columns.COUNTRY]:
+        savefile_basename = "world"
+        location_heading = None
+    elif df[Columns.COUNTRY].iloc[0] == Locations.CHINA:
+        savefile_basename = "china_provinces"
+        location_heading = "Province"
+    elif df[Columns.IS_STATE].iloc[0]:
+        savefile_basename = "states"
+        location_heading = "State"
+    elif (df[Columns.LOCATION_NAME] == df[Columns.COUNTRY]).all():
+        savefile_basename = "countries"
+        location_heading = "Country"
+    else:
+        raise ValueError("DataFrame contents not understood")
+
+    savefile_name = f"{savefile_basename}_{description}.png"
+    return savefile_name, location_heading
 
 
 def plot_world_and_china(df: pd.DataFrame, *, style=None, start_date=None):
@@ -204,61 +264,72 @@ def plot_world_and_china(df: pd.DataFrame, *, style=None, start_date=None):
         df[Columns.LOCATION_NAME].isin(
             [Locations.WORLD, Locations.WORLD_MINUS_CHINA, Locations.CHINA]
         )
-        & (df[Columns.CASE_TYPE] != CaseTypes.RECOVERED)
+        & df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)
     ]
+    df = remove_empty_leading_dates(df)
 
     configs = [
         {ConfigFields.CASE_TYPE: CaseTypes.CONFIRMED, ConfigFields.DASH_STYLE: (1, 0)},
         {ConfigFields.CASE_TYPE: CaseTypes.DEATHS, ConfigFields.DASH_STYLE: (1, 1,)},
     ]
 
-    plot_size = (12, 12)
-    savefile_name = "world.png"
+    savefile_name, location_heading = get_savefile_name_and_location_heading(
+        df, FROM_FIXED_DATE_DESC
+    )
 
     return _plot_helper(
         df,
+        x_axis_col=Columns.DATE,
         style=style,
         case_type_config_list=configs,
-        plot_size=plot_size,
-        filename=savefile_name,
+        savefile_name=savefile_name,
+        location_heading=location_heading,
     )
 
 
-def plot_regions(
-    df: pd.DataFrame, *, style=None, start_date=None, include_recovered=False,
-):
+def plot_cases_from_fixed_date(df: pd.DataFrame, *, style=None, start_date=None):
     if start_date is not None:
         df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
-    df = df[(include_recovered | (df[Columns.CASE_TYPE] != CaseTypes.RECOVERED))]
+    df = df[df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)]
+    df = remove_empty_leading_dates(df)
 
     configs = [
         {ConfigFields.CASE_TYPE: CaseTypes.CONFIRMED, ConfigFields.DASH_STYLE: (1, 0)},
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.RECOVERED,
-            ConfigFields.DASH_STYLE: (3, 3, 1, 3),
-            ConfigFields.INCLUDE: include_recovered,
-        },
         {ConfigFields.CASE_TYPE: CaseTypes.DEATHS, ConfigFields.DASH_STYLE: (1, 1)},
     ]
 
-    plot_size = (12, 12)
-
-    if df[Columns.COUNTRY].iloc[0] == Locations.CHINA:
-        savefile_name = "china_provinces.png"
-        location_heading = "Province"
-    elif df[Columns.IS_STATE].iloc[0]:
-        savefile_name = "states.png"
-        location_heading = "State"
-    else:
-        savefile_name = "countries.png"
-        location_heading = "Country"
+    savefile_name, location_heading = get_savefile_name_and_location_heading(
+        df, FROM_FIXED_DATE_DESC
+    )
 
     _plot_helper(
         df,
+        x_axis_col=Columns.DATE,
         style=style,
         case_type_config_list=configs,
-        plot_size=plot_size,
-        filename=savefile_name,
+        savefile_name=savefile_name,
+        location_heading=location_heading,
+    )
+
+
+def plot_cases_by_days_since_first_widespread_locally(df: pd.DataFrame, *, style=None):
+    configs = [
+        {ConfigFields.CASE_TYPE: CaseTypes.CONFIRMED, ConfigFields.DASH_STYLE: (1, 0)},
+        {ConfigFields.CASE_TYPE: CaseTypes.DEATHS, ConfigFields.DASH_STYLE: (1, 1)},
+    ]
+
+    savefile_name, location_heading = get_savefile_name_and_location_heading(
+        df, FROM_LOCAL_OUTBREAK_START_DESC
+    )
+
+    df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
+
+    _plot_helper(
+        df,
+        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        style=style,
+        case_type_config_list=configs,
+        savefile_name=savefile_name,
         location_heading=location_heading,
     )
