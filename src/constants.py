@@ -61,6 +61,9 @@ class Paths:
     FIGURES = ROOT / "Figures"
     DATA = ROOT / "data"
 
+    FIGURES: Path
+    DATA: Path
+
 
 class Columns:
     LATITUDE = "Lat"
@@ -78,6 +81,7 @@ class Columns:
     DATE = "Date"
     CASE_COUNT = "Cases"
     CASE_TYPE = "Case Type"
+    DAYS_SINCE_OUTBREAK = "Days Since Outbreak"
 
     string_cols = [
         LATITUDE,
@@ -99,11 +103,12 @@ class Columns:
 
 class CaseTypes:
     CONFIRMED = "Cases"
+    TESTED = "Tested"
+    ACTIVE = "Active"
     RECOVERED = "Recovered"
     DEATHS = "Deaths"
     MORTALITY = "Mortality"
     GROWTH_FACTOR = "GrowthFactor"
-    TESTED = "Tested"
 
 
 class Locations:
