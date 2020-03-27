@@ -1,3 +1,4 @@
+# %%
 import enum
 import itertools
 from datetime import datetime, timezone
@@ -24,6 +25,7 @@ FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 
 PLOTTED_CASE_TYPES = [CaseTypes.CONFIRMED, CaseTypes.DEATHS]
+START_DATE = "start_date"
 
 rcParams["font.family"] = "Arial"
 rcParams["font.size"] = 16
@@ -68,26 +70,7 @@ class ConfigFields(enum.Enum):
         raise ValueError(err_str)
 
 
-def _plot_helper(
-    df: pd.DataFrame,
-    *,
-    x_axis_col: str,
-    style=None,
-    palette=None,
-    case_type_config_list: List[Mapping],
-    plot_size: Tuple[float] = None,
-    savefile_name: Union[Path, str],
-    location_heading: str = None,
-):
-    df = df[df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)]
-
-    if plot_size is None:
-        plot_size = (12, 12)
-    fig, ax = plt.subplots(figsize=plot_size, dpi=100, facecolor="white")
-    fig: plt.Figure
-    ax: plt.Axes
-
-    START_DATE = "start_date"
+def get_current_case_counts(df: pd.DataFrame) -> pd.DataFrame:
     current_case_counts = (
         df.groupby(Columns.id_cols)
         .apply(
@@ -124,6 +107,29 @@ def _plot_helper(
         current_case_counts[CaseTypes.DEATHS] / current_case_counts[CaseTypes.CONFIRMED]
     )
 
+    return current_case_counts
+
+
+def _plot_helper(
+    df: pd.DataFrame,
+    *,
+    x_axis_col: str,
+    style=None,
+    palette=None,
+    case_type_config_list: List[Mapping],
+    plot_size: Tuple[float] = None,
+    savefile_name: Union[Path, str],
+    location_heading: str = None,
+):
+    df = df[df[Columns.CASE_TYPE].isin(PLOTTED_CASE_TYPES)]
+
+    if plot_size is None:
+        plot_size = (12, 12)
+    fig, ax = plt.subplots(figsize=plot_size, dpi=100, facecolor="white")
+    fig: plt.Figure
+    ax: plt.Axes
+
+    current_case_counts = get_current_case_counts(df)
     hue_order = current_case_counts[Columns.LOCATION_NAME]
 
     # Apply default config and validate resulting dicts
@@ -145,7 +151,7 @@ def _plot_helper(
             style=Columns.CASE_TYPE,
             style_order=config_df[ConfigFields.CASE_TYPE].tolist(),
             dashes=config_df[ConfigFields.DASH_STYLE].tolist(),
-            palette=None,
+            palette=palette,
         )
 
         # Configure axes and ticks
@@ -252,8 +258,12 @@ def get_savefile_name_and_location_heading(
     elif df[Columns.IS_STATE].iloc[0]:
         savefile_basename = "states"
         location_heading = "State"
-    elif (df[Columns.LOCATION_NAME] == df[Columns.COUNTRY]).all():
-        savefile_basename = "countries"
+    elif (~df[Columns.IS_STATE]).all():
+        if (df[Columns.COUNTRY] == Locations.CHINA).any():
+            savefile_basename = "countries_w_china"
+        else:
+            savefile_basename = "countries_wo_china"
+
         location_heading = "Country"
     else:
         raise ValueError("DataFrame contents not understood")
@@ -262,7 +272,26 @@ def get_savefile_name_and_location_heading(
     return savefile_name, location_heading
 
 
-def plot_cases_from_fixed_date(df: pd.DataFrame, *, style=None, start_date=None):
+def get_palette_for_df_excluding_china(
+    df: pd.DataFrame,
+) -> List[Tuple[float, float, float]]:
+    # We'll need to find China in the current case counts, then remove its position
+    # from the default color palette
+    current_case_counts = get_current_case_counts(df)
+    china_pos = current_case_counts[Columns.COUNTRY].tolist().index(Locations.CHINA)
+
+    palette = sns.color_palette()
+    palette = [*palette[:china_pos], *palette[china_pos + 1 :]]
+    return palette
+
+
+def plot_cases_from_fixed_date(
+    df: pd.DataFrame,
+    *,
+    df_with_china: pd.DataFrame = None,
+    style=None,
+    start_date=None,
+):
     if start_date is not None:
         df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
@@ -277,6 +306,11 @@ def plot_cases_from_fixed_date(df: pd.DataFrame, *, style=None, start_date=None)
         df, FROM_FIXED_DATE_DESC
     )
 
+    if df_with_china is None:
+        palette = None
+    else:
+        palette = get_palette_for_df_excluding_china(df_with_china)
+
     _plot_helper(
         df,
         x_axis_col=Columns.DATE,
@@ -284,10 +318,13 @@ def plot_cases_from_fixed_date(df: pd.DataFrame, *, style=None, start_date=None)
         case_type_config_list=configs,
         savefile_name=savefile_name,
         location_heading=location_heading,
+        palette=palette,
     )
 
 
-def plot_cases_by_days_since_first_widespread_locally(df: pd.DataFrame, *, style=None):
+def plot_cases_by_days_since_first_widespread_locally(
+    df: pd.DataFrame, *, df_with_china: pd.DataFrame = None, style=None
+):
     configs = [
         {ConfigFields.CASE_TYPE: CaseTypes.CONFIRMED, ConfigFields.DASH_STYLE: (1, 0)},
         {ConfigFields.CASE_TYPE: CaseTypes.DEATHS, ConfigFields.DASH_STYLE: (1, 1)},
@@ -299,6 +336,11 @@ def plot_cases_by_days_since_first_widespread_locally(df: pd.DataFrame, *, style
 
     df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
 
+    if df_with_china is None:
+        palette = None
+    else:
+        palette = get_palette_for_df_excluding_china(df_with_china)
+
     _plot_helper(
         df,
         x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
@@ -306,4 +348,5 @@ def plot_cases_by_days_since_first_widespread_locally(df: pd.DataFrame, *, style
         case_type_config_list=configs,
         savefile_name=savefile_name,
         location_heading=location_heading,
+        palette=palette,
     )

@@ -19,6 +19,7 @@ from constants import (
 COUNTRY_DATA = Paths.DATA / "WaPo"
 
 
+# Not currently used
 class DataOrigin(enum.Enum):
     USE_LOCAL_UNCONDITIONALLY = enum.auto()
     USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB = enum.auto()
@@ -142,7 +143,7 @@ class SaveFormats(enum.Enum):
         )
         df[Columns.CASE_COUNT] = df[Columns.CASE_COUNT].fillna(0).astype(int)
 
-        df[Columns.STATE] = ""
+        df[Columns.STATE] = ""  # NA preferred except it doesn't play nice with groupby
         df[Columns.COUNTRY] = (
             df[Columns.COUNTRY]
             .replace({"U.S.": Locations.USA, "Georgia": "Georgia (country)"})
