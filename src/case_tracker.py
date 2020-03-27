@@ -90,14 +90,13 @@ def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
     ]
 
 
-def get_countries_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
+def get_countries_df(df: pd.DataFrame, n: int, *, include_china: bool) -> pd.DataFrame:
+    exclude_locations = set([Locations.WORLD, Locations.WORLD_MINUS_CHINA])
+    if not include_china:
+        exclude_locations.add(Locations.CHINA)
+
     df = df[
-        (~df[Columns.IS_STATE])
-        & (
-            ~df[Columns.LOCATION_NAME].isin(
-                [Locations.WORLD, Locations.WORLD_MINUS_CHINA, Locations.CHINA]
-            )
-        )
+        (~df[Columns.IS_STATE]) & (~df[Columns.LOCATION_NAME].isin(exclude_locations))
     ]
     return keep_only_n_largest_locations(df, n)
 
@@ -110,14 +109,21 @@ def get_usa_states_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
 df = get_df(refresh_local_data=True)
 display(df)
 
-# %%
-plot_cases_from_fixed_date(get_world_df(df))
-plot_cases_from_fixed_date(get_countries_df(df, 10))
-plot_cases_from_fixed_date(get_usa_states_df(df, 10))
+world_df = get_world_df(df)
+usa_states_df = get_usa_states_df(df, 10)
+countries_with_china_df = get_countries_df(df, 10, include_china=True)
+countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
-plot_cases_by_days_since_first_widespread_locally(get_world_df(df))
-plot_cases_by_days_since_first_widespread_locally(get_countries_df(df, 10))
-plot_cases_by_days_since_first_widespread_locally(get_usa_states_df(df, 10))
+plot_cases_from_fixed_date(world_df)
+plot_cases_from_fixed_date(countries_wo_china_df, df_with_china=countries_with_china_df)
+plot_cases_from_fixed_date(usa_states_df)
+
+plot_cases_by_days_since_first_widespread_locally(world_df)
+plot_cases_by_days_since_first_widespread_locally(countries_with_china_df)
+plot_cases_by_days_since_first_widespread_locally(
+    countries_wo_china_df, df_with_china=countries_with_china_df
+)
+plot_cases_by_days_since_first_widespread_locally(usa_states_df)
 
 # days_since_outbreak_df = get_df_with_days_since_local_outbreak(df,)
 
