@@ -12,5 +12,6 @@ dependencies:
   - pyarrow
   - matplotlib
   - seaborn
+  - requests
   - flake8
   - black

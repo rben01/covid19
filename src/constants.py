@@ -126,3 +126,22 @@ class Locations:
     SOUTH_KOREA = "South Korea"
     IRAN = "Iran"
     FRANCE = "France"
+
+
+class Urls:
+    WAPO_COUNTRIES_DAILY_HISTORICAL = (
+        "https://www.washingtonpost.com/graphics/2020/"
+        + "world/mapping-spread-new-coronavirus/"
+        + "data/clean/world-daily-historical.csv"
+    )
+    COVIDTRACKING_STATES_DAILY_HISTORICAL = (
+        "https://covidtracking.com/api/states/daily.csv"
+    )
+
+    HEADERS = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)"
+            + " AppleWebKit/605.1.15 (KHTML, like Gecko)"
+            + " Version/13.1 Safari/605.1.15"
+        )
+    }
