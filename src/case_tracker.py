@@ -4,7 +4,7 @@ import pandas as pd
 from IPython.display import display  # noqa F401
 
 import read_in_data
-from constants import CASE_THRESHOLD, CaseTypes, Columns, Locations
+from constants import CaseTypes, Columns, Locations, Thresholds, CaseGroup
 from plotting import (
     plot_cases_by_days_since_first_widespread_locally,
     plot_cases_from_fixed_date,
@@ -16,25 +16,54 @@ def get_data(*, from_web: bool) -> pd.DataFrame:
     return df
 
 
-def get_df_with_days_since_n_confirmed_cases(
-    df: pd.DataFrame, confirmed_case_threshold: int
+def _get_df_with_outbreak_start_date_and_days_since(
+    df: pd.DataFrame, *, case_type: str, confirmed_case_threshold: int,
 ) -> pd.DataFrame:
-    OUTBREAK_START_DATE_COL = "Outbreak start date"
     outbreak_start_dates = (
         df[
-            (df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED)
+            (df[Columns.CASE_TYPE] == case_type)
             & (df[Columns.CASE_COUNT] >= confirmed_case_threshold)
         ]
         .groupby(Columns.id_cols)[Columns.DATE]
         .min()
-        .rename(OUTBREAK_START_DATE_COL)
+        .rename(Columns.OUTBREAK_START_DATE_COL)
     )
+
     df = df.merge(outbreak_start_dates, how="left", on=Columns.id_cols)
 
     df[Columns.DAYS_SINCE_OUTBREAK] = (
-        df[Columns.DATE] - df[OUTBREAK_START_DATE_COL]
+        df[Columns.DATE] - df[Columns.OUTBREAK_START_DATE_COL]
     ).dt.total_seconds() / 86400
 
+    return df
+
+
+def append_per_capita_data(df: pd.DataFrame) -> pd.DataFrame:
+    per_capita_df = df.copy()
+    per_capita_df[Columns.CASE_COUNT] /= per_capita_df[Columns.POPULATION]
+    per_capita_df[Columns.CASE_TYPE] = (
+        per_capita_df[Columns.CASE_TYPE]
+        .map(
+            {
+                CaseTypes.CONFIRMED: CaseTypes.CASES_PER_CAPITA,
+                CaseTypes.DEATHS: CaseTypes.DEATHS_PER_CAPITA,
+            }
+        )
+        .fillna(per_capita_df[Columns.CASE_TYPE])
+    )
+
+    df = _get_df_with_outbreak_start_date_and_days_since(
+        df,
+        case_type=CaseTypes.CONFIRMED,
+        confirmed_case_threshold=Thresholds.CASE_COUNT,
+    )
+    per_capita_df = _get_df_with_outbreak_start_date_and_days_since(
+        per_capita_df,
+        case_type=CaseTypes.CASES_PER_CAPITA,
+        confirmed_case_threshold=Thresholds.CASES_PER_CAPITA,
+    )
+
+    df = pd.concat([df, per_capita_df], axis=0, ignore_index=True)
     return df
 
 
@@ -50,9 +79,8 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = get_data(from_web=refresh_local_data)
-    df = get_df_with_days_since_n_confirmed_cases(
-        df, confirmed_case_threshold=CASE_THRESHOLD
-    )
+    # df = df[df[Columns.LOCATION_NAME] == "New York"]
+    df = append_per_capita_data(df)
     df = clean_up(df)
     return df
 
@@ -107,25 +135,35 @@ def get_usa_states_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
 
 
 df = get_df(refresh_local_data=True)
-display(df)
+# display(df)
 
 world_df = get_world_df(df)
 usa_states_df = get_usa_states_df(df, 10)
 countries_with_china_df = get_countries_df(df, 10, include_china=True)
 countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
-plot_cases_from_fixed_date(world_df)
-plot_cases_from_fixed_date(countries_wo_china_df, df_with_china=countries_with_china_df)
-plot_cases_from_fixed_date(usa_states_df)
 
-plot_cases_by_days_since_first_widespread_locally(world_df)
-plot_cases_by_days_since_first_widespread_locally(countries_with_china_df)
-plot_cases_by_days_since_first_widespread_locally(
-    countries_wo_china_df, df_with_china=countries_with_china_df
-)
-plot_cases_by_days_since_first_widespread_locally(usa_states_df)
+for count_type in [*CaseGroup.CountType]:
+    plot_cases_from_fixed_date(world_df, count_type=count_type)
+    plot_cases_from_fixed_date(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=count_type,
+    )
+    plot_cases_from_fixed_date(usa_states_df, count_type=count_type)
 
-# days_since_outbreak_df = get_df_with_days_since_local_outbreak(df,)
+    plot_cases_by_days_since_first_widespread_locally(
+        countries_with_china_df, count_type=count_type
+    )
+    plot_cases_by_days_since_first_widespread_locally(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=count_type,
+    )
+    plot_cases_by_days_since_first_widespread_locally(
+        usa_states_df, count_type=count_type
+    )
+
 
 # %%
 plt.show()
