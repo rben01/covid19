@@ -17,6 +17,14 @@ from constants import (
 )
 
 COUNTRY_DATA = Paths.DATA / "WaPo"
+DATA_COLS = [
+    Columns.STATE,
+    Columns.COUNTRY,
+    Columns.DATE,
+    Columns.CASE_TYPE,
+    Columns.CASE_COUNT,
+    Columns.POPULATION,
+]
 
 
 # Not currently used
@@ -72,12 +80,26 @@ class SaveFormats(enum.Enum):
             df[col] = pd.to_datetime(df[col])
 
         df[Columns.DATE] = self._adjust_dates(df[Columns.DATE])
-
         df = df.melt(
             id_vars=[Columns.DATE, Columns.TWO_LETTER_STATE_CODE, "dateChecked"],
+            value_vars=[
+                CaseTypes.CONFIRMED,
+                CaseTypes.DEATHS,
+                # "negative",
+                # "pending",
+                # "hospitalized",
+                # "total",
+                # "totalTestResults",
+                # "deathIncrease",
+                # "hospitalizedIncrease",
+                # "negativeIncrease",
+                # "positiveIncrease",
+                # "totalTestResultsIncrease",
+            ],
             var_name=Columns.CASE_TYPE,
             value_name=Columns.CASE_COUNT,
         )
+
         df[Columns.CASE_COUNT] = df[Columns.CASE_COUNT].fillna(0).astype(int)
 
         df[Columns.STATE] = df.merge(
@@ -91,18 +113,22 @@ class SaveFormats(enum.Enum):
         )
 
         df = df[df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES)]
-
         df[Columns.COUNTRY] = Locations.USA
 
-        df = df[
-            [
-                Columns.STATE,
-                Columns.COUNTRY,
-                Columns.DATE,
-                Columns.CASE_TYPE,
-                Columns.CASE_COUNT,
-            ]
-        ]
+        population_series = df.merge(
+            pd.read_csv(Paths.DATA / "usa_and_state_populations.csv", dtype="string"),
+            how="left",
+            left_on=Columns.TWO_LETTER_STATE_CODE,
+            right_on="Abbreviation:",
+        )["Population"]
+        df[Columns.POPULATION] = pd.array(
+            population_series.map(int, na_action="ignore")
+            # .values needed to handle index alignment issues when assigning
+            .values,
+            dtype="Int64",
+        )
+
+        df = df[DATA_COLS]
 
         return df
 
@@ -138,6 +164,7 @@ class SaveFormats(enum.Enum):
                 "dateInProgress",
                 "updated",
             ],
+            value_vars=[CaseTypes.CONFIRMED, CaseTypes.DEATHS],
             var_name=Columns.CASE_TYPE,
             value_name=Columns.CASE_COUNT,
         )
@@ -146,19 +173,21 @@ class SaveFormats(enum.Enum):
         df[Columns.STATE] = ""  # NA preferred except it doesn't play nice with groupby
         df[Columns.COUNTRY] = (
             df[Columns.COUNTRY]
-            .replace({"U.S.": Locations.USA, "Georgia": "Georgia (country)"})
+            .map({"U.S.": Locations.USA, "Georgia": "Georgia (country)"})
             .fillna(df[Columns.COUNTRY])
         )
 
-        df = df[
-            [
-                Columns.STATE,
-                Columns.COUNTRY,
-                Columns.DATE,
-                Columns.CASE_TYPE,
-                Columns.CASE_COUNT,
-            ]
-        ]
+        population_series = df.merge(
+            pd.read_csv(Paths.DATA / "country_populations.csv", dtype="string"),
+            how="left",
+            left_on=Columns.COUNTRY,
+            right_on="Country (or dependent territory)",
+        )["Population"]
+        df[Columns.POPULATION] = pd.array(
+            population_series.map(int, na_action="ignore").values, dtype="Int64",
+        )
+
+        df = df[DATA_COLS]
 
         return df
 
@@ -185,11 +214,35 @@ class SaveFormats(enum.Enum):
 
         world_minus_china_df = world_df - china_df
 
+        countries_pop_df = pd.read_csv(
+            Paths.DATA / "country_populations.csv", dtype=str
+        )
+        world_pop = int(
+            countries_pop_df.loc[
+                countries_pop_df["Country (or dependent territory)"] == "World",
+                "Population",
+            ].iloc[0]
+        )
+        china_pop = int(
+            countries_pop_df.loc[
+                countries_pop_df["Country (or dependent territory)"] == "China",
+                "Population",
+            ].iloc[0]
+        )
+
         world_df = world_df.reset_index().assign(
-            **{Columns.STATE: "", Columns.COUNTRY: Locations.WORLD}
+            **{
+                Columns.STATE: "",
+                Columns.COUNTRY: Locations.WORLD,
+                Columns.POPULATION: world_pop,
+            }
         )
         world_minus_china_df = world_minus_china_df.reset_index().assign(
-            **{Columns.STATE: "", Columns.COUNTRY: Locations.WORLD_MINUS_CHINA}
+            **{
+                Columns.STATE: "",
+                Columns.COUNTRY: Locations.WORLD_MINUS_CHINA,
+                Columns.POPULATION: world_pop - china_pop,
+            }
         )
 
         df = pd.concat(
@@ -197,6 +250,7 @@ class SaveFormats(enum.Enum):
             axis=0,
             ignore_index=True,
         )
+        df[Columns.POPULATION] = pd.array(df[Columns.POPULATION], dtype="Int64")
 
         df[Columns.IS_STATE] = df[Columns.STATE] != ""
         df[Columns.LOCATION_NAME] = df[Columns.STATE].where(
@@ -213,3 +267,7 @@ class SaveFormats(enum.Enum):
             df.to_parquet(path, index=False, compression="brotli")
         else:
             raise ValueError(f"Unhandled case {self} when writing")
+
+
+df = SaveFormats.CSV.read(from_web=True)
+df
