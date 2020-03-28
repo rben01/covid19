@@ -250,9 +250,9 @@ def _plot_helper(
             f"{location_heading}{left_str}{fmt_str}{right_str}"
         )
 
-        # Add case counts to legend labels (first label is title, so skip it)
+        # Add (formatted) current data to legend labels
         if count_type == CaseGroup.CountType.ABSOLUTE:
-            float_format_func = r"{:,}".format
+            float_format_func = r"{:,.0f}".format
         else:
             float_format_func = r"{:.4e}".format
 
@@ -277,6 +277,7 @@ def _plot_helper(
             + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
             + right_str
         )
+        #  First label is title, so skip it
         for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
             text.set_text(label)
 
