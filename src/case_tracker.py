@@ -88,7 +88,7 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
 def keep_only_n_largest_locations(
     df: pd.DataFrame, n: int, count_type: CaseGroup.CountType
 ) -> pd.DataFrame:
-    case_type = CaseTypes.get_case_type(
+    case_type = CaseTypes.get_case_types(
         stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
     )
 
