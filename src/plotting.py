@@ -285,15 +285,13 @@ def _plot_helper(
                 current_case_counts[START_DATE].dt.strftime(r"%b %-d")
             )
 
-        # print(x_axis_col, count_type, savefile_path)
-        # display(current_case_counts_sorted_by_absolute)
         labels = (
             current_case_counts[Columns.LOCATION_NAME]
             + left_str
             + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
             + right_str
         )
-        display(labels)
+
         #  First label is title, so skip it
         for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
             text.set_text(label)

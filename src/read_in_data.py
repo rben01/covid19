@@ -267,7 +267,3 @@ class SaveFormats(enum.Enum):
             df.to_parquet(path, index=False, compression="brotli")
         else:
             raise ValueError(f"Unhandled case {self} when writing")
-
-
-df = SaveFormats.CSV.read(from_web=True)
-df
