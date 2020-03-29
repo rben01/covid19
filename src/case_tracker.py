@@ -85,10 +85,16 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     return df
 
 
-def keep_only_n_largest_locations(df: pd.DataFrame, n: int) -> pd.DataFrame:
-    def get_n_largest_locations(df: pd.DataFrame, n: int) -> pd.Series:
+def keep_only_n_largest_locations(
+    df: pd.DataFrame, n: int, count_type: CaseGroup.CountType
+) -> pd.DataFrame:
+    case_type = CaseTypes.get_case_type(
+        stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+    )
+
+    def get_n_largest_locations(df: pd.DataFrame) -> pd.Series:
         return (
-            df[df[Columns.CASE_TYPE] == CaseTypes.CONFIRMED]
+            df[df[Columns.CASE_TYPE] == case_type]
             .groupby(Columns.id_cols)
             .apply(lambda g: g[Columns.CASE_COUNT].iloc[-1])
             .nlargest(n)
@@ -98,14 +104,12 @@ def keep_only_n_largest_locations(df: pd.DataFrame, n: int) -> pd.DataFrame:
     def keep_only_above_cutoff(df: pd.DataFrame, cutoff: float) -> pd.DataFrame:
         return df.groupby(Columns.id_cols).filter(
             lambda g: (
-                g.loc[
-                    g[Columns.CASE_TYPE] == CaseTypes.CONFIRMED, Columns.CASE_COUNT
-                ].iloc[-1]
+                g.loc[g[Columns.CASE_TYPE] == case_type, Columns.CASE_COUNT].iloc[-1]
                 >= cutoff
             )
         )
 
-    n_largest_location_case_counts = get_n_largest_locations(df, n)
+    n_largest_location_case_counts = get_n_largest_locations(df)
     case_count_cutoff = n_largest_location_case_counts.min()
     return keep_only_above_cutoff(df, case_count_cutoff)
 
@@ -118,7 +122,11 @@ def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
     ]
 
 
-def get_countries_df(df: pd.DataFrame, n: int, *, include_china: bool) -> pd.DataFrame:
+def get_countries_df(
+    df: pd.DataFrame, n: int, count_type: CaseGroup = None, *, include_china: bool,
+) -> pd.DataFrame:
+    count_type = count_type or CaseGroup.CountType.ABSOLUTE
+
     exclude_locations = set([Locations.WORLD, Locations.WORLD_MINUS_CHINA])
     if not include_china:
         exclude_locations.add(Locations.CHINA)
@@ -126,24 +134,26 @@ def get_countries_df(df: pd.DataFrame, n: int, *, include_china: bool) -> pd.Dat
     df = df[
         (~df[Columns.IS_STATE]) & (~df[Columns.LOCATION_NAME].isin(exclude_locations))
     ]
-    return keep_only_n_largest_locations(df, n)
+    return keep_only_n_largest_locations(df, n, count_type)
 
 
-def get_usa_states_df(df: pd.DataFrame, n: int) -> pd.DataFrame:
+def get_usa_states_df(
+    df: pd.DataFrame, n: int, count_type: CaseGroup.CountType = None
+) -> pd.DataFrame:
+    count_type = count_type or CaseGroup.CountType.ABSOLUTE
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
-    return keep_only_n_largest_locations(df, n)
+    return keep_only_n_largest_locations(df, n, count_type)
 
 
 df = get_df(refresh_local_data=True)
 # display(df)
 
-world_df = get_world_df(df)
-usa_states_df = get_usa_states_df(df, 10)
-countries_with_china_df = get_countries_df(df, 10, include_china=True)
-countries_wo_china_df = get_countries_df(df, 9, include_china=False)
-
-
 for count_type in [*CaseGroup.CountType]:
+    world_df = get_world_df(df)
+    usa_states_df = get_usa_states_df(df, 10)
+    countries_with_china_df = get_countries_df(df, 10, include_china=True)
+    countries_wo_china_df = get_countries_df(df, 9, include_china=False)
+
     plot_cases_from_fixed_date(world_df, count_type=count_type)
     plot_cases_from_fixed_date(
         countries_wo_china_df,
