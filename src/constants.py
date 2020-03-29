@@ -127,7 +127,7 @@ class CaseGroup:
         PER_CAPITA = enum.auto()
 
     @staticmethod
-    def get_case_types(stage: Stage, count_type: CountType) -> str:
+    def get_case_type(stage: Stage, count_type: CountType) -> str:
         case_type_groups = {
             CaseGroup.Stage.CONFIRMED: {
                 CaseGroup.CountType.ABSOLUTE: CaseTypes.CONFIRMED,
@@ -157,7 +157,7 @@ class CaseTypes:
                 {
                     CaseGroup._STAGE: stage,
                     CaseGroup._COUNT_TYPE: count_type,
-                    "Case_Type": CaseGroup.get_case_types(stage, count_type),
+                    "Case_Type": CaseGroup.get_case_type(stage, count_type),
                 }
                 for (stage, count_type) in itertools.product(
                     CaseGroup.Stage, CaseGroup.CountType,
@@ -169,7 +169,7 @@ class CaseTypes:
     # We call this method a ton, no point in not caching its results
     @classmethod
     @lru_cache(None)
-    def get_case_type(
+    def get_case_types(
         cls, stage: CaseGroup = None, count_type: CaseGroup = None, flatten=True
     ) -> Union[pd.Series, str]:
 
