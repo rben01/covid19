@@ -95,7 +95,7 @@ def get_current_case_data(
             .to_dict(),
         }
 
-        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_types)],)
+        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_types()],)
 
     current_case_counts = (
         df.groupby(Columns.id_cols)
@@ -202,7 +202,7 @@ def _plot_helper(
 
         # Y axis
         ax.set_ylabel(
-            CaseTypes.get_case_types
+            CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             )
         )
