@@ -265,5 +265,7 @@ class SaveFormats(enum.Enum):
             df.to_csv(path, index=False)
         elif self == SaveFormats.PARQUET:
             df.to_parquet(path, index=False, compression="brotli")
+            # Seems silly but I want a human-readable file around at all times
+            df.to_csv(path, index=False)
         else:
             raise ValueError(f"Unhandled case {self} when writing")

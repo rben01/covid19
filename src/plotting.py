@@ -95,7 +95,7 @@ def get_current_case_data(
             .to_dict(),
         }
 
-        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_type()],)
+        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_types)],)
 
     current_case_counts = (
         df.groupby(Columns.id_cols)
@@ -105,7 +105,7 @@ def get_current_case_data(
         # so the location with the most current cases is first in the legend and the
         # least is last
         .sort_values(
-            CaseTypes.get_case_type(
+            CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             ),
             ascending=False,
@@ -115,10 +115,10 @@ def get_current_case_data(
 
     current_case_counts[CaseTypes.MORTALITY] = (
         current_case_counts[
-            CaseTypes.get_case_type(stage=CaseGroup.Stage.DEATH, count_type=count_type)
+            CaseTypes.get_case_types(stage=CaseGroup.Stage.DEATH, count_type=count_type)
         ]
         / current_case_counts[
-            CaseTypes.get_case_type(
+            CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             )
         ]
@@ -149,7 +149,7 @@ def _plot_helper(
 
     current_case_counts = get_current_case_data(df, count_type)
 
-    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_type(count_type=count_type))]
+    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_types(count_type=count_type))]
 
     # Filter and sort color mapping correctly so that colors 1. are assigned to the
     # same locations across graphs (for continuity) and 2. are placed correctly in the
@@ -202,7 +202,7 @@ def _plot_helper(
 
         # Y axis
         ax.set_ylabel(
-            CaseTypes.get_case_type(
+            CaseTypes.get_case_types
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             )
         )
@@ -308,7 +308,7 @@ def remove_empty_leading_dates(
     start_date = df.loc[
         (
             df[Columns.CASE_TYPE]
-            == CaseTypes.get_case_type(
+            == CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             )
         )
@@ -384,13 +384,13 @@ def plot_cases_from_fixed_date(
 
     configs = [
         {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_type(
+            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             ),
             ConfigFields.DASH_STYLE: Style.Dash.PRIMARY,
         },
         {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_type(
+            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.DEATH, count_type=count_type
             ),
             ConfigFields.DASH_STYLE: Style.Dash.SECONDARY,
@@ -427,13 +427,13 @@ def plot_cases_by_days_since_first_widespread_locally(
 ):
     configs = [
         {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_type(
+            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
             ),
             ConfigFields.DASH_STYLE: Style.Dash.PRIMARY,
         },
         {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_type(
+            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
                 stage=CaseGroup.Stage.DEATH, count_type=count_type
             ),
             ConfigFields.DASH_STYLE: Style.Dash.SECONDARY,
