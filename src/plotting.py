@@ -24,10 +24,15 @@ from constants import CaseGroup, CaseTypes, Columns, Locations, Paths, Threshold
 FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 
-START_DATE = "start_date"
+START_DATE = "Start_Date_"
+COLOR = "Color_"
 
 rcParams["font.family"] = "Arial"
 rcParams["font.size"] = 16
+
+SingleColor = Tuple[float, float, float]
+ColorPalette = List[SingleColor]
+LocationColorMapping = pd.DataFrame
 
 
 class Style:
@@ -81,13 +86,7 @@ def get_current_case_data(
 ) -> pd.DataFrame:
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
         data_dict = {
-            START_DATE: g.loc[
-                g[Columns.CASE_TYPE]
-                == CaseTypes.get_case_type(
-                    stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-                ),
-                Columns.DATE,
-            ].min(),
+            START_DATE: g[Columns.DATE].min(),
             # Get last case count of each case type for current group
             # .tail(1).sum() is a trick to get the last value if it exists,
             # else 0 (remember, this is sorted by date)
@@ -96,14 +95,10 @@ def get_current_case_data(
             .to_dict(),
         }
 
-        return pd.Series(
-            data_dict,
-            index=[START_DATE, *CaseTypes.get_case_type(count_type=count_type)],
-        )
+        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_type()],)
 
     current_case_counts = (
-        df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_type(count_type=count_type))]
-        .groupby(Columns.id_cols)
+        df.groupby(Columns.id_cols)
         .apply(get_group_stats)
         # Order locations by decreasing current confirmed case count
         # This is used to keep plot legend in sync with the order of lines on the graph
@@ -138,14 +133,13 @@ def _plot_helper(
     x_axis_col: str,
     count_type: CaseGroup.CountType,
     style=None,
-    palette=None,
+    color_mapping: LocationColorMapping = None,
     case_type_config_list: List[Mapping],
     plot_size: Tuple[float] = None,
     savefile_path: Path,
     location_heading: str = None,
 ):
-
-    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_type(count_type=count_type))]
+    SORTED_POSITION = "Sorted_Position_"
 
     if plot_size is None:
         plot_size = (12, 12)
@@ -155,10 +149,25 @@ def _plot_helper(
 
     current_case_counts = get_current_case_data(df, count_type)
 
+    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_type(count_type=count_type))]
+
+    # Filter and sort color mapping correctly so that colors 1. are assigned to the
+    # same locations across graphs (for continuity) and 2. are placed correctly in the
+    # legend (for correctness)
+    color_mapping = color_mapping.copy()
+    color_mapping = color_mapping[
+        color_mapping[Columns.LOCATION_NAME].isin(
+            current_case_counts[Columns.LOCATION_NAME]
+        )
+    ]
+    color_mapping[SORTED_POSITION] = color_mapping[Columns.LOCATION_NAME].map(
+        current_case_counts[Columns.LOCATION_NAME].tolist().index
+    )
+    color_mapping = color_mapping.sort_values(SORTED_POSITION)
+
     # Apply default config and validate resulting dicts
     for config_dict in case_type_config_list:
         config_dict.setdefault(ConfigFields.INCLUDE, True)
-
         ConfigFields.validate_fields(config_dict)
 
     config_df = pd.DataFrame.from_records(case_type_config_list)
@@ -170,11 +179,11 @@ def _plot_helper(
             x=x_axis_col,
             y=Columns.CASE_COUNT,
             hue=Columns.LOCATION_NAME,
-            hue_order=current_case_counts[Columns.LOCATION_NAME],
+            hue_order=color_mapping[Columns.LOCATION_NAME].tolist(),
             style=Columns.CASE_TYPE,
             style_order=config_df[ConfigFields.CASE_TYPE].tolist(),
             dashes=config_df[ConfigFields.DASH_STYLE].tolist(),
-            palette=palette,
+            palette=color_mapping[COLOR].tolist(),
         )
 
         # Configure axes and ticks
@@ -188,6 +197,8 @@ def _plot_helper(
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
             ax.set_xlabel(f"Days Since Reaching {Thresholds.CASE_COUNT} Cases")
+        else:
+            raise ValueError(f"Unexpected {x_axis_col=}")
 
         # Y axis
         ax.set_ylabel(
@@ -197,17 +208,20 @@ def _plot_helper(
         )
         if count_type == CaseGroup.CountType.ABSOLUTE:
             ax.set_yscale("log", basey=2, nonposy="mask")
-            ax.set_ylim(bottom=1)
+            ax.set_ylim(bottom=0.9)
             ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_minor_locator(
-                # 5-2 = 3 minor ticks between each pair of major ticks
+                # 5 ticks is one full "cycle": n, 1.25n, 1.5n, 1.75n, 2n
+                # Hence 5-2 minor ticks between each pair of majors (omit endpoints)
                 LogLocator(base=2, subs=np.linspace(0.5, 1, 5)[1:-1], numticks=1000)
             )
             ax.yaxis.set_minor_formatter(NullFormatter())
         elif count_type == CaseGroup.CountType.PER_CAPITA:
             ax.set_yscale("log", basey=10, nonposy="mask")
             ax.set_ylim(bottom=0)
+            # No need to set minor ticks; 8 is the default number, which makes one cycle
+            # n, 2n, 3n, ..., 8n, 9n, 10n
         else:
             raise ValueError(f"Unexpected y_axis_col {count_type}")
 
@@ -271,12 +285,15 @@ def _plot_helper(
                 current_case_counts[START_DATE].dt.strftime(r"%b %-d")
             )
 
+        # print(x_axis_col, count_type, savefile_path)
+        # display(current_case_counts_sorted_by_absolute)
         labels = (
             current_case_counts[Columns.LOCATION_NAME]
             + left_str
             + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
             + right_str
         )
+        display(labels)
         #  First label is title, so skip it
         for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
             text.set_text(label)
@@ -337,27 +354,28 @@ def get_savefile_path_and_location_heading(
     return savefile_path, location_heading
 
 
-# Assumes China is actually in the df (don't call this function if it's not!)
-def get_palette_for_df_excluding_china(
-    df: pd.DataFrame, count_type: CaseGroup.CountType
-) -> List[Tuple[float, float, float]]:
-    # We'll need to find China in the current case counts, then remove its position
-    # from the default color palette
-    current_case_counts = get_current_case_data(df, count_type)
+def get_color_palette_assignments(
+    df: pd.DataFrame, palette: ColorPalette = None
+) -> LocationColorMapping:
+    current_case_data = get_current_case_data(df, CaseGroup.CountType.ABSOLUTE)
+    if palette is None:
+        palette = sns.color_palette(n_colors=len(current_case_data))
+    else:
+        palette = palette[: len(current_case_data)]
 
-    china_pos = current_case_counts[Columns.COUNTRY].tolist().index(Locations.CHINA)
-
-    palette = sns.color_palette(n_colors=10)
-    palette = [*palette[:china_pos], *palette[china_pos + 1 :]]
-
-    return palette
+    return pd.DataFrame(
+        {
+            Columns.LOCATION_NAME: current_case_data[Columns.LOCATION_NAME],
+            COLOR: palette,
+        }
+    )
 
 
 def plot_cases_from_fixed_date(
     df: pd.DataFrame,
     *,
     count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,
+    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
     start_date=None,
 ):
@@ -385,20 +403,20 @@ def plot_cases_from_fixed_date(
         df, FROM_FIXED_DATE_DESC, count_type
     )
 
-    if df_with_china is None:
-        palette = None
+    if df_with_china is not None:
+        color_mapping = get_color_palette_assignments(df_with_china)
     else:
-        palette = get_palette_for_df_excluding_china(df_with_china, count_type)
+        color_mapping = get_color_palette_assignments(df)
 
     _plot_helper(
         df,
         x_axis_col=Columns.DATE,
         count_type=count_type,
         style=style,
+        color_mapping=color_mapping,
         case_type_config_list=configs,
         savefile_path=savefile_path,
         location_heading=location_heading,
-        palette=palette,
     )
 
 
@@ -406,7 +424,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     df: pd.DataFrame,
     *,
     count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,
+    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
 ):
     configs = [
@@ -430,18 +448,18 @@ def plot_cases_by_days_since_first_widespread_locally(
 
     df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
 
-    if df_with_china is None:
-        palette = None
+    if df_with_china is not None:
+        color_mapping = get_color_palette_assignments(df_with_china)
     else:
-        palette = get_palette_for_df_excluding_china(df_with_china, count_type)
+        color_mapping = get_color_palette_assignments(df)
 
     _plot_helper(
         df,
         x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
         count_type=count_type,
         style=style,
+        color_mapping=color_mapping,
         case_type_config_list=configs,
         savefile_path=savefile_path,
         location_heading=location_heading,
-        palette=palette,
     )
