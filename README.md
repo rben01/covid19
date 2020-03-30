@@ -62,12 +62,12 @@ python src/case_tracker.py
 
 ## :notebook: Notes
 
-- :calendar: In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases
+- :calendar: In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.
 
 - :keycap_ten: In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases or cases per capita).
 For example, in a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world (the country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which it's obviously not given its population of 33k).
 
-- :arrows_counterclockwise: The data sources used will change frequently due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might)
+- :arrows_counterclockwise: The data sources used will change frequently due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might).
 
 - :memo: Mortality notes
 

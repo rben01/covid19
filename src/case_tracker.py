@@ -5,7 +5,7 @@ import pandas as pd
 from IPython.display import display  # noqa F401
 
 import read_in_data
-from constants import CaseGroup, CaseTypes, Columns, Locations, Thresholds
+from constants import CaseGroup, CaseTypes, Columns, Locations, Paths, Thresholds
 from plotting import (
     plot_cases_by_days_since_first_widespread_locally,
     plot_cases_from_fixed_date,
@@ -146,8 +146,61 @@ def get_usa_states_df(
     return keep_only_n_largest_locations(df, n, count_type)
 
 
+def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
+
+    world_df = get_world_df(df)
+    usa_states_df = get_usa_states_df(df, 10)
+    countries_with_china_df = get_countries_df(df, 10, include_china=True)
+
+    df = pd.concat([world_df, usa_states_df, countries_with_china_df], axis=0)
+    df[Columns.DATE] = df[Columns.DATE].dt.strftime("%Y-%m-%d")
+
+    df = df.drop(
+        columns=[
+            Columns.IS_STATE,
+            Columns.LOCATION_NAME,
+            Columns.OUTBREAK_START_DATE_COL,
+            Columns.DAYS_SINCE_OUTBREAK,
+            Columns.POPULATION,
+        ]
+    )
+
+    df = (
+        df.pivot_table(
+            index=[
+                c
+                for c in df.columns
+                if c not in [Columns.CASE_TYPE, Columns.CASE_COUNT]
+            ],
+            columns=Columns.CASE_TYPE,
+            values=Columns.CASE_COUNT,
+            aggfunc="first",
+        )
+        .reset_index()
+        .sort_values([Columns.COUNTRY, Columns.STATE, Columns.DATE])
+    )
+
+    for col in CaseTypes.get_case_types(count_type=CaseGroup.CountType.ABSOLUTE):
+        df[col] = pd.to_numeric(df[col], downcast="integer")
+
+    for col in CaseTypes.get_case_types(count_type=CaseGroup.CountType.PER_CAPITA):
+        df[col] = df[col].map("{:e}".format)
+
+    save_path = Paths.DATA / "data_table.csv"
+    df.to_csv(save_path, index=False)
+    print(f"Saved data to {save_path.relative_to(Paths.ROOT)}")
+
+    return df
+
+
 def main(namespace: argparse.Namespace):
     df = get_df(refresh_local_data=namespace.refresh)
+
+    if namespace.create_data_table:
+        create_data_table(df)
+
+    if namespace.no_graphs:
+        return
 
     for count_type in CaseGroup.CountType:
         world_df = get_world_df(df)
@@ -176,10 +229,30 @@ def main(namespace: argparse.Namespace):
         )
 
 
+# %%
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--create-data-table",
+        action="store_true",
+        help="Save data used in graphs to a file",
+    )
+    parser.add_argument(
+        "--no-graphs", action="store_true", help="Don't create graphs",
+    )
     data_group = parser.add_mutually_exclusive_group()
-    data_group.add_argument("--refresh-data", action="store_true", dest="refresh")
-    data_group.add_argument("--use-local-data", action="store_false", dest="refresh")
+    data_group.add_argument(
+        "--use-web-data",
+        action="store_true",
+        dest="refresh",
+        help="Pull data from web sources",
+    )
+    data_group.add_argument(
+        "--use-local-data",
+        action="store_false",
+        dest="refresh",
+        help="Use locally cached data",
+    )
+
     args = parser.parse_args()
     main(args)
