@@ -27,14 +27,8 @@ FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 START_DATE = "Start_Date_"
 COLOR = "Color_"
 
-rcParams.update(
-    {
-        "font.family": "Arial",
-        "font.size": 12,
-        "legend.fontsize": "xx-small",
-        "axes.titlesize": "xx-small",
-    }
-)
+rcParams.update({"font.family": "sans-serif", "font.size": 12})
+
 
 SingleColor = Tuple[float, float, float]
 ColorPalette = List[SingleColor]
@@ -241,7 +235,7 @@ def _plot_helper(
         ax.grid(True, which="major", axis="both", color="0.75")
 
         # Add case counts of the different categories to the legend (next few blocks)
-        legend = plt.legend(loc="best", framealpha=0.9)
+        legend = plt.legend(loc="best", framealpha=0.9, fontsize="small")
         sep_str = " / "
         left_str = " ("
         right_str = ")"
@@ -340,7 +334,7 @@ def get_savefile_path_and_location_heading(
     elif df[Columns.IS_STATE].iloc[0]:
         savefile_basename = "States"
         location_heading = "State"
-    elif (~df[Columns.IS_STATE]).all():
+    elif not df[Columns.IS_STATE].any():
         if (df[Columns.COUNTRY] == Locations.CHINA).any():
             savefile_basename = "Countries_w_china"
         else:
