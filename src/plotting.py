@@ -27,8 +27,14 @@ FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 START_DATE = "Start_Date_"
 COLOR = "Color_"
 
-rcParams["font.family"] = "Arial"
-rcParams["font.size"] = 13
+rcParams.update(
+    {
+        "font.family": "Arial",
+        "font.size": 12,
+        "legend.fontsize": "xx-small",
+        "axes.titlesize": "xx-small",
+    }
+)
 
 SingleColor = Tuple[float, float, float]
 ColorPalette = List[SingleColor]
@@ -144,7 +150,7 @@ def _plot_helper(
     if plot_size is None:
         plot_size = (10, 10)
 
-    fig, ax = plt.subplots(figsize=plot_size, dpi=200, facecolor="white")
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=200, facecolor="white")
     fig: plt.Figure
     ax: plt.Axes
 
@@ -227,10 +233,10 @@ def _plot_helper(
 
         # Configure plot design
         now_str = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
-        ax.set_title(f"Last updated {now_str}", loc="right")
+        ax.set_title(f"Last updated {now_str}", loc="right", fontsize="small")
 
         for line in g.lines:
-            line.set_linewidth(3)
+            line.set_linewidth(2)
         ax.grid(True, which="minor", axis="both", color="0.9")
         ax.grid(True, which="major", axis="both", color="0.75")
 
