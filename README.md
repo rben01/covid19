@@ -7,7 +7,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 
 - [2019 COVID-19/Coronavirus Tracker](#2019-covid-19coronavirus-tracker)
 	- [Contents](#contents)
-	- [Instructions](#instructions)
+	- [Setup](#setup)
 	- [Primary data sources](#primary-data-sources)
 	- [Notes](#notes)
 	- [Absolute case counts (not adjusted for region population)](#absolute-case-counts-not-adjusted-for-region-population)
@@ -29,9 +29,9 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 			- [Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-per-capita-over-time-jan-24---present)
 			- [Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](#top-10-us-states-confirmed-cases-per-capita-over-time-mar-10---present)
 
-## Instructions
+## Setup
 
-GitHub repo: [https://github.com/rben01/covid19](https://github.com/rben01/covid19)
+Clone this GitHub repo: [https://github.com/rben01/covid19](https://github.com/rben01/covid19)
 
 To create these graphs, create the conda environment using
 
@@ -60,14 +60,14 @@ python src/case_tracker.py
 
 ## Notes
 
-- In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases
+- 📅In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases
 
-- In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases or cases per capita).
+- 🔟In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases or cases per capita).
 For example, in a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world (the country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which it's obviously not given its population of 33k).
 
-- The data sources used will change frequently due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might)
+- 📈The data sources used will change frequently due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might)
 
-- Mortality notes
+- 📝Mortality notes
 
   - Mortality = deaths / confirmed.
   - This is an underestimate of the true mortality rate within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed mortality rate will be a gross underestimate, as new infections won't yet have had time to become fatal. If it's been flat for a while, then the computed mortality rate should approach the true mortality rate, as cases will all be resolved (either fatally or not). Of course, the true mortality rate can itself change over time as treatment quality goes up (e.g.,  more resources per capita allocated to response) or down (e.g.,  hospitals become overburdened).
