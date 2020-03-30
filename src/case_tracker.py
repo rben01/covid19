@@ -188,7 +188,13 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def main(namespace: argparse.Namespace):
+def main(namespace: argparse.Namespace = None):
+    if namespace is None:
+        namespace = argparse.Namespace()
+        namespace.refresh = True
+        namespace.create_data_table = False
+        namespace.no_graphs = False
+
     df = get_df(refresh_local_data=namespace.refresh)
 
     if namespace.create_data_table:
@@ -223,6 +229,8 @@ def main(namespace: argparse.Namespace):
             usa_states_df, count_type=count_type
         )
 
+    return df
+
 
 # %%
 if __name__ == "__main__":
@@ -250,4 +258,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(args)
+    df = main(args)
+
+if False:
+    pass
+    # %%
+    df = main()
