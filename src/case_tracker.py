@@ -147,7 +147,7 @@ def get_usa_states_df(
 
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
-
+    df = df.copy()
     df[Columns.DATE] = df[Columns.DATE].dt.strftime("%Y-%m-%d")
 
     df = df.drop(
