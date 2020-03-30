@@ -10,6 +10,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
   - [:card_index_dividers: Contents](#card_index_dividers-Contents)
   - [:hammer_and_wrench: Setup](#hammer_and_wrench-Setup)
   - [:floppy_disk: Data sources](#floppy_disk-Data-sources)
+    - [Raw data table](#Raw-data-table)
   - [:notebook: Notes](#notebook-Notes)
   - [:chart_with_upwards_trend: Graphs](#chart_with_upwards_trend-Graphs)
     - [Absolute case counts (not adjusted for region population)](#Absolute-case-counts-not-adjusted-for-region-population)
@@ -59,6 +60,10 @@ python src/case_tracker.py
 - [covidtracking.com US states historical data](https://covidtracking.com/api/states/daily.csv)
 - [Wikipedia - List of Countries by Population](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
 - [Wikipedia - List of US States by Population](https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population)
+
+### Raw data table
+
+The data used to create these graphs is available [here](data/data_table.csv).
 
 ## :notebook: Notes
 
@@ -137,5 +142,3 @@ For example, in a graph of countries and their cases per capita, the first count
 ##### Top 10 US states: confirmed cases per capita over time (Mar 10 - present)
 
 ![Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](Figures/Per_capita/From_fixed_date/states.png)
-
-[data/data_table.csv](data/data_table.csv)
