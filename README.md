@@ -34,24 +34,30 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 
 ## :hammer_and_wrench: Setup
 
-Clone this GitHub repo: [https://github.com/rben01/covid19](https://github.com/rben01/covid19)
+Clone this GitHub repo ([https://github.com/rben01/covid19](https://github.com/rben01/covid19))
 
-To create these graphs, create the conda environment using
+Create the conda environment using
 
-```bash
+```text
 conda env create -f environment.yml
 ```
 
 Activate the environment with
 
-```bash
+```text
 conda activate covid
 ```
 
 Finally, run the graphing script
 
-```bash
+```text
 python src/case_tracker.py
+```
+
+The script has a command line interface; check it out with
+
+```text
+python src/case_tracker.py --help
 ```
 
 ## :floppy_disk: Data sources
