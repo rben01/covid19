@@ -137,3 +137,5 @@ For example, in a graph of countries and their cases per capita, the first count
 ##### Top 10 US states: confirmed cases per capita over time (Mar 10 - present)
 
 ![Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](Figures/Per_capita/From_fixed_date/states.png)
+
+[data/data_table.csv](data/data_table.csv)
