@@ -65,7 +65,16 @@ USA_STATE_CODES = [
 
 
 class Paths:
-    ROOT = Path("..")
+    ROOT = Path().resolve()
+    while not (ROOT / "src").exists() and ROOT != ROOT.parent:
+        ROOT = ROOT.parent
+
+    if ROOT == ROOT.parent:
+        raise FileNotFoundError(
+            f"Could not find a suitable project directory; "
+            + f"current folder is {Path().resolve()}"
+        )
+
     FIGURES = ROOT / "Figures"
     DATA = ROOT / "data"
 

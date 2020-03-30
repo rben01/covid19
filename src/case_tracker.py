@@ -148,7 +148,7 @@ def get_usa_states_df(
 df = get_df(refresh_local_data=True)
 # display(df)
 
-for count_type in [*CaseGroup.CountType]:
+for count_type in CaseGroup.CountType:
     world_df = get_world_df(df)
     usa_states_df = get_usa_states_df(df, 10)
     countries_with_china_df = get_countries_df(df, 10, include_china=True)
@@ -173,7 +173,3 @@ for count_type in [*CaseGroup.CountType]:
     plot_cases_by_days_since_first_widespread_locally(
         usa_states_df, count_type=count_type
     )
-
-
-# %%
-plt.show()

@@ -219,7 +219,6 @@ def _plot_helper(
             ax.yaxis.set_minor_formatter(NullFormatter())
         elif count_type == CaseGroup.CountType.PER_CAPITA:
             ax.set_yscale("log", basey=10, nonposy="mask")
-            ax.set_ylim(bottom=0)
             # No need to set minor ticks; 8 is the default number, which makes one cycle
             # n, 2n, 3n, ..., 8n, 9n, 10n
         else:
@@ -300,6 +299,7 @@ def _plot_helper(
         savefile_path = Paths.FIGURES / savefile_path
         savefile_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(savefile_path, bbox_inches="tight")
+        print(f"Saved '{savefile_path.relative_to(Paths.ROOT)}'")
 
 
 def remove_empty_leading_dates(
