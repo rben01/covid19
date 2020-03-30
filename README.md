@@ -4,14 +4,14 @@
 
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-## 🗂 Contents
+## :file_folder: Contents
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
 - [2019 COVID-19/Coronavirus Tracker](#2019-covid-19coronavirus-tracker)
-	- [🗂 Contents](#%f0%9f%97%82-contents)
+	- [:file_folder: Contents](#filefolder-contents)
 	- [Setup](#setup)
 	- [Data sources](#data-sources)
 	- [Notes](#notes)
@@ -38,7 +38,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 <!-- /code_chunk_output -->
 
 - [2019 COVID-19/Coronavirus Tracker](#2019-covid-19coronavirus-tracker)
-	- [🗂 Contents](#%f0%9f%97%82-contents)
+	- [:file_folder: Contents](#filefolder-contents)
 	- [Setup](#setup)
 	- [Data sources](#data-sources)
 	- [Notes](#notes)
