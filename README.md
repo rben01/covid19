@@ -4,41 +4,41 @@
 
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-## <a id="Contents"></a>🗂 Contents
+## 🗂 Contents
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
 - [2019 COVID-19/Coronavirus Tracker](#2019-covid-19coronavirus-tracker)
-  - [🗂 Contents](#a-idcontentsa-contents)
-  - [Setup](#setup)
-  - [Data sources](#data-sources)
-  - [Notes](#notes)
-  - [Graphs](#graphs)
-    - [Absolute case counts (not adjusted for region population)](#absolute-case-counts-not-adjusted-for-region-population)
-      - [Number of confirmed cases N days after first day of at least 100 confirmed cases in region](#number-of-confirmed-cases-n-days-after-first-day-of-at-least-100-confirmed-cases-in-region)
-        - [Top 10 countries, including China: confirmed cases after first day of 100 confirmed cases](#top-10-countries-including-china-confirmed-cases-after-first-day-of-100-confirmed-cases)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-after-first-day-of-100-confirmed-cases)
-        - [Top 10 US states: confirmed cases after first day of 100 confirmed cases](#top-10-us-states-confirmed-cases-after-first-day-of-100-confirmed-cases)
-      - [Number of confirmed cases over time](#number-of-confirmed-cases-over-time)
-        - [China and rest of world: confirmed cases over time (Jan 22 - present)](#china-and-rest-of-world-confirmed-cases-over-time-jan-22-present)
-        - [Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](#top-10-countries-excluding-china-confirmed-cases-over-time-jan-24-present)
-        - [Top 10 US states: confirmed cases over time (Mar 10 - present)](#top-10-us-states-confirmed-cases-over-time-mar-10-present)
-    - [Per-capita case counts](#per-capita-case-counts)
-      - [Number of confirmed cases N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region](#number-of-confirmed-cases-n-days-after-first-day-of-at-least-10-5-cases-per-capita-1-case-per-100000-people-in-region)
-        - [Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-countries-including-china-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
-        - [Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-us-states-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
-      - [Cases per capita over time](#cases-per-capita-over-time)
-        - [China and rest of world: confirmed cases per capita over time (Jan 22 - present)](#china-and-rest-of-world-confirmed-cases-per-capita-over-time-jan-22-present)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-per-capita-over-time-jan-24-present)
-        - [Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](#top-10-us-states-confirmed-cases-per-capita-over-time-mar-10-present)
+	- [🗂 Contents](#%f0%9f%97%82-contents)
+	- [Setup](#setup)
+	- [Data sources](#data-sources)
+	- [Notes](#notes)
+	- [Graphs](#graphs)
+		- [Absolute case counts (not adjusted for region population)](#absolute-case-counts-not-adjusted-for-region-population)
+			- [Number of confirmed cases N days after first day of at least 100 confirmed cases in region](#number-of-confirmed-cases-n-days-after-first-day-of-at-least-100-confirmed-cases-in-region)
+				- [Top 10 countries, including China: confirmed cases after first day of 100 confirmed cases](#top-10-countries-including-china-confirmed-cases-after-first-day-of-100-confirmed-cases)
+				- [Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-after-first-day-of-100-confirmed-cases)
+				- [Top 10 US states: confirmed cases after first day of 100 confirmed cases](#top-10-us-states-confirmed-cases-after-first-day-of-100-confirmed-cases)
+			- [Number of confirmed cases over time](#number-of-confirmed-cases-over-time)
+				- [China and rest of world: confirmed cases over time (Jan 22 - present)](#china-and-rest-of-world-confirmed-cases-over-time-jan-22---present)
+				- [Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](#top-10-countries-excluding-china-confirmed-cases-over-time-jan-24---present)
+				- [Top 10 US states: confirmed cases over time (Mar 10 - present)](#top-10-us-states-confirmed-cases-over-time-mar-10---present)
+		- [Per-capita case counts](#per-capita-case-counts)
+			- [Number of confirmed cases N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region](#number-of-confirmed-cases-n-days-after-first-day-of-at-least-10-5-cases-per-capita-1-case-per-100000-people-in-region)
+				- [Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-countries-including-china-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
+				- [Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
+				- [Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita](#top-10-us-states-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
+			- [Cases per capita over time](#cases-per-capita-over-time)
+				- [China and rest of world: confirmed cases per capita over time (Jan 22 - present)](#china-and-rest-of-world-confirmed-cases-per-capita-over-time-jan-22---present)
+				- [Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](#top-10-countries-excluding-china-nine-countries-total-confirmed-cases-per-capita-over-time-jan-24---present)
+				- [Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](#top-10-us-states-confirmed-cases-per-capita-over-time-mar-10---present)
 
 <!-- /code_chunk_output -->
 
 - [2019 COVID-19/Coronavirus Tracker](#2019-covid-19coronavirus-tracker)
-	- [<a id="Contents"></a>� Contents](#%f0%9f%97%82-contents)
+	- [🗂 Contents](#%f0%9f%97%82-contents)
 	- [Setup](#setup)
 	- [Data sources](#data-sources)
 	- [Notes](#notes)
