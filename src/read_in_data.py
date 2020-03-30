@@ -42,7 +42,9 @@ class DataOrigin(enum.Enum):
 
 class SaveFormats(enum.Enum):
     CSV = ".csv"
-    PARQUET = ".parquet"
+
+    # Parquet currently broken (pyarrow bug?), don't know why but csv is fine
+    # PARQUET = ".parquet"
 
     @staticmethod
     def _adjust_dates(date_col: pd.Series) -> pd.Series:
@@ -199,6 +201,11 @@ class SaveFormats(enum.Enum):
             return pd.read_parquet(path)
 
     def read(self, *, from_web: bool) -> pd.DataFrame:
+        if from_web:
+            print("Pulling data from web")
+        else:
+            print("Using locally cached data")
+
         states_df = self._read_states_daily(from_web=from_web)
         countries_df = self._read_countries_daily(from_web=from_web)
 

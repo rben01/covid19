@@ -1,10 +1,11 @@
 # %%
-import matplotlib.pyplot as plt
+import argparse
+
 import pandas as pd
 from IPython.display import display  # noqa F401
 
 import read_in_data
-from constants import CaseTypes, Columns, Locations, Thresholds, CaseGroup
+from constants import CaseGroup, CaseTypes, Columns, Locations, Thresholds
 from plotting import (
     plot_cases_by_days_since_first_widespread_locally,
     plot_cases_from_fixed_date,
@@ -12,7 +13,7 @@ from plotting import (
 
 
 def get_data(*, from_web: bool) -> pd.DataFrame:
-    df = read_in_data.SaveFormats.PARQUET.read(from_web=from_web)
+    df = read_in_data.SaveFormats.CSV.read(from_web=from_web)
     return df
 
 
@@ -145,31 +146,40 @@ def get_usa_states_df(
     return keep_only_n_largest_locations(df, n, count_type)
 
 
-df = get_df(refresh_local_data=True)
-# display(df)
+def main(namespace: argparse.Namespace):
+    df = get_df(refresh_local_data=namespace.refresh)
 
-for count_type in CaseGroup.CountType:
-    world_df = get_world_df(df)
-    usa_states_df = get_usa_states_df(df, 10)
-    countries_with_china_df = get_countries_df(df, 10, include_china=True)
-    countries_wo_china_df = get_countries_df(df, 9, include_china=False)
+    for count_type in CaseGroup.CountType:
+        world_df = get_world_df(df)
+        usa_states_df = get_usa_states_df(df, 10)
+        countries_with_china_df = get_countries_df(df, 10, include_china=True)
+        countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
-    plot_cases_from_fixed_date(world_df, count_type=count_type)
-    plot_cases_from_fixed_date(
-        countries_wo_china_df,
-        df_with_china=countries_with_china_df,
-        count_type=count_type,
-    )
-    plot_cases_from_fixed_date(usa_states_df, count_type=count_type)
+        plot_cases_from_fixed_date(world_df, count_type=count_type)
+        plot_cases_from_fixed_date(
+            countries_wo_china_df,
+            df_with_china=countries_with_china_df,
+            count_type=count_type,
+        )
+        plot_cases_from_fixed_date(usa_states_df, count_type=count_type)
 
-    plot_cases_by_days_since_first_widespread_locally(
-        countries_with_china_df, count_type=count_type
-    )
-    plot_cases_by_days_since_first_widespread_locally(
-        countries_wo_china_df,
-        df_with_china=countries_with_china_df,
-        count_type=count_type,
-    )
-    plot_cases_by_days_since_first_widespread_locally(
-        usa_states_df, count_type=count_type
-    )
+        plot_cases_by_days_since_first_widespread_locally(
+            countries_with_china_df, count_type=count_type
+        )
+        plot_cases_by_days_since_first_widespread_locally(
+            countries_wo_china_df,
+            df_with_china=countries_with_china_df,
+            count_type=count_type,
+        )
+        plot_cases_by_days_since_first_widespread_locally(
+            usa_states_df, count_type=count_type
+        )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    data_group = parser.add_mutually_exclusive_group()
+    data_group.add_argument("--refresh-data", action="store_true", dest="refresh")
+    data_group.add_argument("--use-local-data", action="store_false", dest="refresh")
+    args = parser.parse_args()
+    main(args)
