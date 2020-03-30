@@ -28,7 +28,7 @@ START_DATE = "Start_Date_"
 COLOR = "Color_"
 
 rcParams["font.family"] = "Arial"
-rcParams["font.size"] = 16
+rcParams["font.size"] = 13
 
 SingleColor = Tuple[float, float, float]
 ColorPalette = List[SingleColor]
@@ -142,8 +142,9 @@ def _plot_helper(
     SORTED_POSITION = "Sorted_Position_"
 
     if plot_size is None:
-        plot_size = (12, 12)
-    fig, ax = plt.subplots(figsize=plot_size, dpi=100, facecolor="white")
+        plot_size = (10, 10)
+
+    fig, ax = plt.subplots(figsize=plot_size, dpi=200, facecolor="white")
     fig: plt.Figure
     ax: plt.Axes
 
@@ -298,7 +299,7 @@ def _plot_helper(
         # Save
         savefile_path = Paths.FIGURES / savefile_path
         savefile_path.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(savefile_path, bbox_inches="tight")
+        fig.savefig(savefile_path, bbox_inches="tight", dpi=300)
         print(f"Saved '{savefile_path.relative_to(Paths.ROOT)}'")
 
 
