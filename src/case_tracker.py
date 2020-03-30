@@ -148,11 +148,6 @@ def get_usa_states_df(
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
 
-    world_df = get_world_df(df)
-    usa_states_df = get_usa_states_df(df, 10)
-    countries_with_china_df = get_countries_df(df, 10, include_china=True)
-
-    df = pd.concat([world_df, usa_states_df, countries_with_china_df], axis=0)
     df[Columns.DATE] = df[Columns.DATE].dt.strftime("%Y-%m-%d")
 
     df = df.drop(
