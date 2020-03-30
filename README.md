@@ -31,13 +31,15 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 GitHub repo: [https://github.com/rben01/covid19](https://github.com/rben01/covid19)
 
 Primary data sources:
-[Washington Post world historical data](https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv)
 
-[covidtracking.com US states historical data](https://covidtracking.com/api/states/daily.csv)
+- [Washington Post world historical data](https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv)
+- [covidtracking.com US states historical data](https://covidtracking.com/api/states/daily.csv)
 
-[Wikipedia - List of Countries by Population](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
+- [Wikipedia - List of Countries by Population](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
 
-[Wikipedia - List of US States by Population](https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population)
+- [Wikipedia - List of US States by Population](https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population)
+
+---
 
 - In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases
 
