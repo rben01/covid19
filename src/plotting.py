@@ -208,8 +208,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # Plot in a temporary location just to get the size; we'll move and
             # rotate later
             plotted_text = ax.text(0, 0, annot_text, text_props, transform=ax.transAxes)
-            # Render so that we can convert between figure and data coords
-            fig.canvas.draw()
 
             ac_line_slope = (ac_y_max - ac_y_min) / (ac_x_max - ac_x_min)
             ac_text_angle_rad = np.arctan(ac_line_slope)
@@ -238,7 +236,15 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 
             # Get text box origin relative to line upper endpoint
             if edge == RIGHT_EDGE:
-                ac_text_origin_x = ac_x_max - ac_rot_text_width
+                # Account for bit of overhang; when slanted, top left corner of the
+                # text box extends left of the bottom left corner, which is the origin
+                # Subtracting that bit of overhang (height * sin(theta)) gets us the
+                # x-origin
+                # This only applies to the x coord; the bottom left corner of the text
+                # box *is* the bottom of the rotated rectangle as well
+                ac_text_origin_x = ac_x_max - (
+                    ac_rot_text_width - ac_text_height * np.sin(ac_text_angle_rad)
+                )
                 ac_text_origin_y = (
                     ac_y_min + (ac_text_origin_x - ac_x_min) * ac_line_slope
                 ) + 0.005  # fudge factor to get the bbox off of the line itself
