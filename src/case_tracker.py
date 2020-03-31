@@ -191,7 +191,7 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
 def main(namespace: argparse.Namespace = None):
     if namespace is None:
         namespace = argparse.Namespace()
-        namespace.refresh = True
+        namespace.refresh = False
         namespace.create_data_table = False
         namespace.no_graphs = False
 
@@ -232,6 +232,13 @@ def main(namespace: argparse.Namespace = None):
     return df
 
 
+# A little hack -- an ipython cell that will run in an interactive window but not when
+# running this from a terminal
+if False:
+    pass
+    # %%
+    df = main()
+
 # %%
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -259,8 +266,3 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     df = main(args)
-
-if False:
-    pass
-    # %%
-    df = main()
