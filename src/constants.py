@@ -153,8 +153,8 @@ class CaseGroup:
 class CaseTypes:
     CONFIRMED = "Cases"
     DEATHS = "Deaths"
-    CASES_PER_CAPITA = CONFIRMED + " Per Capita"
-    DEATHS_PER_CAPITA = DEATHS + " Per Capita"
+    CASES_PER_CAPITA = CONFIRMED + " Per Cap."
+    DEATHS_PER_CAPITA = DEATHS + " Per Cap."
 
     # We can't create this df until the class is defined, so we make it a staticmethod
     # and for effiicency purposes memoize it

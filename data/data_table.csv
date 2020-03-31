@@ -1,4 +1,4 @@
-State,Country,Date,Cases,Cases Per Capita,Deaths,Deaths Per Capita
+State,Country,Date,Cases,Cases Per Cap.,Deaths,Deaths Per Cap.
 ,Afghanistan,2020-01-22,0,0.000000e+00,0,0.000000e+00
 ,Afghanistan,2020-01-23,0,0.000000e+00,0,0.000000e+00
 ,Afghanistan,2020-01-24,0,0.000000e+00,0,0.000000e+00
@@ -1427,6 +1427,7 @@ State,Country,Date,Cases,Cases Per Capita,Deaths,Deaths Per Capita
 ,Bosnia,2020-03-27,237,nan,4,nan
 ,Bosnia,2020-03-28,258,nan,5,nan
 ,Bosnia,2020-03-29,323,nan,6,nan
+,Botswana,2020-03-29,3,1.282681e-06,0,0.000000e+00
 ,Brazil,2020-01-22,0,0.000000e+00,0,0.000000e+00
 ,Brazil,2020-01-23,0,0.000000e+00,0,0.000000e+00
 ,Brazil,2020-01-24,0,0.000000e+00,0,0.000000e+00

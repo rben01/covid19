@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import List, Mapping, Set, Tuple
 
 import matplotlib.pyplot as plt
+
+# import matplotlib
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -138,8 +140,11 @@ def _plot_helper(
     plot_size: Tuple[float] = None,
     savefile_path: Path,
     location_heading: str = None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
+
     SORTED_POSITION = "Sorted_Position_"
+
+    figs_and_axes = []
 
     if plot_size is None:
         plot_size = (10, 10)
@@ -268,7 +273,7 @@ def _plot_helper(
         if count_type == CaseGroup.CountType.ABSOLUTE:
             float_format_func = r"{:,.0f}".format
         else:
-            float_format_func = r"{:.4e}".format
+            float_format_func = r"{:.2e}".format
 
         case_count_str_cols = [
             current_case_counts[col].map(float_format_func)
@@ -296,11 +301,89 @@ def _plot_helper(
         for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
             text.set_text(label)
 
+        # If using this for a date-like x axis, use this (leaving commented code because
+        # I foresee myself needing it eventually)
+        # x_max = pd.Timestamp(matplotlib.dates.num2epoch(ax.get_xlim()[1]), unit="s")
+
+        # Add doubling time lines
+        if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+            # Getting min x,y bounds of lines is easy
+            x_min = 0
+            if count_type == CaseGroup.CountType.ABSOLUTE:
+                y_min = Thresholds.CASE_COUNT
+            else:
+                y_min = Thresholds.CASES_PER_CAPITA
+
+            # Getting max x,y bounds is tougher due to needing to use the maximum
+            # extent of the graph area
+            # We try to use ax_y_max by default, and if that leads to too long a line
+            # (sticking out through the right side of the graph) then we use ax_x_max
+            # instead
+            ax_x_min, ax_x_max = ax.get_xlim()
+            ax_y_min, ax_y_max = ax.get_ylim()
+
+            visual_ax_x_bounds = ax_x_max - ax_x_min
+            visual_ax_y_bounds = np.log2(ax_y_max / ax_y_min)
+
+            doubling_times = [1, 2, 3, 4]  # days
+            for dt in doubling_times:
+                # Simple math: if y_max = y_min * 2**((x_max-x_min)/dt), then...
+                x_max = x_min + dt * np.log2(ax_y_max / y_min)
+                if x_max > ax_x_max:
+                    line_extent = 0.91
+                    x_max = ax_x_max
+                    y_max = y_min * 2 ** ((ax_x_max - x_min) / dt)
+                else:
+                    line_extent = 0.83
+                    y_max = ax_y_max
+
+                ax.plot([x_min, x_max], [y_min, y_max], color="0.3", dashes=(1, 2))
+
+                # Annotate lines with assocated doubling times
+                annot_loc = np.array(
+                    [
+                        x_min + line_extent * (x_max - x_min),
+                        # The +0.02 is to add a bit of space between text and line
+                        y_min * (y_max / y_min) ** (line_extent + 0.02),
+                    ]
+                )
+
+                # Rotate plotted text
+                visual_dy = (np.log2(y_max) - np.log2(y_min)) / visual_ax_y_bounds
+                visual_dx = (x_max - x_min) / visual_ax_x_bounds
+                visual_line_slope = visual_dy / visual_dx
+                text_angle = np.arctan(visual_line_slope) * 180 / np.pi
+
+                annot_text = f"{dt} " + ("days" if dt > 1 else "day")
+                text_props = {
+                    "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5},
+                    "ha": "left",
+                    "va": "bottom",
+                }
+                ax.text(
+                    *annot_loc,
+                    annot_text,
+                    text_props,
+                    rotation=text_angle,
+                    rotation_mode="anchor",
+                )
+
+                # Adding text causes the axis to resize itself, and we have to stop it
+                #  from doing so
+                # (I get it, the axis wants to maintain a margin around things in the
+                # plot area, but in this case we don't want that)
+                ax.set_xlim(ax_x_min, ax_x_max)
+                ax.set_ylim(ax_y_min, ax_y_max)
+
         # Save
         savefile_path = Paths.FIGURES / savefile_path
         savefile_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(savefile_path, bbox_inches="tight", dpi=300)
         print(f"Saved '{savefile_path.relative_to(Paths.ROOT)}'")
+
+        figs_and_axes.append((fig, ax))
+
+    return figs_and_axes
 
 
 def remove_empty_leading_dates(
@@ -377,7 +460,8 @@ def plot_cases_from_fixed_date(
     df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
     start_date=None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
+
     if start_date is not None:
         df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
@@ -407,7 +491,7 @@ def plot_cases_from_fixed_date(
     else:
         color_mapping = get_color_palette_assignments(df)
 
-    _plot_helper(
+    return _plot_helper(
         df,
         x_axis_col=Columns.DATE,
         count_type=count_type,
@@ -425,7 +509,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     count_type: CaseGroup.CountType,
     df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
     configs = [
         {
             ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
@@ -452,7 +536,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     else:
         color_mapping = get_color_palette_assignments(df)
 
-    _plot_helper(
+    return _plot_helper(
         df,
         x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
         count_type=count_type,
