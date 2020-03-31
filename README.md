@@ -75,6 +75,8 @@ The data used to create these graphs is available [here](data/data_table.csv).
 
 - :calendar: In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.
 
+- :hourglass_flowing_sand: Some graphs are annotated with growth rates given certain doubling times. For instance, lines annotated "2 days" show how coronavirus would cases would increase in a region if the number of cases doubled every two days.
+
 - :keycap_ten: In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases or cases per capita).
 For example, in a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world (the country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which it's obviously not given its population of 33k).
 
