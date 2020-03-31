@@ -1931,6 +1931,7 @@ State,Country,Date,Cases,Cases Per Cap.,Deaths,Deaths Per Cap.
 ,Burma,2020-03-28,8,nan,0,nan
 ,Burma,2020-03-29,10,nan,0,nan
 ,Burma,2020-03-30,14,nan,0,nan
+,Burundi,2020-03-30,2,1.825931e-07,0,0.000000e+00
 ,Cabo Verde,2020-01-22,0,nan,0,nan
 ,Cabo Verde,2020-01-23,0,nan,0,nan
 ,Cabo Verde,2020-01-24,0,nan,0,nan
@@ -12212,7 +12213,7 @@ Illinois,United States,2020-03-13,32,2.525288e-06,0,0.000000e+00
 Illinois,United States,2020-03-14,46,3.630102e-06,0,0.000000e+00
 Illinois,United States,2020-03-15,64,5.050576e-06,0,0.000000e+00
 Illinois,United States,2020-03-16,93,7.339119e-06,0,0.000000e+00
-Illinois,United States,2020-03-17,160,1.262644e-05,1,7.891526e-08
+Illinois,United States,2020-03-17,28,2.209627e-06,1,7.891526e-08
 Illinois,United States,2020-03-18,288,2.272759e-05,1,7.891526e-08
 Illinois,United States,2020-03-19,422,3.330224e-05,4,3.156610e-07
 Illinois,United States,2020-03-20,585,4.616542e-05,5,3.945763e-07
