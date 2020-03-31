@@ -325,9 +325,10 @@ def _plot_helper(
             visual_ax_x_bounds = ax_x_max - ax_x_min
             visual_ax_y_bounds = np.log2(ax_y_max / ax_y_min)
 
-            doubling_times = [1, 2, 3, 4]  # days
+            doubling_times = [1, 2, 3, 4, 5]  # days
             for dt in doubling_times:
                 # Simple math: if y_max = y_min * 2**((x_max-x_min)/dt), then...
+                # (assuming y_max is ax_y_max)
                 x_max = x_min + dt * np.log2(ax_y_max / y_min)
                 if x_max > ax_x_max:
                     line_extent = 0.91
