@@ -337,7 +337,15 @@ def _plot_helper(
                     line_extent = 0.83
                     y_max = ax_y_max
 
-                ax.plot([x_min, x_max], [y_min, y_max], color="0.3", dashes=(1, 2))
+                lines = ax.plot(
+                    [x_min, x_max],
+                    [y_min, y_max],
+                    color="0.0",
+                    alpha=0.7,
+                    dashes=(3, 2),
+                )
+                for line in lines:
+                    line.set_linewidth(1)
 
                 # Annotate lines with assocated doubling times
                 annot_loc = np.array(
@@ -372,6 +380,8 @@ def _plot_helper(
                 #  from doing so
                 # (I get it, the axis wants to maintain a margin around things in the
                 # plot area, but in this case we don't want that)
+                # (And yes I did pull my hair out for an hour trying to figure out what
+                # was going on)
                 ax.set_xlim(ax_x_min, ax_x_max)
                 ax.set_ylim(ax_y_min, ax_y_max)
 
