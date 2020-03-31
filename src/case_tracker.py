@@ -239,7 +239,7 @@ if False:
     # %%
     df = main()
 
-# %%
+# %% Don't run this cell if using ipython
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
