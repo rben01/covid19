@@ -231,21 +231,23 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             ac_rot_text_width = ac_text_width * np.cos(
                 ac_text_angle_rad
             ) + ac_text_height * np.sin(ac_text_angle_rad)
-            ac_rot_text_height = ac_text_width * np.sin(
-                ac_text_angle_rad
-            ) + ac_text_height * np.cos(ac_text_angle_rad)
+            ac_rot_text_height = (
+                ac_text_width * np.sin(ac_text_angle_rad)
+                + ac_text_height * np.cos(ac_text_angle_rad)
+                + 0.005  # idk, the computed height is just a bit short
+            )
 
             # Get text box origin relative to line upper endpoint
             if edge == RIGHT_EDGE:
-                ac_text_origin_x = ac_x_max - ac_rot_text_width - 0.01
+                ac_text_origin_x = ac_x_max - ac_rot_text_width
                 ac_text_origin_y = (
                     ac_y_min + (ac_text_origin_x - ac_x_min) * ac_line_slope
-                )
+                ) + 0.005
             elif edge == TOP_EDGE:
-                ac_text_origin_y = ac_y_max - ac_rot_text_height - 0.01
+                ac_text_origin_y = ac_y_max - ac_rot_text_height
                 ac_text_origin_x = (
                     ac_x_min + (ac_text_origin_y - ac_y_min) / ac_line_slope
-                )
+                ) - 0.005
             else:
                 raise ValueError(f"Invalid edge {edge}")
 
