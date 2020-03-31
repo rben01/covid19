@@ -143,7 +143,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         #  from doing so
         # (I get it, the axis wants to maintain a margin around things in the
         # plot area, but in this case we don't want that)
-        # Also we will need the axis limits in data coordinates later
+        # Also we will need the axis upper limits in data coordinates later
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
         ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
@@ -164,9 +164,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 
         # Getting max x,y bounds is trickier due to needing to use the maximum
         # extent of the graph area
-        # We try to use ac_y_max=1 by default, and if that leads to too long a line
-        # (sticking out through the right side of the graph) then we use ac_x_max=1
-        # instead
         ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
         # Get top right corner of graph in data coords
         ac_x_upper_lim = ac_y_upper_lim = 1
@@ -180,8 +177,11 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
             # then...
             dc_x_max = dc_x_min + dt * np.log2(dc_y_upper_lim / dc_y_min)
-            (ac_x_max, ac_y_max) = dc_to_ac.transform((dc_x_max, dc_y_upper_lim))
+            ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_max, dc_y_upper_lim))
 
+            # We try to use ac_y_max=1 by default, and if that leads to too long a line
+            # (sticking out through the right side of the graph) then we use ac_x_max=1
+            # instead
             if ac_x_max > ac_x_upper_lim:
                 dc_y_max = dc_y_min * 2 ** ((dc_x_upper_lim - dc_x_min) / dt)
                 ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_upper_lim, dc_y_max))
@@ -189,6 +189,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             else:
                 edge = TOP_EDGE
 
+            # Plot the lines themselves
             ax.plot(
                 [ac_x_min, ac_x_max],
                 [ac_y_min, ac_y_max],
@@ -201,12 +202,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 
             # Annotate lines with assocated doubling times
             # annot_loc = np.array(
-            #     [
-            #         x_min + line_extent * (x_max - x_min),
-            #         # The +0.02 is to add a bit of space between text and line
-            #         y_min * (y_max / y_min) ** (line_extent + 0.02),
-            #     ]
-            # )
             annot_text = f"{dt} " + ("days" if dt > 1 else "day")
             text_props = {
                 "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5}
@@ -222,19 +217,23 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             ac_text_angle_rad = np.arctan(ac_line_slope)
             ac_text_angle_deg = ac_text_angle_rad * 180 / np.pi
 
-            # Get the text bounds, then compute its width and height after rotation
+            # Get the unrotated text box bounds, then compute the width and height after
+            # rotation
             ac_text_box = plotted_text.get_window_extent(
                 fig.canvas.get_renderer()
             ).transformed(ax.transAxes.inverted())
             ac_text_width = ac_text_box.x1 - ac_text_box.x0
             ac_text_height = ac_text_box.y1 - ac_text_box.y0
+            # Simple geometry; a decent high school math problem
             ac_rot_text_width = ac_text_width * np.cos(
                 ac_text_angle_rad
             ) + ac_text_height * np.sin(ac_text_angle_rad)
             ac_rot_text_height = (
                 ac_text_width * np.sin(ac_text_angle_rad)
                 + ac_text_height * np.cos(ac_text_angle_rad)
-                + 0.005  # idk, the computed height is just a bit short
+                # idk, the computed height is just a bit short
+                # (issues with bbox outline?) so we add a smidge
+                + 0.005
             )
 
             # Get text box origin relative to line upper endpoint
@@ -242,7 +241,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                 ac_text_origin_x = ac_x_max - ac_rot_text_width
                 ac_text_origin_y = (
                     ac_y_min + (ac_text_origin_x - ac_x_min) * ac_line_slope
-                ) + 0.005
+                ) + 0.005  # fudge factor to get the bbox off of the line itself
             elif edge == TOP_EDGE:
                 ac_text_origin_y = ac_y_max - ac_rot_text_height
                 ac_text_origin_x = (
