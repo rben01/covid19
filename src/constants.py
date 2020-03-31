@@ -1,6 +1,7 @@
 # %%
 import enum
 import itertools
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import Union
@@ -8,7 +9,7 @@ from typing import Union
 import pandas as pd
 from IPython.display import display  # noqa F401
 
-# Includes D.C.
+# Includes D.C.; has length 51
 USA_STATE_CODES = [
     "AL",
     "AK",
@@ -65,15 +66,9 @@ USA_STATE_CODES = [
 
 
 class Paths:
-    ROOT = Path().resolve()
-    while not (ROOT / "src").exists() and ROOT != ROOT.parent:
-        ROOT = ROOT.parent
-
-    if ROOT == ROOT.parent:
-        raise FileNotFoundError(
-            f"Could not find a suitable project directory; "
-            + f"current folder is {Path().resolve()}"
-        )
+    ROOT = Path(sys.argv[0]).parent.parent
+    ROOT: Path
+    assert (ROOT / "src").exists()
 
     FIGURES = ROOT / "Figures"
     DATA = ROOT / "data"
