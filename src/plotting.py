@@ -152,8 +152,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         # Create transformation from data coords to axes coords
         # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
         dc_to_ac = ax.transData + ax.transAxes.inverted()
-        # And its inverse
-        ac_to_dc = dc_to_ac.inverted()
 
         # Getting min x,y bounds of lines is easy
         dc_x_min = 0
@@ -167,7 +165,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
         # Get top right corner of graph in data coords
         ac_x_upper_lim = ac_y_upper_lim = 1
-        dc_x_upper_lim, dc_y_upper_lim = ac_to_dc.transform(
+        dc_x_upper_lim, dc_y_upper_lim = dc_to_ac.inverted().transform(
             (ac_x_upper_lim, ac_y_upper_lim)
         )
 
@@ -225,14 +223,16 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             ac_text_width = ac_text_box.x1 - ac_text_box.x0
             ac_text_height = ac_text_box.y1 - ac_text_box.y0
             # Simple geometry; a decent high school math problem
-            ac_rot_text_width = ac_text_width * np.cos(
-                ac_text_angle_rad
-            ) + ac_text_height * np.sin(ac_text_angle_rad)
+            ac_rot_text_width = (
+                ac_text_width * np.cos(ac_text_angle_rad)
+                + ac_text_height * np.sin(ac_text_angle_rad)
+                # idk, the computed height is just a bit short
+                # (issues with bbox outline?) so we add a smidge
+                + 0.005
+            )
             ac_rot_text_height = (
                 ac_text_width * np.sin(ac_text_angle_rad)
                 + ac_text_height * np.cos(ac_text_angle_rad)
-                # idk, the computed height is just a bit short
-                # (issues with bbox outline?) so we add a smidge
                 + 0.005
             )
 
@@ -257,11 +257,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             plotted_text.set_va("bottom")
             plotted_text.set_rotation(ac_text_angle_deg)
             plotted_text.set_rotation_mode("anchor")
-
-            # plotted_text.set_x(text_origin_x)
-            # plotted_text.set_y(text_origin_y)
-            # plotted_text.set_rotation(text_angle_deg)
-            # plotted_text.set_rotation_mode("anchor")
 
 
 def _plot_helper(
