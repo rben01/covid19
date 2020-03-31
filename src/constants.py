@@ -66,9 +66,23 @@ USA_STATE_CODES = [
 
 
 class Paths:
+    # Try to use source filename to get project dir - this works if running from
+    # a command line
     ROOT = Path(sys.argv[0]).parent.parent
+    # If using interactively in ipython, it might not work
+    # Path() will be correct, but sys.argv[0] might be some ipython.py (or similar) file
+    if not (ROOT / "src" / "case_tracker.py").exists():
+        ROOT = Path().resolve()
+        while not (ROOT / "src" / "case_tracker.py").exists():
+            if ROOT == ROOT.parent:
+                raise FileNotFoundError(
+                    f"Could not find a suitable project directory; "
+                    + f"current folder is {Path().resolve()}"
+                )
+
+            ROOT = ROOT.parent
+
     ROOT: Path
-    assert (ROOT / "src").exists()
 
     FIGURES = ROOT / "Figures"
     DATA = ROOT / "data"

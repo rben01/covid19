@@ -129,6 +129,140 @@ def get_current_case_data(
     return current_case_counts
 
 
+def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count_type):
+    # For ease of computation, everything will be in axes coordinate system
+    # Note that variable names beginning with "ac" refer to axis coords and "dc"
+    # to data coords
+    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+        RIGHT_EDGE = "right"
+        TOP_EDGE = "top"
+
+        # Preliminaries: fix the axis lims to prevent auto resizing as new stuff
+        # (text and lines) is added
+        # Adding stuff causes the axis to resize itself, and we have to stop it
+        #  from doing so
+        # (I get it, the axis wants to maintain a margin around things in the
+        # plot area, but in this case we don't want that)
+        # Also we will need the axis limits in data coordinates later
+        dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
+        dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
+        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
+        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
+
+        # Create transformation from data coords to axes coords
+        # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
+        dc_to_ac = ax.transData + ax.transAxes.inverted()
+        # And its inverse
+        ac_to_dc = dc_to_ac.inverted()
+
+        # Getting min x,y bounds of lines is easy
+        dc_x_min = 0
+        if count_type == CaseGroup.CountType.ABSOLUTE:
+            dc_y_min = Thresholds.CASE_COUNT
+        else:
+            dc_y_min = Thresholds.CASES_PER_CAPITA
+
+        # Getting max x,y bounds is trickier due to needing to use the maximum
+        # extent of the graph area
+        # We try to use ac_y_max=1 by default, and if that leads to too long a line
+        # (sticking out through the right side of the graph) then we use ac_x_max=1
+        # instead
+        ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
+        # Get top right corner of graph in data coords
+        ac_x_upper_lim = ac_y_upper_lim = 1
+        dc_x_upper_lim, dc_y_upper_lim = ac_to_dc.transform(
+            (ac_x_upper_lim, ac_y_upper_lim)
+        )
+
+        doubling_times = [1, 2, 3, 4, 5]  # days (x-axis units)
+        for dt in doubling_times:
+            # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
+            # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
+            # then...
+            dc_x_max = dc_x_min + dt * np.log2(dc_y_upper_lim / dc_y_min)
+            (ac_x_max, ac_y_max) = dc_to_ac.transform((dc_x_max, dc_y_upper_lim))
+
+            if ac_x_max > ac_x_upper_lim:
+                dc_y_max = dc_y_min * 2 ** ((dc_x_upper_lim - dc_x_min) / dt)
+                ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_upper_lim, dc_y_max))
+                edge = RIGHT_EDGE
+            else:
+                edge = TOP_EDGE
+
+            ax.plot(
+                [ac_x_min, ac_x_max],
+                [ac_y_min, ac_y_max],
+                transform=ax.transAxes,
+                color="0.0",
+                alpha=0.7,
+                dashes=(3, 2),
+                linewidth=1,
+            )
+
+            # Annotate lines with assocated doubling times
+            # annot_loc = np.array(
+            #     [
+            #         x_min + line_extent * (x_max - x_min),
+            #         # The +0.02 is to add a bit of space between text and line
+            #         y_min * (y_max / y_min) ** (line_extent + 0.02),
+            #     ]
+            # )
+            annot_text = f"{dt} " + ("days" if dt > 1 else "day")
+            text_props = {
+                "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5}
+            }
+
+            # Plot in a temporary location just to get the size; we'll move and
+            # rotate later
+            plotted_text = ax.text(0, 0, annot_text, text_props, transform=ax.transAxes)
+            # Render so that we can convert between figure and data coords
+            fig.canvas.draw()
+
+            ac_line_slope = (ac_y_max - ac_y_min) / (ac_x_max - ac_x_min)
+            ac_text_angle_rad = np.arctan(ac_line_slope)
+            ac_text_angle_deg = ac_text_angle_rad * 180 / np.pi
+
+            # Get the text bounds, then compute its width and height after rotation
+            ac_text_box = plotted_text.get_window_extent(
+                fig.canvas.get_renderer()
+            ).transformed(ax.transAxes.inverted())
+            ac_text_width = ac_text_box.x1 - ac_text_box.x0
+            ac_text_height = ac_text_box.y1 - ac_text_box.y0
+            ac_rot_text_width = ac_text_width * np.cos(
+                ac_text_angle_rad
+            ) + ac_text_height * np.sin(ac_text_angle_rad)
+            ac_rot_text_height = ac_text_width * np.sin(
+                ac_text_angle_rad
+            ) + ac_text_height * np.cos(ac_text_angle_rad)
+
+            # Get text box origin relative to line upper endpoint
+            if edge == RIGHT_EDGE:
+                ac_text_origin_x = ac_x_max - ac_rot_text_width - 0.01
+                ac_text_origin_y = (
+                    ac_y_min + (ac_text_origin_x - ac_x_min) * ac_line_slope
+                )
+            elif edge == TOP_EDGE:
+                ac_text_origin_y = ac_y_max - ac_rot_text_height - 0.01
+                ac_text_origin_x = (
+                    ac_x_min + (ac_text_origin_y - ac_y_min) / ac_line_slope
+                )
+            else:
+                raise ValueError(f"Invalid edge {edge}")
+
+            # set_x and set_y work in axis coordinates
+            plotted_text.set_x(ac_text_origin_x)
+            plotted_text.set_y(ac_text_origin_y)
+            plotted_text.set_ha("left")
+            plotted_text.set_va("bottom")
+            plotted_text.set_rotation(ac_text_angle_deg)
+            plotted_text.set_rotation_mode("anchor")
+
+            # plotted_text.set_x(text_origin_x)
+            # plotted_text.set_y(text_origin_y)
+            # plotted_text.set_rotation(text_angle_deg)
+            # plotted_text.set_rotation_mode("anchor")
+
+
 def _plot_helper(
     df: pd.DataFrame,
     *,
@@ -306,117 +440,7 @@ def _plot_helper(
         # x_max = pd.Timestamp(matplotlib.dates.num2epoch(ax.get_xlim()[1]), unit="s")
 
         # Add doubling time lines
-        if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
-            # Getting min x,y bounds of lines is easy
-            x_min = 0
-            if count_type == CaseGroup.CountType.ABSOLUTE:
-                y_min = Thresholds.CASE_COUNT
-            else:
-                y_min = Thresholds.CASES_PER_CAPITA
-
-            # Getting max x,y bounds is tougher due to needing to use the maximum
-            # extent of the graph area
-            # We try to use ax_y_max by default, and if that leads to too long a line
-            # (sticking out through the right side of the graph) then we use ax_x_max
-            # instead
-            ax_x_min, ax_x_max = ax.get_xlim()
-            ax_y_min, ax_y_max = ax.get_ylim()
-
-            ax_x_visual_length = ax_x_max - ax_x_min
-            ax_y_visual_length = np.log2(ax_y_max / ax_y_min)
-
-            doubling_times = [1, 2, 3, 4, 5]  # days
-            for dt in doubling_times:
-                # Simple math: if y_max = y_min * 2**((x_max-x_min)/dt), then...
-                # (assuming y_max is ax_y_max)
-                x_max = x_min + dt * np.log2(ax_y_max / y_min)
-                if x_max > ax_x_max:
-                    x_max = ax_x_max
-                    y_max = y_min * 2 ** ((ax_x_max - x_min) / dt)
-                else:
-                    y_max = ax_y_max
-
-                ax.plot(
-                    [x_min, x_max],
-                    [y_min, y_max],
-                    color="0.0",
-                    alpha=0.7,
-                    dashes=(3, 2),
-                    linewidth=1,
-                )
-
-                # Annotate lines with assocated doubling times
-                # annot_loc = np.array(
-                #     [
-                #         x_min + line_extent * (x_max - x_min),
-                #         # The +0.02 is to add a bit of space between text and line
-                #         y_min * (y_max / y_min) ** (line_extent + 0.02),
-                #     ]
-                # )
-                annot_text = f"{dt} " + ("days" if dt > 1 else "day")
-                text_props = {
-                    "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5},
-                    "ha": "left",
-                    "va": "bottom",
-                }
-
-                # Plot in a temporary location just to get the size; we'll move and
-                # rotate later
-                plotted_text = ax.text(
-                    x_min,
-                    y_min,
-                    annot_text,
-                    text_props,
-                    # rotation=text_angle,
-                    # rotation_mode="anchor",
-                )
-                # Render so that we can convert between figure and data coords
-                fig.canvas.draw()
-
-                # Compute rotation angle
-                visual_dy = (np.log2(y_max) - np.log2(y_min)) / ax_y_visual_length
-                visual_dx = (x_max - x_min) / ax_x_visual_length
-                visual_line_slope = visual_dy / visual_dx
-                text_angle_rad = np.arctan(visual_line_slope)
-                text_angle_deg = text_angle_rad * 180 / np.pi
-
-                # Get the text bounds, then compute its width and height after rotation
-                ax_coords_to_data_coords = ax.tras
-                text_box = plotted_text.get_window_extent(
-                    fig.canvas.get_renderer()
-                ).transformed(ax.transData.inverted())
-                text_width = text_box.x1 - text_box.x0
-                text_height = text_box.y1 - text_box.y0
-                rot_text_width = text_width * np.cos(
-                    text_angle_rad
-                ) + text_height * np.sin(text_angle_rad)
-                rot_text_height = text_width * np.sin(
-                    text_angle_rad
-                ) + text_height * np.cos(text_angle_rad)
-
-                # Get text box origin relative to line upper endpoint
-                text_origin_x = x_max - rot_text_width - 0.02
-                text_origin_y = y_max - rot_text_height - 0.02
-                print(annot_text)
-                print(plotted_text.get_window_extent())
-                print(text_box)
-                print(x_max, text_width, rot_text_width, text_origin_x)
-                print(y_max, text_height, rot_text_height, text_origin_y)
-                print(text_angle_deg)
-
-                plotted_text.set_x(text_origin_x)
-                plotted_text.set_y(text_origin_y)
-                plotted_text.set_rotation(text_angle_deg)
-                plotted_text.set_rotation_mode("anchor")
-
-                # Adding text causes the axis to resize itself, and we have to stop it
-                #  from doing so
-                # (I get it, the axis wants to maintain a margin around things in the
-                # plot area, but in this case we don't want that)
-                # (And yes I did pull my hair out for an hour trying to figure out what
-                # was going on)
-                ax.set_xlim(ax_x_min, ax_x_max)
-                ax.set_ylim(ax_y_min, ax_y_max)
+        _add_doubling_time_lines(fig, ax, x_axis_col=x_axis_col, count_type=count_type)
 
         # Save
         savefile_path = Paths.FIGURES / savefile_path
