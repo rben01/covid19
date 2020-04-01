@@ -257,8 +257,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # Perpendicular distance from text to corresponding line
             ac_dist_from_line = 0.005
             # Get text box origin relative to line upper endpoint
-            # If the doubling-time line is y = m*x + b, then the bottom edge of the text
-            # box lies on y = m*x + b + ac_vert_dist_from_line
             assert edge in EdgeGuide
             if edge == EdgeGuide.RIGHT:
                 # Account for bit of overhang; when slanted, top left corner of the
@@ -272,7 +270,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                 )
                 ac_text_origin_y = (
                     ac_y_min
-                    + ac_dist_from_line * cos_ac_angle
+                    + ac_dist_from_line / cos_ac_angle
                     + (ac_text_origin_x - ac_x_min) * ac_line_slope
                 )
 
@@ -287,8 +285,8 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                 ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
                 ac_text_origin_x = (
                     ac_x_min
-                    - (ac_dist_from_line / sin_ac_angle)
-                    + ((ac_text_origin_y - ac_y_min) / ac_line_slope)
+                    - ac_dist_from_line / sin_ac_angle
+                    + (ac_text_origin_y - ac_y_min) / ac_line_slope
                 )
 
             # set_x and set_y work in axis coordinates
