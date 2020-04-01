@@ -43,6 +43,11 @@ class Style:
         SECONDARY = (1, 1)
 
 
+class EdgeGuide(enum.Enum):
+    RIGHT = "right"
+    TOP = "top"
+
+
 # Contains fields used to do per-series configuration when plotting
 class ConfigFields(enum.Enum):
     CASE_TYPE = enum.auto()
@@ -135,8 +140,6 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
     # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
     # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
     if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
-        RIGHT_EDGE = "right"
-        TOP_EDGE = "top"
 
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
@@ -176,9 +179,9 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             if ac_x_max > ac_x_upper_lim:
                 dc_y_max = dc_y_min * 2 ** ((dc_x_upper_lim - dc_x_min) / dt)
                 ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_upper_lim, dc_y_max))
-                edge = RIGHT_EDGE
+                edge = EdgeGuide.RIGHT
             else:
-                edge = TOP_EDGE
+                edge = EdgeGuide.TOP
 
             # Plot the lines themselves
             ax.plot(
@@ -256,7 +259,8 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # Get text box origin relative to line upper endpoint
             # If the doubling-time line is y = m*x + b, then the bottom edge of the text
             # box lies on y = m*x + b + ac_vert_dist_from_line
-            if edge == RIGHT_EDGE:
+            assert edge in EdgeGuide
+            if edge == EdgeGuide.RIGHT:
                 # Account for bit of overhang; when slanted, top left corner of the
                 # text box extends left of the bottom left corner, which is its origin
                 # Subtracting that bit of overhang (height * sin(theta)) gets us the
@@ -271,22 +275,21 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                     + ac_dist_from_line * cos_ac_angle
                     + (ac_text_origin_x - ac_x_min) * ac_line_slope
                 )
-                if ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim:
-                    ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
-                    ac_text_origin_x = (
-                        ac_x_min
-                        - (ac_dist_from_line / sin_ac_angle)
-                        + ((ac_text_origin_y - ac_y_min) / ac_line_slope)
-                    )
-            elif edge == TOP_EDGE:
-                ac_text_origin_y = ac_y_max - ac_rot_text_height
+
+            # If text box is in very top right of graph, it may use only the right
+            # edge of the graph as a guide and hence clip through the top; if that
+            # happens, it's effectively the same situation as using the top edge from
+            # the start
+            if (
+                edge == EdgeGuide.TOP  # Must go first to short-circuit
+                or ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim
+            ):
+                ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
                 ac_text_origin_x = (
                     ac_x_min
                     - (ac_dist_from_line / sin_ac_angle)
                     + ((ac_text_origin_y - ac_y_min) / ac_line_slope)
                 )
-            else:
-                raise ValueError(f"Invalid edge {edge}")
 
             # set_x and set_y work in axis coordinates
             plotted_text.set_x(ac_text_origin_x)
