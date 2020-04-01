@@ -160,9 +160,9 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         # extent of the graph area
         # Get top right corner of graph in data coords (to a void the edges of the
         # texts' boxes clipping the axes, we move things in just a hair)
-        ac_x_upper_lim = 1
+        ac_x_upper_lim = ac_y_upper_lim = 1
 
-        doubling_times = [1, 2, 3, 4, 5]  # days (x-axis units)
+        doubling_times = [1, 2, 3, 4, 7]  # days (x-axis units)
         for dt in doubling_times:
             # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
             # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
@@ -192,9 +192,21 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             )
 
             # Annotate lines with assocated doubling times
-            annot_text_str = f"{dt} " + ("days" if dt > 1 else "day")
+            if dt == 1:
+                annot_text_str = f"{dt} day"
+            elif dt == 7:
+                annot_text_str = "1 week"
+            else:
+                annot_text_str = f"{dt} days"
+
             text_props = {
-                "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5}
+                "bbox": {
+                    "fc": "1.0",
+                    "pad": 0,
+                    # "edgecolor": "1.0",
+                    "alpha": 0.7,
+                    "lw": 0,
+                }
             }
 
             # Plot in a temporary location just to get the text box size; we'll move and
@@ -259,6 +271,13 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                     + ac_dist_from_line * cos_ac_angle
                     + (ac_text_origin_x - ac_x_min) * ac_line_slope
                 )
+                if ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim:
+                    ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
+                    ac_text_origin_x = (
+                        ac_x_min
+                        - (ac_dist_from_line / sin_ac_angle)
+                        + ((ac_text_origin_y - ac_y_min) / ac_line_slope)
+                    )
             elif edge == TOP_EDGE:
                 ac_text_origin_y = ac_y_max - ac_rot_text_height
                 ac_text_origin_x = (
