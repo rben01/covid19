@@ -130,25 +130,16 @@ def get_current_case_data(
 
 
 def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count_type):
+
     # For ease of computation, everything will be in axes coordinate system
-    # Note that variable names beginning with "ac" refer to axis coords and "dc"
-    # to data coords
+    # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
     # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
     if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
         RIGHT_EDGE = "right"
         TOP_EDGE = "top"
 
-        # Preliminaries: fix the axis lims to prevent auto resizing as new stuff
-        # (text and lines) is added
-        # Adding stuff causes the axis to resize itself, and we have to stop it
-        #  from doing so
-        # (I get it, the axis wants to maintain a margin around things in the
-        # plot area, but in this case we don't want that)
-        # Also we will need the axis upper limits in data coordinates later
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
-        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
-        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
 
         # Create transformation from data coords to axes coords
         # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
@@ -158,17 +149,18 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         dc_x_min = 0
         if count_type == CaseGroup.CountType.ABSOLUTE:
             dc_y_min = Thresholds.CASE_COUNT
-        else:
+        elif count_type == CaseGroup.CountType.PER_CAPITA:
             dc_y_min = Thresholds.CASES_PER_CAPITA
+        else:
+            raise ValueError(f"{count_type=} not understood")
+
+        ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
 
         # Getting max x,y bounds is trickier due to needing to use the maximum
         # extent of the graph area
-        ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
-        # Get top right corner of graph in data coords
-        ac_x_upper_lim = ac_y_upper_lim = 1
-        dc_x_upper_lim, dc_y_upper_lim = dc_to_ac.inverted().transform(
-            (ac_x_upper_lim, ac_y_upper_lim)
-        )
+        # Get top right corner of graph in data coords (to a void the edges of the
+        # texts' boxes clipping the axes, we move things in just a hair)
+        ac_x_upper_lim = 1
 
         doubling_times = [1, 2, 3, 4, 5]  # days (x-axis units)
         for dt in doubling_times:
@@ -200,58 +192,79 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             )
 
             # Annotate lines with assocated doubling times
-            annot_text = f"{dt} " + ("days" if dt > 1 else "day")
+            annot_text_str = f"{dt} " + ("days" if dt > 1 else "day")
             text_props = {
                 "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5}
             }
 
             # Plot in a temporary location just to get the text box size; we'll move and
             # rotate later
-            plotted_text = ax.text(0, 0, annot_text, text_props, transform=ax.transAxes)
+            plotted_text = ax.text(
+                0, 0, annot_text_str, text_props, transform=ax.transAxes
+            )
 
             ac_line_slope = (ac_y_max - ac_y_min) / (ac_x_max - ac_x_min)
             ac_text_angle_rad = np.arctan(ac_line_slope)
+            sin_ac_angle = np.sin(ac_text_angle_rad)
+            cos_ac_angle = np.cos(ac_text_angle_rad)
 
             # Get the unrotated text box bounds, then compute the width and height of
-            # the rotated text box
+            # the upright rectangle bounding the rotated text box in axis coordinates
             ac_text_box = plotted_text.get_window_extent(
                 fig.canvas.get_renderer()
             ).transformed(ax.transAxes.inverted())
             ac_text_width = ac_text_box.x1 - ac_text_box.x0
             ac_text_height = ac_text_box.y1 - ac_text_box.y0
-            # Simple geometry; a decent high school math problem
+
+            # Simple geometry (a decent high school math problem)
+            # We cheat a bit; to create some padding between the rotated text box and
+            # the axes, we can add the padding directly to the width and height of the
+            # upright rectangle bounding the rotated text box
+            # This works because the origin of the rotated text box is in the lower left
+            # corner of the upright bounding rectangle, so anything added to these
+            # dimensions gets added to the top and right, pushing it away from the axes
+            # and producing the padding we want
+            # If we wanted to do this the "right" way we'd redo everything above but
+            # with ac_x_upper_lim = ac_y_upper_lim = 1 - padding
+            padding = 0.005
             ac_rot_text_width = (
-                ac_text_width * np.cos(ac_text_angle_rad)
-                + ac_text_height * np.sin(ac_text_angle_rad)
-                # idk, the computed height is just a bit short
-                # (issues with bbox outline?) so we add a smidge
-                + 0.005
+                (ac_text_width * cos_ac_angle)
+                + (ac_text_height * sin_ac_angle)
+                + padding
             )
             ac_rot_text_height = (
-                ac_text_width * np.sin(ac_text_angle_rad)
-                + ac_text_height * np.cos(ac_text_angle_rad)
-                + 0.005
+                (ac_text_width * sin_ac_angle)
+                + (ac_text_height * cos_ac_angle)
+                + padding
             )
 
+            # Perpendicular distance from text to corresponding line
+            ac_dist_from_line = 0.005
             # Get text box origin relative to line upper endpoint
+            # If the doubling-time line is y = m*x + b, then the bottom edge of the text
+            # box lies on y = m*x + b + ac_vert_dist_from_line
             if edge == RIGHT_EDGE:
                 # Account for bit of overhang; when slanted, top left corner of the
-                # text box extends left of the bottom left corner, which is the origin
+                # text box extends left of the bottom left corner, which is its origin
                 # Subtracting that bit of overhang (height * sin(theta)) gets us the
                 # x-origin
                 # This only applies to the x coord; the bottom left corner of the text
-                # box *is* the bottom of the rotated rectangle as well
+                # box is also the bottom of the rotated rectangle
                 ac_text_origin_x = ac_x_max - (
-                    ac_rot_text_width - ac_text_height * np.sin(ac_text_angle_rad)
+                    ac_rot_text_width - ac_text_height * sin_ac_angle
                 )
                 ac_text_origin_y = (
-                    ac_y_min + (ac_text_origin_x - ac_x_min) * ac_line_slope
-                ) + 0.005  # fudge factor to get the bbox off of the line itself
+                    ac_y_min
+                    + ac_dist_from_line * cos_ac_angle
+                    + (ac_text_origin_x - ac_x_min) * ac_line_slope
+                )
             elif edge == TOP_EDGE:
                 ac_text_origin_y = ac_y_max - ac_rot_text_height
                 ac_text_origin_x = (
-                    ac_x_min + (ac_text_origin_y - ac_y_min) / ac_line_slope
-                ) - 0.005
+                    ac_x_min
+                    - (ac_dist_from_line / sin_ac_angle)
+                    + ((ac_text_origin_y - ac_y_min) / ac_line_slope)
+                )
             else:
                 raise ValueError(f"Invalid edge {edge}")
 
@@ -262,6 +275,11 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             plotted_text.set_verticalalignment("bottom")
             plotted_text.set_rotation(ac_text_angle_rad * 180 / np.pi)  # takes degrees
             plotted_text.set_rotation_mode("anchor")
+
+        # Adding stuff causes the axis to resize itself, and we have to stop it
+        # from doing so (by setting it back to its original size)
+        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
+        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
 
 
 def _plot_helper(
