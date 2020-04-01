@@ -208,14 +208,15 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             sin_ac_angle = np.sin(ac_text_angle_rad)
             cos_ac_angle = np.cos(ac_text_angle_rad)
 
-            # Get the unrotated text box bounds, then compute the width and height of
-            # the upright rectangle bounding the rotated text box in axis coordinates
+            # Get the unrotated text box bounds
             ac_text_box = plotted_text.get_window_extent(
                 fig.canvas.get_renderer()
             ).transformed(ax.transAxes.inverted())
             ac_text_width = ac_text_box.x1 - ac_text_box.x0
             ac_text_height = ac_text_box.y1 - ac_text_box.y0
 
+            # Compute the width and height of the upright rectangle bounding the rotated
+            # text box in axis coordinates
             # Simple geometry (a decent high school math problem)
             # We cheat a bit; to create some padding between the rotated text box and
             # the axes, we can add the padding directly to the width and height of the
@@ -224,8 +225,8 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # corner of the upright bounding rectangle, so anything added to these
             # dimensions gets added to the top and right, pushing it away from the axes
             # and producing the padding we want
-            # If we wanted to do this the "right" way we'd redo everything above but
-            # with ac_x_upper_lim = ac_y_upper_lim = 1 - padding
+            # If we wanted to do this the "right" way we'd *redo* the calculations above
+            # but with ac_x_upper_lim = ac_y_upper_lim = 1 - padding
             padding = 0.005
             ac_rot_text_width = (
                 (ac_text_width * cos_ac_angle)
