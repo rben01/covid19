@@ -58,6 +58,16 @@ class SaveFormats(enum.Enum):
     def path_with_fmt_suffix(self, path: Path) -> Path:
         return path.with_suffix(self.value)
 
+    def _print_if_new_data(self, df: pd.DataFrame, data_path: Path, message: str):
+        # Inform user that new data exists
+        try:
+            _orig_df = self._load(data_path)
+        except FileNotFoundError:
+            _orig_df = None
+
+        if not df.equals(_orig_df):
+            print(message)
+
     def _read_states_daily(self, *, from_web: bool) -> pd.DataFrame:
         local_data_path = Paths.DATA / "covid_states_daily"
 
@@ -65,6 +75,8 @@ class SaveFormats(enum.Enum):
             df = pd.read_csv(
                 Urls.COVIDTRACKING_STATES_DAILY_HISTORICAL, dtype=str, low_memory=False,
             )
+            self._print_if_new_data(df, local_data_path, "Got new US states data")
+
             self.save(df, local_data_path)
         else:
             df = self._load(local_data_path)
@@ -140,6 +152,7 @@ class SaveFormats(enum.Enum):
             # WaPo delays requests if they don't have a human-like user agent
             r = requests.get(Urls.WAPO_COUNTRIES_DAILY_HISTORICAL, headers=Urls.HEADERS)
             df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
+            self._print_if_new_data(df, local_data_path, "Got countries data")
             self.save(df, local_data_path)
         else:
             df = self._load(local_data_path)
@@ -198,7 +211,10 @@ class SaveFormats(enum.Enum):
         if self == SaveFormats.CSV:
             return pd.read_csv(path, dtype=str, low_memory=False)
         elif self == SaveFormats.PARQUET:
-            return pd.read_parquet(path)
+            try:
+                return pd.read_parquet(path)
+            except IOError as e:  # pyarrow raises IOError on file not found...
+                raise FileNotFoundError(str(e))
 
     def read(self, *, from_web: bool) -> pd.DataFrame:
         if from_web:

@@ -133,6 +133,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
     # For ease of computation, everything will be in axes coordinate system
     # Note that variable names beginning with "ac" refer to axis coords and "dc"
     # to data coords
+    # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
     if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
         RIGHT_EDGE = "right"
         TOP_EDGE = "top"
@@ -179,7 +180,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 
             # We try to use ac_y_max=1 by default, and if that leads to too long a line
             # (sticking out through the right side of the graph) then we use ac_x_max=1
-            # instead
+            # instead and compute ac_y_max accordingly
             if ac_x_max > ac_x_upper_lim:
                 dc_y_max = dc_y_min * 2 ** ((dc_x_upper_lim - dc_x_min) / dt)
                 ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_upper_lim, dc_y_max))
@@ -199,22 +200,20 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             )
 
             # Annotate lines with assocated doubling times
-            # annot_loc = np.array(
             annot_text = f"{dt} " + ("days" if dt > 1 else "day")
             text_props = {
                 "bbox": {"fc": "1.0", "pad": 0, "edgecolor": "1.0", "alpha": 0.5}
             }
 
-            # Plot in a temporary location just to get the size; we'll move and
+            # Plot in a temporary location just to get the text box size; we'll move and
             # rotate later
             plotted_text = ax.text(0, 0, annot_text, text_props, transform=ax.transAxes)
 
             ac_line_slope = (ac_y_max - ac_y_min) / (ac_x_max - ac_x_min)
             ac_text_angle_rad = np.arctan(ac_line_slope)
-            ac_text_angle_deg = ac_text_angle_rad * 180 / np.pi
 
-            # Get the unrotated text box bounds, then compute the width and height after
-            # rotation
+            # Get the unrotated text box bounds, then compute the width and height of
+            # the rotated text box
             ac_text_box = plotted_text.get_window_extent(
                 fig.canvas.get_renderer()
             ).transformed(ax.transAxes.inverted())
@@ -259,9 +258,9 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # set_x and set_y work in axis coordinates
             plotted_text.set_x(ac_text_origin_x)
             plotted_text.set_y(ac_text_origin_y)
-            plotted_text.set_ha("left")
-            plotted_text.set_va("bottom")
-            plotted_text.set_rotation(ac_text_angle_deg)
+            plotted_text.set_horizontalalignment("left")
+            plotted_text.set_verticalalignment("bottom")
+            plotted_text.set_rotation(ac_text_angle_rad * 180 / np.pi)  # takes degrees
             plotted_text.set_rotation_mode("anchor")
 
 
