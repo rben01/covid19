@@ -152,7 +152,7 @@ class SaveFormats(enum.Enum):
             # WaPo delays requests if they don't have a human-like user agent
             r = requests.get(Urls.WAPO_COUNTRIES_DAILY_HISTORICAL, headers=Urls.HEADERS)
             df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
-            self._print_if_new_data(df, local_data_path, "Got countries data")
+            self._print_if_new_data(df, local_data_path, "Got new countries data")
             self.save(df, local_data_path)
         else:
             df = self._load(local_data_path)
