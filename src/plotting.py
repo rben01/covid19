@@ -165,7 +165,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         # texts' boxes clipping the axes, we move things in just a hair)
         ac_x_upper_lim = ac_y_upper_lim = 1
 
-        doubling_times = [1, 2, 3, 4, 7]  # days (x-axis units)
+        doubling_times = [1, 2, 3, 4, 7, 14]  # days (x-axis units)
         for dt in doubling_times:
             # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
             # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
@@ -195,12 +195,17 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             )
 
             # Annotate lines with assocated doubling times
-            if dt == 1:
-                annot_text_str = f"{dt} day"
-            elif dt == 7:
-                annot_text_str = "1 week"
+
+            # Get text to annotate with
+            n_weeks, weekday = divmod(dt, 7)
+            if weekday == 0:
+                annot_text_str = f"{n_weeks} week"
+                if n_weeks != 1:
+                    annot_text_str += "s"
             else:
-                annot_text_str = f"{dt} days"
+                annot_text_str = f"{dt} day"
+                if dt != 1:
+                    annot_text_str += "s"
 
             text_props = {
                 "bbox": {
