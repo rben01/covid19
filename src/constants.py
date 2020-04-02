@@ -203,7 +203,7 @@ class CaseTypes:
     TESTED = "Tested"
     ACTIVE = "Active"
     RECOVERED = "Recovered"
-    MORTALITY = "Mortality"
+    MORTALITY = "CFR"
     GROWTH_FACTOR = "GrowthFactor"
 
 

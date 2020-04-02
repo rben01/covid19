@@ -67,6 +67,8 @@ python src/case_tracker.py --help
 - [Wikipedia - List of Countries by Population](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
 - [Wikipedia - List of US States by Population](https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population)
 
+This source is not currently used, but it seems decent as well: [Corona Data Scraper](https://coronadatascraper.com/#home)
+
 ### Raw data table
 
 The data used to create these graphs is available [here](data/data_table.csv).
@@ -87,12 +89,12 @@ For example, in a graph of countries and their cases per capita, the first count
 
 - :arrows_counterclockwise: The data sources used may change due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might).
 
-- :memo: Mortality notes
+- :memo: Case Fatality Rate (CFR) notes
 
-  - Mortality = deaths / confirmed.
-  - This is an underestimate of the true mortality rate within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed mortality rate will be a gross underestimate, as new infections won't yet have had time to become fatal. If it's been flat for a while, then the computed mortality rate should approach the true mortality rate, as cases will all be resolved (either fatally or not). Of course, the true mortality rate can itself change over time as treatment quality goes up (e.g.,  more resources per capita allocated to response) or down (e.g.,  hospitals become overburdened).
+  - CFR = Case fatality rate = deaths / confirmed.
+  - This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won't yet have had time to become fatal. If it's been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not). Of course, the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 
-  - The nature of log-scale graphs is that the mortality rate can be observed from the vertical distance between the **Confirmed Cases** and **Deaths** lines for a given country — the larger the distance, the lower the mortality rate. (The computed mortality rate is roughly (1/2)^distance; again this will be an underestimate.)
+  - The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the **Confirmed Cases** and **Deaths** lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly (1/2)^distance; again this will be an underestimate.)
 
 ## :chart_with_upwards_trend: Graphs
 
