@@ -23,7 +23,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
         - [Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](#Top-10-countries-excluding-China-confirmed-cases-over-time-Jan-24---present)
         - [Top 10 US states: confirmed cases over time (Mar 10 - present)](#Top-10-US-states-confirmed-cases-over-time-Mar-10---present)
     - [Per-capita case counts](#Per-capita-case-counts)
-      - [Number of confirmed cases N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region](#Number-of-confirmed-cases-N-days-after-first-day-of-at-least-10-5-cases-per-capita-1-case-per-100000-people-in-region)
+      - [Number of confirmed cases per capita N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region](#Number-of-confirmed-cases-per-capita-N-days-after-first-day-of-at-least-10-5-cases-per-capita-1-case-per-100000-people-in-region)
         - [Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-countries-including-China-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
         - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
         - [Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-US-states-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
@@ -130,7 +130,7 @@ For example, in a graph of countries and their cases per capita, the first count
 
 ### Per-capita case counts
 
-#### Number of confirmed cases N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region
+#### Number of confirmed cases per capita N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region
 
 ##### Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita
 
