@@ -1,6 +1,7 @@
 # %%
 import enum
 import itertools
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import Union
@@ -8,7 +9,7 @@ from typing import Union
 import pandas as pd
 from IPython.display import display  # noqa F401
 
-# Includes D.C.
+# Includes D.C.; has length 51
 USA_STATE_CODES = [
     "AL",
     "AK",
@@ -65,15 +66,23 @@ USA_STATE_CODES = [
 
 
 class Paths:
-    ROOT = Path().resolve()
-    while not (ROOT / "src").exists() and ROOT != ROOT.parent:
-        ROOT = ROOT.parent
+    # Try to use source filename to get project dir - this works if running from
+    # a command line
+    ROOT = Path(sys.argv[0]).parent.parent
+    # If using interactively in ipython, it might not work
+    # Path() will be correct, but sys.argv[0] might be some ipython.py (or similar) file
+    if not (ROOT / "src" / "case_tracker.py").exists():
+        ROOT = Path().resolve()
+        while not (ROOT / "src" / "case_tracker.py").exists():
+            if ROOT == ROOT.parent:
+                raise FileNotFoundError(
+                    f"Could not find a suitable project directory; "
+                    + f"current folder is {Path().resolve()}"
+                )
 
-    if ROOT == ROOT.parent:
-        raise FileNotFoundError(
-            f"Could not find a suitable project directory; "
-            + f"current folder is {Path().resolve()}"
-        )
+            ROOT = ROOT.parent
+
+    ROOT: Path
 
     FIGURES = ROOT / "Figures"
     DATA = ROOT / "data"
@@ -153,8 +162,8 @@ class CaseGroup:
 class CaseTypes:
     CONFIRMED = "Cases"
     DEATHS = "Deaths"
-    CASES_PER_CAPITA = CONFIRMED + " Per Capita"
-    DEATHS_PER_CAPITA = DEATHS + " Per Capita"
+    CASES_PER_CAPITA = CONFIRMED + " Per Cap."
+    DEATHS_PER_CAPITA = DEATHS + " Per Cap."
 
     # We can't create this df until the class is defined, so we make it a staticmethod
     # and for effiicency purposes memoize it
@@ -194,7 +203,7 @@ class CaseTypes:
     TESTED = "Tested"
     ACTIVE = "Active"
     RECOVERED = "Recovered"
-    MORTALITY = "Mortality"
+    MORTALITY = "CFR"
     GROWTH_FACTOR = "GrowthFactor"
 
 

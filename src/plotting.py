@@ -6,12 +6,15 @@ from pathlib import Path
 from typing import List, Mapping, Set, Tuple
 
 import matplotlib.pyplot as plt
+
+# import matplotlib
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from IPython.display import display  # noqa F401
 from matplotlib import rcParams
 from matplotlib.dates import DateFormatter, DayLocator
+from matplotlib.legend import Legend
 from matplotlib.ticker import (
     LogLocator,
     MultipleLocator,
@@ -25,7 +28,12 @@ FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 
 START_DATE = "Start_Date_"
+DOUBLING_TIME = "Doubling_Time_"
 COLOR = "Color_"
+
+# Decides which doubling times are included in addition to the net (from day 1)
+# Don't include 0 here; it'll be added automatically (hence "additional")
+ADTL_DAY_INDICES = [-20, -10]
 
 rcParams.update({"font.family": "sans-serif", "font.size": 12})
 
@@ -39,6 +47,11 @@ class Style:
     class Dash:
         PRIMARY = (1, 0)
         SECONDARY = (1, 1)
+
+
+class EdgeGuide(enum.Enum):
+    RIGHT = "right"
+    TOP = "top"
 
 
 # Contains fields used to do per-series configuration when plotting
@@ -81,12 +94,57 @@ class ConfigFields(enum.Enum):
         raise ValueError(err_str)
 
 
+def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
+    return (DOUBLING_TIME, day_idx)
+
+
 def get_current_case_data(
-    df: pd.DataFrame, count_type: CaseGroup.CountType
+    df: pd.DataFrame, count_type: CaseGroup.CountType, x_axis_col: bool
 ) -> pd.DataFrame:
+
+    # Filter in order to compute doubling time
+    df = df[df[Columns.CASE_COUNT] > 0]
+    relevant_case_type = CaseTypes.get_case_types(
+        stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+    )
+
+    day_indices = [0, *ADTL_DAY_INDICES]
+
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
+        # Filter to the relevant case type and just the two columns
+        relevant_subsection = g.loc[
+            g[Columns.CASE_TYPE] == relevant_case_type,
+            [Columns.DATE, Columns.CASE_COUNT],
+        ]
+
+        # Get the doubling times for selected day indices (fed to iloc)
+        # Keys are stringified iloc positions (0, k, -j, etc),
+        # Values are values at that iloc
+        doubling_times = {}
+        current_date, current_count = relevant_subsection.iloc[-1]
+        for day_idx in day_indices:
+            col_name = form_doubling_time_colname(day_idx)
+            try:
+                then_row = relevant_subsection.iloc[day_idx]
+            except IndexError:
+                doubling_times[col_name] = np.nan
+                continue
+
+            # $ currentCount = initialCount * 2^(n_days/doublingTime) $
+            then_date = then_row[Columns.DATE]
+            then_count = then_row[Columns.CASE_COUNT]
+
+            n_days = (current_date - then_date).total_seconds() / 86400
+            count_ratio = current_count / then_count
+
+            doubling_times[col_name] = n_days / np.log2(count_ratio)
+
         data_dict = {
             START_DATE: g[Columns.DATE].min(),
+            **{
+                col_name: doubling_time
+                for col_name, doubling_time in doubling_times.items()
+            },
             # Get last case count of each case type for current group
             # .tail(1).sum() is a trick to get the last value if it exists,
             # else 0 (remember, this is sorted by date)
@@ -95,7 +153,17 @@ def get_current_case_data(
             .to_dict(),
         }
 
-        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_types()],)
+        return pd.Series(
+            data_dict,
+            index=[START_DATE, *doubling_times.keys(), *CaseTypes.get_case_types()],
+        )
+
+    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+        sort_col = form_doubling_time_colname(0)
+        sort_ascending = True
+    else:
+        sort_col = relevant_case_type
+        sort_ascending = False
 
     current_case_counts = (
         df.groupby(Columns.id_cols)
@@ -104,12 +172,7 @@ def get_current_case_data(
         # This is used to keep plot legend in sync with the order of lines on the graph
         # so the location with the most current cases is first in the legend and the
         # least is last
-        .sort_values(
-            CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            ),
-            ascending=False,
-        )
+        .sort_values(sort_col, ascending=sort_ascending)
         .reset_index()
     )
 
@@ -127,6 +190,288 @@ def get_current_case_data(
     return current_case_counts
 
 
+def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count_type):
+
+    # For ease of computation, everything will be in axes coordinate system
+    # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
+    # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
+    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+
+        dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
+        dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
+
+        # Create transformation from data coords to axes coords
+        # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
+        dc_to_ac = ax.transData + ax.transAxes.inverted()
+
+        # Getting min x,y bounds of lines is easy
+        dc_x_min = 0
+        if count_type == CaseGroup.CountType.ABSOLUTE:
+            dc_y_min = Thresholds.CASE_COUNT
+        elif count_type == CaseGroup.CountType.PER_CAPITA:
+            dc_y_min = Thresholds.CASES_PER_CAPITA
+        else:
+            raise ValueError(f"{count_type=} not understood")
+
+        ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
+
+        # Getting max x,y bounds is trickier due to needing to use the maximum
+        # extent of the graph area
+        # Get top right corner of graph in data coords (to a void the edges of the
+        # texts' boxes clipping the axes, we move things in just a hair)
+        ac_x_upper_lim = ac_y_upper_lim = 1
+
+        doubling_times = [1, 2, 3, 4, 7, 14]  # days (x-axis units)
+        for dt in doubling_times:
+            # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
+            # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
+            # then...
+            dc_x_max = dc_x_min + dt * np.log2(dc_y_upper_lim / dc_y_min)
+            ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_max, dc_y_upper_lim))
+
+            # We try to use ac_y_max=1 by default, and if that leads to too long a line
+            # (sticking out through the right side of the graph) then we use ac_x_max=1
+            # instead and compute ac_y_max accordingly
+            if ac_x_max > ac_x_upper_lim:
+                dc_y_max = dc_y_min * 2 ** ((dc_x_upper_lim - dc_x_min) / dt)
+                ac_x_max, ac_y_max = dc_to_ac.transform((dc_x_upper_lim, dc_y_max))
+                edge = EdgeGuide.RIGHT
+            else:
+                edge = EdgeGuide.TOP
+
+            # Plot the lines themselves
+            ax.plot(
+                [ac_x_min, ac_x_max],
+                [ac_y_min, ac_y_max],
+                transform=ax.transAxes,
+                color="0.0",
+                alpha=0.7,
+                dashes=(3, 2),
+                linewidth=1,
+            )
+
+            # Annotate lines with assocated doubling times
+
+            # Get text to annotate with
+            n_weeks, weekday = divmod(dt, 7)
+            if weekday == 0:
+                annot_text_str = f"{n_weeks} week"
+                if n_weeks != 1:
+                    annot_text_str += "s"
+            else:
+                annot_text_str = f"{dt} day"
+                if dt != 1:
+                    annot_text_str += "s"
+
+            text_props = {
+                "bbox": {
+                    "fc": "1.0",
+                    "pad": 0,
+                    # "edgecolor": "1.0",
+                    "alpha": 0.7,
+                    "lw": 0,
+                }
+            }
+
+            # Plot in a temporary location just to get the text box size; we'll move and
+            # rotate later
+            plotted_text = ax.text(
+                0, 0, annot_text_str, text_props, transform=ax.transAxes
+            )
+
+            ac_line_slope = (ac_y_max - ac_y_min) / (ac_x_max - ac_x_min)
+            ac_text_angle_rad = np.arctan(ac_line_slope)
+            sin_ac_angle = np.sin(ac_text_angle_rad)
+            cos_ac_angle = np.cos(ac_text_angle_rad)
+
+            # Get the unrotated text box bounds
+            ac_text_box = plotted_text.get_window_extent(
+                fig.canvas.get_renderer()
+            ).transformed(ax.transAxes.inverted())
+            ac_text_width = ac_text_box.x1 - ac_text_box.x0
+            ac_text_height = ac_text_box.y1 - ac_text_box.y0
+
+            # Compute the width and height of the upright rectangle bounding the rotated
+            # text box in axis coordinates
+            # Simple geometry (a decent high school math problem)
+            # We cheat a bit; to create some padding between the rotated text box and
+            # the axes, we can add the padding directly to the width and height of the
+            # upright rectangle bounding the rotated text box
+            # This works because the origin of the rotated text box is in the lower left
+            # corner of the upright bounding rectangle, so anything added to these
+            # dimensions gets added to the top and right, pushing it away from the axes
+            # and producing the padding we want
+            # If we wanted to do this the "right" way we'd *redo* the calculations above
+            # but with ac_x_upper_lim = ac_y_upper_lim = 1 - padding
+            padding = 0.005
+            ac_rot_text_width = (
+                (ac_text_width * cos_ac_angle)
+                + (ac_text_height * sin_ac_angle)
+                + padding
+            )
+            ac_rot_text_height = (
+                (ac_text_width * sin_ac_angle)
+                + (ac_text_height * cos_ac_angle)
+                + padding
+            )
+
+            # Perpendicular distance from text to corresponding line
+            ac_dist_from_line = 0.005
+            # Get text box origin relative to line upper endpoint
+            assert edge in EdgeGuide
+            if edge == EdgeGuide.RIGHT:
+                # Account for bit of overhang; when slanted, top left corner of the
+                # text box extends left of the bottom left corner, which is its origin
+                # Subtracting that bit of overhang (height * sin(theta)) gets us the
+                # x-origin
+                # This only applies to the x coord; the bottom left corner of the text
+                # box is also the bottom of the rotated rectangle
+                ac_text_origin_x = ac_x_max - (
+                    ac_rot_text_width - ac_text_height * sin_ac_angle
+                )
+                ac_text_origin_y = (
+                    ac_y_min
+                    + ac_dist_from_line / cos_ac_angle
+                    + (ac_text_origin_x - ac_x_min) * ac_line_slope
+                )
+
+            # If text box is in very top right of graph, it may use only the right
+            # edge of the graph as a guide and hence clip through the top; if that
+            # happens, it's effectively the same situation as using the top edge from
+            # the start
+            if (
+                edge == EdgeGuide.TOP  # Must go first to short-circuit
+                or ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim
+            ):
+                ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
+                ac_text_origin_x = (
+                    ac_x_min
+                    - ac_dist_from_line / sin_ac_angle
+                    + (ac_text_origin_y - ac_y_min) / ac_line_slope
+                )
+
+            # set_x and set_y work in axis coordinates
+            plotted_text.set_x(ac_text_origin_x)
+            plotted_text.set_y(ac_text_origin_y)
+            plotted_text.set_horizontalalignment("left")
+            plotted_text.set_verticalalignment("bottom")
+            plotted_text.set_rotation(ac_text_angle_rad * 180 / np.pi)  # takes degrees
+            plotted_text.set_rotation_mode("anchor")
+
+        # Adding stuff causes the axis to resize itself, and we have to stop it
+        # from doing so (by setting it back to its original size)
+        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
+        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
+
+
+def _format_legend(
+    *,
+    ax: plt.Axes,
+    x_axis_col,
+    count_type,
+    location_heading: str,
+    current_case_counts: pd.DataFrame,
+) -> Legend:
+
+    include_confirmed = x_axis_col == Columns.DATE
+    include_deaths = x_axis_col == Columns.DATE
+    include_doubling_time = x_axis_col == Columns.DAYS_SINCE_OUTBREAK
+    include_mortality = (
+        x_axis_col == Columns.DATE and count_type == CaseGroup.CountType.ABSOLUTE
+    )
+    include_start_date = (not include_mortality) and (
+        x_axis_col == Columns.DAYS_SINCE_OUTBREAK
+    )
+
+    # Add (formatted) current data to legend labels
+
+    # Fields labels, comprising the first row of the legend
+    legend_fields = []
+    case_count_str_cols = []
+
+    legend_fields: List[str]
+    case_count_str_cols: List[pd.Series]
+
+    if include_confirmed:
+        this_case_type = CaseTypes.get_case_types(
+            stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+        )
+        legend_fields.append(this_case_type)
+
+        if count_type == CaseGroup.CountType.ABSOLUTE:
+            float_format_func = r"{:,.0f}".format
+        else:
+            float_format_func = r"{:.2e}".format
+
+        case_count_str_cols.append(
+            current_case_counts[this_case_type].map(float_format_func)
+        )
+
+    if include_deaths:
+        this_case_type = CaseTypes.get_case_types(
+            stage=CaseGroup.Stage.DEATH, count_type=count_type
+        )
+        legend_fields.append(this_case_type)
+        case_count_str_cols.append(
+            current_case_counts[this_case_type].map(float_format_func)
+        )
+
+    if include_start_date:
+        legend_fields.append("Start Date")
+        case_count_str_cols.append(
+            current_case_counts[START_DATE].dt.strftime(r"%b %-d")
+        )
+
+    if include_doubling_time:
+        for day_idx in [0, *ADTL_DAY_INDICES]:
+            if day_idx == 0:
+                legend_fields.append("Net DT")
+            elif day_idx < 0:
+                legend_fields.append(f"{-day_idx}d DT")
+            else:
+                legend_fields.append(f"From day {day_idx}")
+
+            case_count_str_cols.append(
+                current_case_counts[form_doubling_time_colname(day_idx)].map(
+                    lambda x: "NA" if pd.isna(x) else r"{:.3g}d".format(x)
+                )
+            )
+
+    if include_mortality:
+        legend_fields.append(CaseTypes.MORTALITY)
+        case_count_str_cols.append(
+            current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
+        )
+
+    # Add case counts of the different categories to the legend (next few blocks)
+    legend = ax.legend(loc="best", framealpha=0.9, fontsize="small")
+    sep_str = " / "
+    left_str = " ("
+    right_str = ")"
+
+    fmt_str = sep_str.join(legend_fields)
+
+    if location_heading is None:
+        location_heading = Columns.LOCATION_NAME
+
+    next(iter(legend.texts)).set_text(
+        f"{location_heading}{left_str}{fmt_str}{right_str}"
+    )
+
+    labels = (
+        current_case_counts[Columns.LOCATION_NAME]
+        + left_str
+        + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
+        + right_str
+    )
+
+    #  First label is title, so skip it
+    for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
+        text.set_text(label)
+
+    return legend
+
+
 def _plot_helper(
     df: pd.DataFrame,
     *,
@@ -138,8 +483,11 @@ def _plot_helper(
     plot_size: Tuple[float] = None,
     savefile_path: Path,
     location_heading: str = None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
+
     SORTED_POSITION = "Sorted_Position_"
+
+    figs_and_axes = []
 
     if plot_size is None:
         plot_size = (10, 10)
@@ -148,7 +496,7 @@ def _plot_helper(
     fig: plt.Figure
     ax: plt.Axes
 
-    current_case_counts = get_current_case_data(df, count_type)
+    current_case_counts = get_current_case_data(df, count_type, x_axis_col)
 
     df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_types(count_type=count_type))]
 
@@ -234,73 +582,30 @@ def _plot_helper(
         ax.grid(True, which="minor", axis="both", color="0.9")
         ax.grid(True, which="major", axis="both", color="0.75")
 
-        # Add case counts of the different categories to the legend (next few blocks)
-        legend = plt.legend(loc="best", framealpha=0.9, fontsize="small")
-        sep_str = " / "
-        left_str = " ("
-        right_str = ")"
-
-        # Add legend format to legend title (the first item in the legend)
-        include_mortality = (
-            x_axis_col == Columns.DATE and count_type == CaseGroup.CountType.ABSOLUTE
-        )
-        include_start_date = (not include_mortality) and (
-            x_axis_col == Columns.DAYS_SINCE_OUTBREAK
-        )
-        legend_fields = list(config_df[ConfigFields.CASE_TYPE])
-
-        if include_mortality:
-            legend_fields.append(CaseTypes.MORTALITY)
-
-        if include_start_date:
-            legend_fields.append("Start Date")
-
-        fmt_str = sep_str.join(legend_fields)
-
-        if location_heading is None:
-            location_heading = Columns.LOCATION_NAME
-
-        next(iter(legend.texts)).set_text(
-            f"{location_heading}{left_str}{fmt_str}{right_str}"
+        _format_legend(
+            ax=ax,
+            x_axis_col=x_axis_col,
+            count_type=count_type,
+            location_heading=location_heading,
+            current_case_counts=current_case_counts,
         )
 
-        # Add (formatted) current data to legend labels
-        if count_type == CaseGroup.CountType.ABSOLUTE:
-            float_format_func = r"{:,.0f}".format
-        else:
-            float_format_func = r"{:.4e}".format
+        # If using this for a date-like x axis, use this (leaving commented code because
+        # I foresee myself needing it eventually)
+        # x_max = pd.Timestamp(matplotlib.dates.num2epoch(ax.get_xlim()[1]), unit="s")
 
-        case_count_str_cols = [
-            current_case_counts[col].map(float_format_func)
-            for col in config_df[ConfigFields.CASE_TYPE]
-        ]
-
-        if include_mortality:
-            case_count_str_cols.append(
-                current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
-            )
-
-        if include_start_date:
-            case_count_str_cols.append(
-                current_case_counts[START_DATE].dt.strftime(r"%b %-d")
-            )
-
-        labels = (
-            current_case_counts[Columns.LOCATION_NAME]
-            + left_str
-            + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
-            + right_str
-        )
-
-        #  First label is title, so skip it
-        for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
-            text.set_text(label)
+        # Add doubling time lines
+        _add_doubling_time_lines(fig, ax, x_axis_col=x_axis_col, count_type=count_type)
 
         # Save
         savefile_path = Paths.FIGURES / savefile_path
         savefile_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(savefile_path, bbox_inches="tight", dpi=300)
         print(f"Saved '{savefile_path.relative_to(Paths.ROOT)}'")
+
+        figs_and_axes.append((fig, ax))
+
+    return figs_and_axes
 
 
 def remove_empty_leading_dates(
@@ -356,7 +661,9 @@ def get_savefile_path_and_location_heading(
 def get_color_palette_assignments(
     df: pd.DataFrame, palette: ColorPalette = None
 ) -> LocationColorMapping:
-    current_case_data = get_current_case_data(df, CaseGroup.CountType.ABSOLUTE)
+    current_case_data = get_current_case_data(
+        df, CaseGroup.CountType.ABSOLUTE, x_axis_col=Columns.DATE
+    )
     if palette is None:
         palette = sns.color_palette(n_colors=len(current_case_data))
     else:
@@ -377,7 +684,8 @@ def plot_cases_from_fixed_date(
     df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
     start_date=None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
+
     if start_date is not None:
         df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
@@ -407,7 +715,7 @@ def plot_cases_from_fixed_date(
     else:
         color_mapping = get_color_palette_assignments(df)
 
-    _plot_helper(
+    return _plot_helper(
         df,
         x_axis_col=Columns.DATE,
         count_type=count_type,
@@ -425,7 +733,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     count_type: CaseGroup.CountType,
     df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
     style=None,
-):
+) -> List[Tuple[plt.Figure, plt.Axes]]:
     configs = [
         {
             ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
@@ -452,7 +760,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     else:
         color_mapping = get_color_palette_assignments(df)
 
-    _plot_helper(
+    return _plot_helper(
         df,
         x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
         count_type=count_type,

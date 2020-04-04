@@ -21,10 +21,12 @@ def _get_df_with_outbreak_start_date_and_days_since(
     df: pd.DataFrame, *, case_type: str, confirmed_case_threshold: int,
 ) -> pd.DataFrame:
     outbreak_start_dates = (
+        # Filter df for days where case count was at least threshold
         df[
             (df[Columns.CASE_TYPE] == case_type)
             & (df[Columns.CASE_COUNT] >= confirmed_case_threshold)
         ]
+        # Get min date for each region
         .groupby(Columns.id_cols)[Columns.DATE]
         .min()
         .rename(Columns.OUTBREAK_START_DATE_COL)
@@ -32,6 +34,7 @@ def _get_df_with_outbreak_start_date_and_days_since(
 
     df = df.merge(outbreak_start_dates, how="left", on=Columns.id_cols)
 
+    # For each row, get n days since outbreak started
     df[Columns.DAYS_SINCE_OUTBREAK] = (
         df[Columns.DATE] - df[Columns.OUTBREAK_START_DATE_COL]
     ).dt.total_seconds() / 86400
@@ -71,6 +74,7 @@ def append_per_capita_data(df: pd.DataFrame) -> pd.DataFrame:
 def clean_up(df: pd.DataFrame) -> pd.DataFrame:
     # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
     # to get current (or most recent known) situation per location
+    # (Otherwise we'd have to groupby agg -> min date, and then filter)
     df = df.sort_values(
         [Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE], ascending=True
     )
@@ -80,7 +84,6 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = get_data(from_web=refresh_local_data)
-    # df = df[df[Columns.LOCATION_NAME] == "New York"]
     df = append_per_capita_data(df)
     df = clean_up(df)
     return df
@@ -147,13 +150,8 @@ def get_usa_states_df(
 
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
-
-    world_df = get_world_df(df)
-    usa_states_df = get_usa_states_df(df, 10)
-    countries_with_china_df = get_countries_df(df, 10, include_china=True)
-
-    df = pd.concat([world_df, usa_states_df, countries_with_china_df], axis=0)
-    df[Columns.DATE] = df[Columns.DATE].dt.strftime("%Y-%m-%d")
+    df = df.copy()
+    df[Columns.DATE] = df[Columns.DATE].dt.strftime(r"%Y-%m-%d")
 
     df = df.drop(
         columns=[
@@ -193,7 +191,13 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def main(namespace: argparse.Namespace):
+def main(namespace: argparse.Namespace = None):
+    if namespace is None:
+        namespace = argparse.Namespace()
+        namespace.refresh = False
+        namespace.create_data_table = False
+        namespace.no_graphs = False
+
     df = get_df(refresh_local_data=namespace.refresh)
 
     if namespace.create_data_table:
@@ -202,34 +206,48 @@ def main(namespace: argparse.Namespace):
     if namespace.no_graphs:
         return
 
-    for count_type in CaseGroup.CountType:
-        world_df = get_world_df(df)
-        usa_states_df = get_usa_states_df(df, 10)
-        countries_with_china_df = get_countries_df(df, 10, include_china=True)
-        countries_wo_china_df = get_countries_df(df, 9, include_china=False)
+    world_df = get_world_df(df)
+    usa_states_df = get_usa_states_df(df, 10)
+    countries_with_china_df = get_countries_df(df, 10, include_china=True)
+    countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
-        plot_cases_from_fixed_date(world_df, count_type=count_type)
-        plot_cases_from_fixed_date(
-            countries_wo_china_df,
-            df_with_china=countries_with_china_df,
-            count_type=count_type,
-        )
-        plot_cases_from_fixed_date(usa_states_df, count_type=count_type)
+    # Make absolute count graphs
+    plot_cases_from_fixed_date(world_df, count_type=CaseGroup.CountType.ABSOLUTE)
+    plot_cases_from_fixed_date(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE)
 
-        plot_cases_by_days_since_first_widespread_locally(
-            countries_with_china_df, count_type=count_type
-        )
-        plot_cases_by_days_since_first_widespread_locally(
-            countries_wo_china_df,
-            df_with_china=countries_with_china_df,
-            count_type=count_type,
-        )
-        plot_cases_by_days_since_first_widespread_locally(
-            usa_states_df, count_type=count_type
-        )
+    plot_cases_by_days_since_first_widespread_locally(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot_cases_by_days_since_first_widespread_locally(
+        usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE
+    )
+
+    # Make per capita graphs
+    plot_cases_from_fixed_date(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.PER_CAPITA,
+    )
+    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.PER_CAPITA)
+
+    return df
 
 
-# %%
+# A little hack -- an ipython cell that will run in an interactive window but not when
+# running this from a terminal
+if False:
+    pass
+    # %%
+    df = main()
+
+# %% Don't run this cell if using ipython
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -255,4 +273,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(args)
+    df = main(args)
