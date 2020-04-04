@@ -14,6 +14,7 @@ import seaborn as sns
 from IPython.display import display  # noqa F401
 from matplotlib import rcParams
 from matplotlib.dates import DateFormatter, DayLocator
+from matplotlib.legend import Legend
 from matplotlib.ticker import (
     LogLocator,
     MultipleLocator,
@@ -27,7 +28,12 @@ FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
 
 START_DATE = "Start_Date_"
+DOUBLING_TIME = "Doubling_Time_"
 COLOR = "Color_"
+
+# Decides which doubling times are included in addition to the net (from day 1)
+# Don't include 0 here; it'll be added automatically (hence "additional")
+ADTL_DAY_INDICES = [-20, -10]
 
 rcParams.update({"font.family": "sans-serif", "font.size": 12})
 
@@ -88,12 +94,57 @@ class ConfigFields(enum.Enum):
         raise ValueError(err_str)
 
 
+def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
+    return (DOUBLING_TIME, day_idx)
+
+
 def get_current_case_data(
-    df: pd.DataFrame, count_type: CaseGroup.CountType
+    df: pd.DataFrame, count_type: CaseGroup.CountType, x_axis_col: bool
 ) -> pd.DataFrame:
+
+    # Filter in order to compute doubling time
+    df = df[df[Columns.CASE_COUNT] > 0]
+    relevant_case_type = CaseTypes.get_case_types(
+        stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+    )
+
+    day_indices = [0, *ADTL_DAY_INDICES]
+
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
+        # Filter to the relevant case type and just the two columns
+        relevant_subsection = g.loc[
+            g[Columns.CASE_TYPE] == relevant_case_type,
+            [Columns.DATE, Columns.CASE_COUNT],
+        ]
+
+        # Get the doubling times for selected day indices (fed to iloc)
+        # Keys are stringified iloc positions (0, k, -j, etc),
+        # Values are values at that iloc
+        doubling_times = {}
+        current_date, current_count = relevant_subsection.iloc[-1]
+        for day_idx in day_indices:
+            col_name = form_doubling_time_colname(day_idx)
+            try:
+                then_row = relevant_subsection.iloc[day_idx]
+            except IndexError:
+                doubling_times[col_name] = np.nan
+                continue
+
+            # $ currentCount = initialCount * 2^(n_days/doublingTime) $
+            then_date = then_row[Columns.DATE]
+            then_count = then_row[Columns.CASE_COUNT]
+
+            n_days = (current_date - then_date).total_seconds() / 86400
+            count_ratio = current_count / then_count
+
+            doubling_times[col_name] = n_days / np.log2(count_ratio)
+
         data_dict = {
             START_DATE: g[Columns.DATE].min(),
+            **{
+                col_name: doubling_time
+                for col_name, doubling_time in doubling_times.items()
+            },
             # Get last case count of each case type for current group
             # .tail(1).sum() is a trick to get the last value if it exists,
             # else 0 (remember, this is sorted by date)
@@ -102,7 +153,17 @@ def get_current_case_data(
             .to_dict(),
         }
 
-        return pd.Series(data_dict, index=[START_DATE, *CaseTypes.get_case_types()],)
+        return pd.Series(
+            data_dict,
+            index=[START_DATE, *doubling_times.keys(), *CaseTypes.get_case_types()],
+        )
+
+    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+        sort_col = form_doubling_time_colname(0)
+        sort_ascending = True
+    else:
+        sort_col = relevant_case_type
+        sort_ascending = False
 
     current_case_counts = (
         df.groupby(Columns.id_cols)
@@ -111,12 +172,7 @@ def get_current_case_data(
         # This is used to keep plot legend in sync with the order of lines on the graph
         # so the location with the most current cases is first in the legend and the
         # least is last
-        .sort_values(
-            CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            ),
-            ascending=False,
-        )
+        .sort_values(sort_col, ascending=sort_ascending)
         .reset_index()
     )
 
@@ -308,6 +364,114 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
         ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
 
 
+def _format_legend(
+    *,
+    ax: plt.Axes,
+    x_axis_col,
+    count_type,
+    location_heading: str,
+    current_case_counts: pd.DataFrame,
+) -> Legend:
+
+    include_confirmed = x_axis_col == Columns.DATE
+    include_deaths = x_axis_col == Columns.DATE
+    include_doubling_time = x_axis_col == Columns.DAYS_SINCE_OUTBREAK
+    include_mortality = (
+        x_axis_col == Columns.DATE and count_type == CaseGroup.CountType.ABSOLUTE
+    )
+    include_start_date = (not include_mortality) and (
+        x_axis_col == Columns.DAYS_SINCE_OUTBREAK
+    )
+
+    # Add (formatted) current data to legend labels
+
+    # Fields labels, comprising the first row of the legend
+    legend_fields = []
+    case_count_str_cols = []
+
+    legend_fields: List[str]
+    case_count_str_cols: List[pd.Series]
+
+    if include_confirmed:
+        this_case_type = CaseTypes.get_case_types(
+            stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+        )
+        legend_fields.append(this_case_type)
+
+        if count_type == CaseGroup.CountType.ABSOLUTE:
+            float_format_func = r"{:,.0f}".format
+        else:
+            float_format_func = r"{:.2e}".format
+
+        case_count_str_cols.append(
+            current_case_counts[this_case_type].map(float_format_func)
+        )
+
+    if include_deaths:
+        this_case_type = CaseTypes.get_case_types(
+            stage=CaseGroup.Stage.DEATH, count_type=count_type
+        )
+        legend_fields.append(this_case_type)
+        case_count_str_cols.append(
+            current_case_counts[this_case_type].map(float_format_func)
+        )
+
+    if include_start_date:
+        legend_fields.append("Start Date")
+        case_count_str_cols.append(
+            current_case_counts[START_DATE].dt.strftime(r"%b %-d")
+        )
+
+    if include_doubling_time:
+        for day_idx in [0, *ADTL_DAY_INDICES]:
+            if day_idx == 0:
+                legend_fields.append("Net DT")
+            elif day_idx < 0:
+                legend_fields.append(f"{-day_idx}d DT")
+            else:
+                legend_fields.append(f"From day {day_idx}")
+
+            case_count_str_cols.append(
+                current_case_counts[form_doubling_time_colname(day_idx)].map(
+                    lambda x: "NA" if pd.isna(x) else r"{:.3g}d".format(x)
+                )
+            )
+
+    if include_mortality:
+        legend_fields.append(CaseTypes.MORTALITY)
+        case_count_str_cols.append(
+            current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
+        )
+
+    # Add case counts of the different categories to the legend (next few blocks)
+    legend = ax.legend(loc="best", framealpha=0.9, fontsize="small")
+    sep_str = " / "
+    left_str = " ("
+    right_str = ")"
+
+    fmt_str = sep_str.join(legend_fields)
+
+    if location_heading is None:
+        location_heading = Columns.LOCATION_NAME
+
+    next(iter(legend.texts)).set_text(
+        f"{location_heading}{left_str}{fmt_str}{right_str}"
+    )
+
+    labels = (
+        current_case_counts[Columns.LOCATION_NAME]
+        + left_str
+        + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
+        + right_str
+    )
+
+    #  First label is title, so skip it
+    for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
+        text.set_text(label)
+
+    return legend
+
+
 def _plot_helper(
     df: pd.DataFrame,
     *,
@@ -332,7 +496,7 @@ def _plot_helper(
     fig: plt.Figure
     ax: plt.Axes
 
-    current_case_counts = get_current_case_data(df, count_type)
+    current_case_counts = get_current_case_data(df, count_type, x_axis_col)
 
     df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_types(count_type=count_type))]
 
@@ -418,67 +582,13 @@ def _plot_helper(
         ax.grid(True, which="minor", axis="both", color="0.9")
         ax.grid(True, which="major", axis="both", color="0.75")
 
-        # Add case counts of the different categories to the legend (next few blocks)
-        legend = plt.legend(loc="best", framealpha=0.9, fontsize="small")
-        sep_str = " / "
-        left_str = " ("
-        right_str = ")"
-
-        # Add legend format to legend title (the first item in the legend)
-        include_mortality = (
-            x_axis_col == Columns.DATE and count_type == CaseGroup.CountType.ABSOLUTE
+        _format_legend(
+            ax=ax,
+            x_axis_col=x_axis_col,
+            count_type=count_type,
+            location_heading=location_heading,
+            current_case_counts=current_case_counts,
         )
-        include_start_date = (not include_mortality) and (
-            x_axis_col == Columns.DAYS_SINCE_OUTBREAK
-        )
-        legend_fields = list(config_df[ConfigFields.CASE_TYPE])
-
-        if include_mortality:
-            legend_fields.append(CaseTypes.MORTALITY)
-
-        if include_start_date:
-            legend_fields.append("Start Date")
-
-        fmt_str = sep_str.join(legend_fields)
-
-        if location_heading is None:
-            location_heading = Columns.LOCATION_NAME
-
-        next(iter(legend.texts)).set_text(
-            f"{location_heading}{left_str}{fmt_str}{right_str}"
-        )
-
-        # Add (formatted) current data to legend labels
-        if count_type == CaseGroup.CountType.ABSOLUTE:
-            float_format_func = r"{:,.0f}".format
-        else:
-            float_format_func = r"{:.2e}".format
-
-        case_count_str_cols = [
-            current_case_counts[col].map(float_format_func)
-            for col in config_df[ConfigFields.CASE_TYPE]
-        ]
-
-        if include_mortality:
-            case_count_str_cols.append(
-                current_case_counts[CaseTypes.MORTALITY].map(r"{0:.2%}".format)
-            )
-
-        if include_start_date:
-            case_count_str_cols.append(
-                current_case_counts[START_DATE].dt.strftime(r"%b %-d")
-            )
-
-        labels = (
-            current_case_counts[Columns.LOCATION_NAME]
-            + left_str
-            + case_count_str_cols[0].str.cat(case_count_str_cols[1:], sep=sep_str)
-            + right_str
-        )
-
-        #  First label is title, so skip it
-        for text, label in zip(itertools.islice(legend.texts, 1, None), labels):
-            text.set_text(label)
 
         # If using this for a date-like x axis, use this (leaving commented code because
         # I foresee myself needing it eventually)
@@ -551,7 +661,9 @@ def get_savefile_path_and_location_heading(
 def get_color_palette_assignments(
     df: pd.DataFrame, palette: ColorPalette = None
 ) -> LocationColorMapping:
-    current_case_data = get_current_case_data(df, CaseGroup.CountType.ABSOLUTE)
+    current_case_data = get_current_case_data(
+        df, CaseGroup.CountType.ABSOLUTE, x_axis_col=Columns.DATE
+    )
     if palette is None:
         palette = sns.color_palette(n_colors=len(current_case_data))
     else:

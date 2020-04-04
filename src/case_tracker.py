@@ -206,12 +206,12 @@ def main(namespace: argparse.Namespace = None):
     if namespace.no_graphs:
         return
 
-    for count_type in CaseGroup.CountType:
-        world_df = get_world_df(df)
-        usa_states_df = get_usa_states_df(df, 10)
-        countries_with_china_df = get_countries_df(df, 10, include_china=True)
-        countries_wo_china_df = get_countries_df(df, 9, include_china=False)
+    world_df = get_world_df(df)
+    usa_states_df = get_usa_states_df(df, 10)
+    countries_with_china_df = get_countries_df(df, 10, include_china=True)
+    countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
+    for count_type in CaseGroup.CountType:
         plot_cases_from_fixed_date(world_df, count_type=count_type)
         plot_cases_from_fixed_date(
             countries_wo_china_df,
