@@ -211,26 +211,31 @@ def main(namespace: argparse.Namespace = None):
     countries_with_china_df = get_countries_df(df, 10, include_china=True)
     countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
-    for count_type in CaseGroup.CountType:
-        plot_cases_from_fixed_date(world_df, count_type=count_type)
-        plot_cases_from_fixed_date(
-            countries_wo_china_df,
-            df_with_china=countries_with_china_df,
-            count_type=count_type,
-        )
-        plot_cases_from_fixed_date(usa_states_df, count_type=count_type)
+    # Make absolute count graphs
+    plot_cases_from_fixed_date(world_df, count_type=CaseGroup.CountType.ABSOLUTE)
+    plot_cases_from_fixed_date(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE)
 
-        plot_cases_by_days_since_first_widespread_locally(
-            countries_with_china_df, count_type=count_type
-        )
-        plot_cases_by_days_since_first_widespread_locally(
-            countries_wo_china_df,
-            df_with_china=countries_with_china_df,
-            count_type=count_type,
-        )
-        plot_cases_by_days_since_first_widespread_locally(
-            usa_states_df, count_type=count_type
-        )
+    plot_cases_by_days_since_first_widespread_locally(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot_cases_by_days_since_first_widespread_locally(
+        usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE
+    )
+
+    # Make per capita graphs
+    plot_cases_from_fixed_date(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        count_type=CaseGroup.CountType.PER_CAPITA,
+    )
+    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.PER_CAPITA)
 
     return df
 

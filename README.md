@@ -15,7 +15,6 @@ This repository contains graphs of the spread of coronavirus throughout the worl
   - [:chart_with_upwards_trend: Graphs](#chart_with_upwards_trend-Graphs)
     - [Absolute case counts (not adjusted for region population)](#Absolute-case-counts-not-adjusted-for-region-population)
       - [Number of confirmed cases N days after first day of at least 100 confirmed cases in region](#Number-of-confirmed-cases-N-days-after-first-day-of-at-least-100-confirmed-cases-in-region)
-        - [Top 10 countries, including China: confirmed cases after first day of 100 confirmed cases](#Top-10-countries-including-China-confirmed-cases-after-first-day-of-100-confirmed-cases)
         - [Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-after-first-day-of-100-confirmed-cases)
         - [Top 10 US states: confirmed cases after first day of 100 confirmed cases](#Top-10-US-states-confirmed-cases-after-first-day-of-100-confirmed-cases)
       - [Number of confirmed cases over time](#Number-of-confirmed-cases-over-time)
@@ -23,12 +22,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
         - [Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](#Top-10-countries-excluding-China-confirmed-cases-over-time-Jan-24---present)
         - [Top 10 US states: confirmed cases over time (Mar 10 - present)](#Top-10-US-states-confirmed-cases-over-time-Mar-10---present)
     - [Per-capita case counts](#Per-capita-case-counts)
-      - [Number of confirmed cases per capita N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region](#Number-of-confirmed-cases-per-capita-N-days-after-first-day-of-at-least-10-5-cases-per-capita-1-case-per-100000-people-in-region)
-        - [Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-countries-including-China-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
-        - [Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita](#Top-10-US-states-confirmed-cases-per-capita-after-first-day-of-10-5-cases-per-capita)
       - [Cases per capita over time](#Cases-per-capita-over-time)
-        - [China and rest of world: confirmed cases per capita over time (Jan 22 - present)](#China-and-rest-of-world-confirmed-cases-per-capita-over-time-Jan-22---present)
         - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-per-capita-over-time-Jan-24---present)
         - [Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](#Top-10-US-states-confirmed-cases-per-capita-over-time-Mar-10---present)
 
@@ -77,7 +71,7 @@ The data used to create these graphs is available [here](data/data_table.csv).
 
 - :calendar: In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.
 
-- :hourglass_flowing_sand: Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (or "DT" for short). Lines annotated "n days" show how the number of coronavirus cases would increase within a region if it doubled every n days. Comparing the slope of a region's growth line to the slopes of these benchmark lines gives an indication of that region's doubling time. These graphs' legends also list the doubling times over different periods of time.
+- :hourglass_flowing_sand: Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (or "DT" for short). Lines annotated "n days" show how the number of coronavirus cases would increase within a region if it doubled every n days. Comparing the slope of a region's growth line to the slopes of these benchmark lines gives an indication of that region's doubling time. These graphs' legends also list the doubling times over different periods of time (e.g., "20d DT" means the average doubling time of a region over the past 20 days").
   To find the daily percent increase for any doubling time T, simply compute 2^(1/T). Below is a list of doubling times and corresponding per-day percent increases.
     - 1 day: +100% daily
     - 2 days: +41% daily
@@ -105,10 +99,6 @@ For example, in a graph of countries and their cases per capita, the first count
 
 #### Number of confirmed cases N days after first day of at least 100 confirmed cases in region
 
-##### Top 10 countries, including China: confirmed cases after first day of 100 confirmed cases
-
-![Top 10 countries, including China: confirmed cases after first day of 100 confirmed cases](Figures/Absolute/From_local_spread_start/countries_w_china.png)
-
 ##### Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases
 
 ![Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](Figures/Absolute/From_local_spread_start/countries_wo_china.png)
@@ -133,25 +123,7 @@ For example, in a graph of countries and their cases per capita, the first count
 
 ### Per-capita case counts
 
-#### Number of confirmed cases per capita N days after first day of at least 10^-5 cases per capita (1 case per 100,000 people) in region
-
-##### Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita
-
-![Top 10 countries, including China: confirmed cases per capita after first day of 10^-5 cases per capita](Figures/Per_capita/From_local_spread_start/countries_w_china.png)
-
-##### Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita
-
-![Top 10 countries, excluding China (nine countries total): confirmed cases per capita after first day of 10^-5 cases per capita](Figures/Per_capita/From_local_spread_start/countries_wo_china.png)
-
-##### Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita
-
-![Top 10 US states: confirmed cases per capita after first day of 10^-5 cases per capita](Figures/Per_capita/From_local_spread_start/states.png)
-
 #### Cases per capita over time
-
-##### China and rest of world: confirmed cases per capita over time (Jan 22 - present)
-
-![China and rest of world: confirmed cases per capita over time (Jan 22 - present)](Figures/Per_capita/From_fixed_date/world.png)
 
 ##### Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)
 
