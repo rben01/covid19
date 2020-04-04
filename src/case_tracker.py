@@ -21,10 +21,12 @@ def _get_df_with_outbreak_start_date_and_days_since(
     df: pd.DataFrame, *, case_type: str, confirmed_case_threshold: int,
 ) -> pd.DataFrame:
     outbreak_start_dates = (
+        # Filter df for days where case count was at least threshold
         df[
             (df[Columns.CASE_TYPE] == case_type)
             & (df[Columns.CASE_COUNT] >= confirmed_case_threshold)
         ]
+        # Get min date for each region
         .groupby(Columns.id_cols)[Columns.DATE]
         .min()
         .rename(Columns.OUTBREAK_START_DATE_COL)
@@ -32,6 +34,7 @@ def _get_df_with_outbreak_start_date_and_days_since(
 
     df = df.merge(outbreak_start_dates, how="left", on=Columns.id_cols)
 
+    # For each row, get n days since outbreak started
     df[Columns.DAYS_SINCE_OUTBREAK] = (
         df[Columns.DATE] - df[Columns.OUTBREAK_START_DATE_COL]
     ).dt.total_seconds() / 86400
@@ -71,6 +74,7 @@ def append_per_capita_data(df: pd.DataFrame) -> pd.DataFrame:
 def clean_up(df: pd.DataFrame) -> pd.DataFrame:
     # Hereafter df is sorted by date, which is helpful as it allows using .iloc[-1]
     # to get current (or most recent known) situation per location
+    # (Otherwise we'd have to groupby agg -> min date, and then filter)
     df = df.sort_values(
         [Columns.LOCATION_NAME, Columns.DATE, Columns.CASE_TYPE], ascending=True
     )
@@ -80,7 +84,6 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     df = get_data(from_web=refresh_local_data)
-    # df = df[df[Columns.LOCATION_NAME] == "New York"]
     df = append_per_capita_data(df)
     df = clean_up(df)
     return df
@@ -148,7 +151,7 @@ def get_usa_states_df(
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df[Columns.DATE] = df[Columns.DATE].dt.strftime("%Y-%m-%d")
+    df[Columns.DATE] = df[Columns.DATE].dt.strftime(r"%Y-%m-%d")
 
     df = df.drop(
         columns=[
