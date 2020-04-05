@@ -9,7 +9,7 @@ from IPython.display import display  # noqa F401
 
 from constants import (
     USA_STATE_CODES,
-    CaseTypes,
+    CaseType,
     Columns,
     Locations,
     Paths,
@@ -27,21 +27,9 @@ DATA_COLS = [
 ]
 
 
-# Not currently used
-class DataOrigin(enum.Enum):
-    USE_LOCAL_UNCONDITIONALLY = enum.auto()
-    USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB = enum.auto()
-    FETCH_FROM_WEB_UNCONDITIONALLY = enum.auto()
-
-    def should_try_to_use_local(self) -> bool:
-        return self in [
-            DataOrigin.USE_LOCAL_UNCONDITIONALLY,
-            DataOrigin.USE_LOCAL_IF_EXISTS_ELSE_FETCH_FROM_WEB,
-        ]
-
-
 class SaveFormats(enum.Enum):
     CSV = ".csv"
+    CSV: "SaveFormats"
 
     # Parquet currently broken (pyarrow bug?), don't know why but csv is fine
     # PARQUET = ".parquet"
@@ -61,11 +49,11 @@ class SaveFormats(enum.Enum):
     def _print_if_new_data(self, df: pd.DataFrame, data_path: Path, message: str):
         # Inform user that new data exists
         try:
-            _orig_df = self._load(data_path)
+            orig_df = self._load(data_path)
         except FileNotFoundError:
-            _orig_df = None
+            orig_df = None
 
-        if not df.equals(_orig_df):
+        if not df.equals(orig_df):
             print(message)
 
     def _read_states_daily(self, *, from_web: bool) -> pd.DataFrame:
@@ -86,19 +74,20 @@ class SaveFormats(enum.Enum):
             columns={
                 "date": Columns.DATE,
                 "state": Columns.TWO_LETTER_STATE_CODE,
-                "positive": CaseTypes.CONFIRMED,
-                "death": CaseTypes.DEATHS,
+                "positive": CaseType.CONFIRMED,
+                "death": CaseType.DEATHS,
             }
         )
         for col in [Columns.DATE, "dateChecked"]:
             df[col] = pd.to_datetime(df[col])
 
         df[Columns.DATE] = self._adjust_dates(df[Columns.DATE])
+
         df = df.melt(
             id_vars=[Columns.DATE, Columns.TWO_LETTER_STATE_CODE, "dateChecked"],
             value_vars=[
-                CaseTypes.CONFIRMED,
-                CaseTypes.DEATHS,
+                CaseType.CONFIRMED,
+                CaseType.DEATHS,
                 # "negative",
                 # "pending",
                 # "hospitalized",
@@ -162,8 +151,8 @@ class SaveFormats(enum.Enum):
             columns={
                 "country": Columns.COUNTRY,
                 "date": Columns.DATE,
-                "confirmed": CaseTypes.CONFIRMED,
-                "deaths": CaseTypes.DEATHS,
+                "confirmed": CaseType.CONFIRMED,
+                "deaths": CaseType.DEATHS,
             }
         )
         for col in [Columns.DATE]:
@@ -179,7 +168,7 @@ class SaveFormats(enum.Enum):
                 "dateInProgress",
                 "updated",
             ],
-            value_vars=[CaseTypes.CONFIRMED, CaseTypes.DEATHS],
+            value_vars=[CaseType.CONFIRMED, CaseType.DEATHS],
             var_name=Columns.CASE_TYPE,
             value_name=Columns.CASE_COUNT,
         )
@@ -253,20 +242,21 @@ class SaveFormats(enum.Enum):
             ].iloc[0]
         )
 
-        world_df = world_df.reset_index().assign(
-            **{
-                Columns.STATE: "",
-                Columns.COUNTRY: Locations.WORLD,
-                Columns.POPULATION: world_pop,
-            }
-        )
-        world_minus_china_df = world_minus_china_df.reset_index().assign(
-            **{
-                Columns.STATE: "",
-                Columns.COUNTRY: Locations.WORLD_MINUS_CHINA,
-                Columns.POPULATION: world_pop - china_pop,
-            }
-        )
+        world_df = world_df.reset_index()
+        for col, value in {
+            Columns.STATE: "",
+            Columns.COUNTRY: Locations.WORLD,
+            Columns.POPULATION: world_pop,
+        }.items():
+            world_df[col] = value
+
+        world_minus_china_df = world_minus_china_df.reset_index()
+        for col, value in {
+            Columns.STATE: "",
+            Columns.COUNTRY: Locations.WORLD_MINUS_CHINA,
+            Columns.POPULATION: world_pop - china_pop,
+        }.items():
+            world_minus_china_df[col] = value
 
         df = pd.concat(
             [states_df, countries_df, world_df, world_minus_china_df],
@@ -292,3 +282,6 @@ class SaveFormats(enum.Enum):
             df.to_csv(path, index=False)
         else:
             raise ValueError(f"Unhandled case {self} when writing")
+
+
+SaveFormats.CSV.read(from_web=False)

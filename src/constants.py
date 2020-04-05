@@ -1,13 +1,14 @@
 # %%
 import enum
-import itertools
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import NoReturn, Optional, Tuple
+from typing import NoReturn, Optional, Tuple, List, NewType
 
 import pandas as pd
 from IPython.display import display  # noqa F401
+
+Column = NewType("Column", str)
 
 # Includes D.C.; has length 51
 USA_STATE_CODES = [
@@ -91,7 +92,7 @@ class Paths:
     DATA: Path
 
 
-class Columns(enum.Enum):
+class Columns:
     LATITUDE = "Lat"
     LONGITUDE = "Long"
     CITY = "City"
@@ -110,6 +111,25 @@ class Columns(enum.Enum):
     OUTBREAK_START_DATE_COL = "Outbreak start date"
     DAYS_SINCE_OUTBREAK = "Days Since Outbreak"
     SOURCE = "Source"
+
+    LATITUDE: Column
+    LONGITUDE: Column
+    CITY: Column
+    COUNTY_NOT_COUNTRY: Column
+    TWO_LETTER_STATE_CODE: Column
+    STATE: Column
+    COUNTRY: Column
+    THREE_LETTER_COUNTRY_CODE: Column
+    LOCATION_NAME: Column
+    POPULATION: Column
+    IS_STATE: Column
+    URL: Column
+    DATE: Column
+    CASE_COUNT: Column
+    CASE_TYPE: Column
+    OUTBREAK_START_DATE_COL: Column
+    DAYS_SINCE_OUTBREAK: Column
+    SOURCE: Column
 
     string_cols = [
         LATITUDE,
@@ -130,14 +150,8 @@ class Columns(enum.Enum):
 
     @classmethod
     @lru_cache(None)
-    def location_id_cols(cls):
+    def location_id_cols(cls) -> List[Column]:
         return [cls.COUNTRY, cls.STATE, cls.LOCATION_NAME]
-
-    def col_name(self):
-        if self == self.URL:
-            return "URL"
-        else:
-            return self.value.title()
 
 
 class StrictEnumError(Exception):
