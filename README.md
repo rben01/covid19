@@ -61,7 +61,7 @@ python src/case_tracker.py --help
 - [Wikipedia - List of Countries by Population](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
 - [Wikipedia - List of US States by Population](https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population)
 
-This source is not currently used, but it seems decent as well: [Corona Data Scraper](https://coronadatascraper.com/#home)
+The site [Corona Data Scraper](https://coronadatascraper.com/#home) is not used by this project, but it seems decent as well.
 
 ### Raw data table
 
@@ -69,6 +69,7 @@ The data used to create these graphs is available [here](data/data_table.csv).
 
 ## :notebook: Notes
 
+If you have any questions about the graphs, there's a good chance they're ansered in this section. (If not, file an issue!)
 <!-- markdownlint-disable MD033 -->
 <details>
 <summary>Expand to view notes</summary>

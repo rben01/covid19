@@ -140,9 +140,15 @@ class CaseGroup:
         CONFIRMED = enum.auto()
         DEATH = enum.auto()
 
+        def __str__(self):
+            return self.name
+
     class CountType(enum.Enum):
         ABSOLUTE = enum.auto()
         PER_CAPITA = enum.auto()
+
+        def __str__(self):
+            return self.name
 
     @staticmethod
     def get_case_type(stage: Stage, count_type: CountType) -> str:
@@ -188,12 +194,14 @@ class CaseTypes:
     @classmethod
     @lru_cache(None)
     def get_case_types(
-        cls, stage: CaseGroup = None, count_type: CaseGroup = None, flatten=True
+        cls, *, stage: CaseGroup = None, count_type: CaseGroup = None, flatten=True
     ) -> Union[pd.Series, str]:
 
         stage = stage or slice(None)
         count_type = count_type or slice(None)
-        case_types = cls._get_case_type_groups_series().loc(axis=0)[stage, count_type]
+        case_types = cls._get_case_type_groups_series().xs(
+            (stage, count_type), level=(CaseGroup._STAGE, CaseGroup._COUNT_TYPE), axis=0
+        )
 
         if len(case_types) == 1 and flatten:
             return case_types.iloc[0]

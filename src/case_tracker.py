@@ -6,10 +6,8 @@ from IPython.display import display  # noqa F401
 
 import read_in_data
 from constants import CaseGroup, CaseTypes, Columns, Locations, Paths, Thresholds
-from plotting import (
-    plot_cases_by_days_since_first_widespread_locally,
-    plot_cases_from_fixed_date,
-)
+from plotting import plot
+from typing import List
 
 
 def get_data(*, from_web: bool) -> pd.DataFrame:
@@ -18,21 +16,25 @@ def get_data(*, from_web: bool) -> pd.DataFrame:
 
 
 def _get_df_with_outbreak_start_date_and_days_since(
-    df: pd.DataFrame, *, case_type: str, confirmed_case_threshold: int,
+    df: pd.DataFrame, *, count_type: CaseGroup.CountType, confirmed_case_threshold: int,
 ) -> pd.DataFrame:
+
+    case_types = CaseTypes.get_case_types(count_type=count_type)
+
+    outbreak_id_cols = [*Columns.id_cols, Columns.CASE_TYPE]
     outbreak_start_dates = (
-        # Filter df for days where case count was at least threshold
+        # Filter df for days where case count was at least threshold for given case type
         df[
-            (df[Columns.CASE_TYPE] == case_type)
+            (df[Columns.CASE_TYPE].isin(case_types))
             & (df[Columns.CASE_COUNT] >= confirmed_case_threshold)
         ]
         # Get min date for each region
-        .groupby(Columns.id_cols)[Columns.DATE]
+        .groupby(outbreak_id_cols)[Columns.DATE]
         .min()
         .rename(Columns.OUTBREAK_START_DATE_COL)
     )
 
-    df = df.merge(outbreak_start_dates, how="left", on=Columns.id_cols)
+    df = df.merge(outbreak_start_dates, how="left", on=outbreak_id_cols)
 
     # For each row, get n days since outbreak started
     df[Columns.DAYS_SINCE_OUTBREAK] = (
@@ -58,16 +60,17 @@ def append_per_capita_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df = _get_df_with_outbreak_start_date_and_days_since(
         df,
-        case_type=CaseTypes.CONFIRMED,
+        count_type=CaseGroup.CountType.ABSOLUTE,
         confirmed_case_threshold=Thresholds.CASE_COUNT,
     )
     per_capita_df = _get_df_with_outbreak_start_date_and_days_since(
         per_capita_df,
-        case_type=CaseTypes.CASES_PER_CAPITA,
+        count_type=CaseGroup.CountType.PER_CAPITA,
         confirmed_case_threshold=Thresholds.CASES_PER_CAPITA,
     )
 
     df = pd.concat([df, per_capita_df], axis=0, ignore_index=True)
+
     return df
 
 
@@ -144,7 +147,9 @@ def get_countries_df(
 def get_usa_states_df(
     df: pd.DataFrame, n: int, count_type: CaseGroup.CountType = None
 ) -> pd.DataFrame:
-    count_type = count_type or CaseGroup.CountType.ABSOLUTE
+    if count_type is None:
+        count_type = CaseGroup.CountType.ABSOLUTE
+
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
     return keep_only_n_largest_locations(df, n, count_type)
 
@@ -212,30 +217,56 @@ def main(namespace: argparse.Namespace = None):
     countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
     # Make absolute count graphs
-    plot_cases_from_fixed_date(world_df, count_type=CaseGroup.CountType.ABSOLUTE)
-    plot_cases_from_fixed_date(
+    plot(world_df, x_axis_col=Columns.DATE, count_type=CaseGroup.CountType.ABSOLUTE)
+    plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
+        x_axis_col=Columns.DATE,
         count_type=CaseGroup.CountType.ABSOLUTE,
     )
-    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE)
+    plot(
+        usa_states_df, x_axis_col=Columns.DATE, count_type=CaseGroup.CountType.ABSOLUTE
+    )
 
-    plot_cases_by_days_since_first_widespread_locally(
+    plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
+        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        stage=CaseGroup.Stage.CONFIRMED,
         count_type=CaseGroup.CountType.ABSOLUTE,
     )
-    plot_cases_by_days_since_first_widespread_locally(
-        usa_states_df, count_type=CaseGroup.CountType.ABSOLUTE
+    plot(
+        countries_wo_china_df,
+        df_with_china=countries_with_china_df,
+        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        stage=CaseGroup.Stage.DEATH,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot(
+        usa_states_df,
+        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        stage=CaseGroup.Stage.CONFIRMED,
+        count_type=CaseGroup.CountType.ABSOLUTE,
+    )
+    plot(
+        usa_states_df,
+        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        stage=CaseGroup.Stage.DEATH,
+        count_type=CaseGroup.CountType.ABSOLUTE,
     )
 
     # Make per capita graphs
-    plot_cases_from_fixed_date(
+    plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
+        x_axis_col=Columns.DATE,
         count_type=CaseGroup.CountType.PER_CAPITA,
     )
-    plot_cases_from_fixed_date(usa_states_df, count_type=CaseGroup.CountType.PER_CAPITA)
+    plot(
+        usa_states_df,
+        x_axis_col=Columns.DATE,
+        count_type=CaseGroup.CountType.PER_CAPITA,
+    )
 
     return df
 

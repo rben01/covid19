@@ -476,6 +476,7 @@ def _plot_helper(
     df: pd.DataFrame,
     *,
     x_axis_col: str,
+    stage: CaseGroup.Stage,
     count_type: CaseGroup.CountType,
     style=None,
     color_mapping: LocationColorMapping = None,
@@ -498,7 +499,13 @@ def _plot_helper(
 
     current_case_counts = get_current_case_data(df, count_type, x_axis_col)
 
-    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_types(count_type=count_type))]
+    df = df[
+        df[Columns.CASE_TYPE].isin(
+            CaseTypes.get_case_types(
+                stage=stage, count_type=count_type, flatten=False
+            ).values
+        )
+    ]
 
     # Filter and sort color mapping correctly so that colors 1. are assigned to the
     # same locations across graphs (for continuity) and 2. are placed correctly in the
@@ -627,7 +634,11 @@ def remove_empty_leading_dates(
 
 
 def get_savefile_path_and_location_heading(
-    df: pd.DataFrame, description: str, count_type: CaseGroup.CountType
+    df: pd.DataFrame,
+    description: str,
+    *,
+    stage: CaseGroup.Stage,
+    count_type: CaseGroup.CountType,
 ) -> Tuple[Path, str]:
 
     if Locations.WORLD in df[Columns.COUNTRY].values:
@@ -653,6 +664,7 @@ def get_savefile_path_and_location_heading(
         Path()
         / count_type.name.capitalize()
         / description.capitalize()
+        / f"Stage {str(stage).capitalize()}"
         / Path(savefile_basename.lower()).with_suffix(".png")
     )
     return savefile_path, location_heading
@@ -677,63 +689,17 @@ def get_color_palette_assignments(
     )
 
 
-def plot_cases_from_fixed_date(
+def plot(
     df: pd.DataFrame,
     *,
-    count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
-    style=None,
+    x_axis_col,
     start_date=None,
-) -> List[Tuple[plt.Figure, plt.Axes]]:
-
-    if start_date is not None:
-        df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
-
-    df = remove_empty_leading_dates(df, count_type)
-
-    configs = [
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.PRIMARY,
-        },
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.DEATH, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.SECONDARY,
-        },
-    ]
-
-    savefile_path, location_heading = get_savefile_path_and_location_heading(
-        df, FROM_FIXED_DATE_DESC, count_type
-    )
-
-    if df_with_china is not None:
-        color_mapping = get_color_palette_assignments(df_with_china)
-    else:
-        color_mapping = get_color_palette_assignments(df)
-
-    return _plot_helper(
-        df,
-        x_axis_col=Columns.DATE,
-        count_type=count_type,
-        style=style,
-        color_mapping=color_mapping,
-        case_type_config_list=configs,
-        savefile_path=savefile_path,
-        location_heading=location_heading,
-    )
-
-
-def plot_cases_by_days_since_first_widespread_locally(
-    df: pd.DataFrame,
-    *,
+    stage: CaseGroup.Stage = None,
     count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
+    df_with_china: pd.DataFrame = None,
     style=None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
+
     configs = [
         {
             ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
@@ -749,11 +715,21 @@ def plot_cases_by_days_since_first_widespread_locally(
         },
     ]
 
-    savefile_path, location_heading = get_savefile_path_and_location_heading(
-        df, FROM_LOCAL_OUTBREAK_START_DESC, count_type
-    )
+    if x_axis_col == Columns.DATE:
+        if start_date is not None:
+            df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
-    df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
+        df = remove_empty_leading_dates(df, count_type)
+        description = FROM_FIXED_DATE_DESC
+    elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+        df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
+        description = FROM_LOCAL_OUTBREAK_START_DESC
+    else:
+        raise ValueError(f"Unrecognized {x_axis_col=}")
+
+    savefile_path, location_heading = get_savefile_path_and_location_heading(
+        df, description, stage=stage, count_type=count_type
+    )
 
     if df_with_china is not None:
         color_mapping = get_color_palette_assignments(df_with_china)
@@ -763,6 +739,7 @@ def plot_cases_by_days_since_first_widespread_locally(
     return _plot_helper(
         df,
         x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        stage=stage,
         count_type=count_type,
         style=style,
         color_mapping=color_mapping,
