@@ -184,25 +184,6 @@ class Counting(AbstractStrictEnum):
         return f"C.{self.name}"
 
 
-class Constants:
-    @staticmethod
-    @lru_cache(None)
-    def threshold_for(*, stage: DiseaseStage, counting: Counting) -> float:
-        THRESHOLDS = {
-            (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): 100,
-            (DiseaseStage.CONFIRMED, Counting.PER_CAPITA): 1e-5,
-            (DiseaseStage.DEATH, Counting.TOTAL_CASES): 25,
-            (DiseaseStage.DEATH, Counting.PER_CAPITA): 1e-5,
-        }
-        return THRESHOLDS[(stage, counting)]
-
-    @staticmethod
-    @lru_cache(None)
-    def dash_style_for(*, stage: DiseaseStage) -> Tuple:
-        DASH_STYLES = {DiseaseStage.CONFIRMED: (1, 0), DiseaseStage.DEATH: (1, 1)}
-        return DASH_STYLES[stage]
-
-
 class CaseType(enum.Enum):
     # The main ones we use
     CONFIRMED = "Cases"
@@ -233,58 +214,86 @@ class CaseType(enum.Enum):
             return False
         return self.name < other.name
 
+
+class InfoField(AbstractStrictEnum):
+    CASE_TYPE = "CaseType_"
+    THRESHOLD = "Threshold_"
+    DASH_STYLE = "DashStyle_"
+
+    def __str__(self):
+        return f"IF.{self.name}"
+
+
+class CaseInfo:
+    _CASE_TYPES = {
+        (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): CaseType.CONFIRMED,
+        (DiseaseStage.CONFIRMED, Counting.PER_CAPITA,): CaseType.CONFIRMED_PER_CAPITA,
+        (DiseaseStage.DEATH, Counting.TOTAL_CASES): CaseType.DEATHS,
+        (DiseaseStage.DEATH, Counting.PER_CAPITA): CaseType.DEATHS_PER_CAPITA,
+    }
+    _THRESHOLDS = {
+        (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): 100,
+        (DiseaseStage.CONFIRMED, Counting.PER_CAPITA): 1e-5,
+        (DiseaseStage.DEATH, Counting.TOTAL_CASES): 25,
+        (DiseaseStage.DEATH, Counting.PER_CAPITA): 1e-6,
+    }
+    _DASH_STYLES = {DiseaseStage.CONFIRMED: (1, 0), DiseaseStage.DEATH: (1, 1)}
+
     @classmethod
-    @lru_cache(None)
-    def from_specifiers(cls, *, stage: DiseaseStage, counting: Counting) -> "CaseType":
+    def get_info_item_for(
+        cls, *, field: InfoField, stage: DiseaseStage, counting: Counting
+    ):
+        InfoField.verify(field)
         DiseaseStage.verify(stage)
         Counting.verify(counting)
 
-        if stage == DiseaseStage.CONFIRMED:
-            if counting == Counting.TOTAL_CASES:
-                return cls.CONFIRMED
-            elif counting == Counting.PER_CAPITA:
-                return cls.CONFIRMED_PER_CAPITA
-            else:
-                counting.raise_for_unhandled_case()
-
-        elif stage == DiseaseStage.DEATH:
-            if counting == Counting.TOTAL_CASES:
-                return cls.DEATHS
-            elif counting == Counting.PER_CAPITA:
-                return cls.DEATHS_PER_CAPITA
-            else:
-                counting.raise_for_unhandled_case()
-
+        if field == InfoField.CASE_TYPE:
+            return cls._CASE_TYPES[(stage, counting)]
+        elif field == InfoField.DASH_STYLE:
+            return cls._DASH_STYLES[stage]
+        elif field == InfoField.THRESHOLD:
+            return cls._THRESHOLDS[(stage, counting)]
         else:
-            stage.raise_for_unhandled_case()
+            field.raise_for_unhandled_case()
 
-    # Return the series that contains the case type mapping defined
-    # in from_specifiers
     @classmethod
-    @lru_cache(None)
-    def _get_case_type_groups_series(cls) -> pd.Series:
+    @lru_cache
+    # Return df multi-indexed by (Stage, Counting), columns are InfoField
+    def _get_case_type_groups_df(cls) -> pd.DataFrame:
+        multiindex_dict = {t.__name__: t for t in [DiseaseStage, Counting]}
         index = pd.MultiIndex.from_product(
-            [DiseaseStage, Counting], names=[DiseaseStage.__name__, Counting.__name__]
+            multiindex_dict.values(), names=multiindex_dict.keys()
         )
-        values = index.to_frame().apply(
-            lambda row: cls.from_specifiers(
-                stage=row[DiseaseStage.__name__], counting=row[Counting.__name__]
-            ),
-            axis=1,
+        values = (
+            index.to_frame()
+            .apply(
+                lambda row: {
+                    field: cls.get_info_item_for(
+                        stage=row[DiseaseStage.__name__],
+                        counting=row[Counting.__name__],
+                        field=field,
+                    )
+                    for field in InfoField
+                },
+                axis=1,
+            )
+            .tolist()
         )
-        return pd.Series(values, index=index, name=cls.__name__)
 
-    # Get the Series of case types corresponding to the arguments
-    # If both arguments are a single enum case, result is a 1-element Series
-    # None arguments are converted to slice(None), i.e., are wildcards
+        return pd.DataFrame.from_records(values, index=index)
+
     @classmethod
     @lru_cache(None)
-    def get_case_types_for(
+    def get_info_items_for(
         cls,
         *,
+        field: Optional[InfoField] = None,
         stage: Optional[DiseaseStage] = None,
         counting: Optional[Counting] = None,
     ) -> pd.Series:
+
+        if field is None:
+            field = slice(None)
 
         if stage is None:
             stage = slice(None)
@@ -292,11 +301,17 @@ class CaseType(enum.Enum):
         if counting is None:
             counting = slice(None)
 
-        case_types = cls._get_case_type_groups_series().xs(
-            (stage, counting), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
+        info_df = (
+            cls._get_case_type_groups_df()
+            .xs(
+                (stage, counting),
+                level=(DiseaseStage.__name__, Counting.__name__),
+                axis=0,
+            )
+            .loc(axis=1)[field]
         )
 
-        return case_types
+        return info_df
 
 
 class Locations:
@@ -334,6 +349,3 @@ class Urls:
 
 
 # display(CaseType.get_case_types(stage=CaseGroup.Stage.CONFIRMED))
-
-
-# %%
