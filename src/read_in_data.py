@@ -9,7 +9,7 @@ from IPython.display import display  # noqa F401
 
 from constants import (
     USA_STATE_CODES,
-    CaseType,
+    CaseTypes,
     Columns,
     Locations,
     Paths,
@@ -74,8 +74,8 @@ class SaveFormats(enum.Enum):
             columns={
                 "date": Columns.DATE,
                 "state": Columns.TWO_LETTER_STATE_CODE,
-                "positive": CaseType.CONFIRMED,
-                "death": CaseType.DEATHS,
+                "positive": CaseTypes.CONFIRMED,
+                "death": CaseTypes.DEATHS,
             }
         )
         for col in [Columns.DATE, "dateChecked"]:
@@ -86,8 +86,8 @@ class SaveFormats(enum.Enum):
         df = df.melt(
             id_vars=[Columns.DATE, Columns.TWO_LETTER_STATE_CODE, "dateChecked"],
             value_vars=[
-                CaseType.CONFIRMED,
-                CaseType.DEATHS,
+                CaseTypes.CONFIRMED,
+                CaseTypes.DEATHS,
                 # "negative",
                 # "pending",
                 # "hospitalized",
@@ -151,8 +151,8 @@ class SaveFormats(enum.Enum):
             columns={
                 "country": Columns.COUNTRY,
                 "date": Columns.DATE,
-                "confirmed": CaseType.CONFIRMED,
-                "deaths": CaseType.DEATHS,
+                "confirmed": CaseTypes.CONFIRMED,
+                "deaths": CaseTypes.DEATHS,
             }
         )
         for col in [Columns.DATE]:
@@ -168,7 +168,7 @@ class SaveFormats(enum.Enum):
                 "dateInProgress",
                 "updated",
             ],
-            value_vars=[CaseType.CONFIRMED, CaseType.DEATHS],
+            value_vars=[CaseTypes.CONFIRMED, CaseTypes.DEATHS],
             var_name=Columns.CASE_TYPE,
             value_name=Columns.CASE_COUNT,
         )

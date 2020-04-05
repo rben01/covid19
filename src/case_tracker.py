@@ -29,25 +29,13 @@ def _get_df_with_outbreak_start_date_and_days_since(df: pd.DataFrame) -> pd.Data
         InfoField.THRESHOLD, InfoField.CASE_TYPE
     )
 
-    x = set(df[Columns.CASE_TYPE].values)
-    y = set(outbreak_thresholds[InfoField.CASE_TYPE].values)
-    display(x)
-    display(y)
-    display(x.union(y))
-    s = sorted(x.union(y))
-    display(s)
-    display(s[0] == s[1])
-    display(hash(s[0]), hash(s[1]))
-    # a1 = next(it)
-    # a2 = next(it)
-    # display(a1, a2)
+    # Add threshold column to df
     df = df.merge(
         outbreak_thresholds,
         how="left",
         left_on=Columns.CASE_TYPE,
         right_on=InfoField.CASE_TYPE,
     )
-    display(df)
 
     outbreak_id_cols = [*Columns.location_id_cols, Columns.CASE_TYPE]
     outbreak_start_dates = (
@@ -59,7 +47,9 @@ def _get_df_with_outbreak_start_date_and_days_since(df: pd.DataFrame) -> pd.Data
         .rename(Columns.OUTBREAK_START_DATE_COL)
     )
 
-    df = df.merge(outbreak_start_dates, how="left", on=outbreak_id_cols)
+    df = df.merge(outbreak_start_dates, how="left", on=outbreak_id_cols).drop(
+        columns=[InfoField.THRESHOLD, InfoField.CASE_TYPE]
+    )
 
     # For each row, get n days since outbreak started
     df[Columns.DAYS_SINCE_OUTBREAK] = (
@@ -109,29 +99,24 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     return df
 
 
-df = get_df(refresh_local_data=False)
-df
-# %%
-
-
 def keep_only_n_largest_locations(
-    df: pd.DataFrame, n: int, count_type: Counting
+    df: pd.DataFrame, n: int, counting: Counting
 ) -> pd.DataFrame:
-    case_type = CaseTypes.get_case_types(
-        stage=DiseaseStage.CONFIRMED, count_type=count_type
+    case_type = CaseInfo.get_info_item_for(
+        InfoField.CASE_TYPE, stage=DiseaseStage.CONFIRMED, counting=counting
     )
 
     def get_n_largest_locations(df: pd.DataFrame) -> pd.Series:
         return (
             df[df[Columns.CASE_TYPE] == case_type]
-            .groupby(Columns.id_cols)
+            .groupby(Columns.location_id_cols)
             .apply(lambda g: g[Columns.CASE_COUNT].iloc[-1])
             .nlargest(n)
             .rename(CaseTypes.CONFIRMED)
         )
 
     def keep_only_above_cutoff(df: pd.DataFrame, cutoff: float) -> pd.DataFrame:
-        return df.groupby(Columns.id_cols).filter(
+        return df.groupby(Columns.location_id_cols).filter(
             lambda g: (
                 g.loc[g[Columns.CASE_TYPE] == case_type, Columns.CASE_COUNT].iloc[-1]
                 >= cutoff
@@ -152,9 +137,11 @@ def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_countries_df(
-    df: pd.DataFrame, n: int, count_type: Counting = None, *, include_china: bool,
+    df: pd.DataFrame, n: int, counting: Counting = None, *, include_china: bool,
 ) -> pd.DataFrame:
-    count_type = count_type or Counting.TOTAL_CASES
+
+    if counting is None:
+        counting = Counting.TOTAL_CASES
 
     exclude_locations = set([Locations.WORLD, Locations.WORLD_MINUS_CHINA])
     if not include_china:
@@ -163,17 +150,18 @@ def get_countries_df(
     df = df[
         (~df[Columns.IS_STATE]) & (~df[Columns.LOCATION_NAME].isin(exclude_locations))
     ]
-    return keep_only_n_largest_locations(df, n, count_type)
+    return keep_only_n_largest_locations(df, n, counting)
 
 
 def get_usa_states_df(
-    df: pd.DataFrame, n: int, count_type: Counting = None
+    df: pd.DataFrame, n: int, counting: Counting = None
 ) -> pd.DataFrame:
-    if count_type is None:
-        count_type = Counting.TOTAL_CASES
+
+    if counting is None:
+        counting = Counting.TOTAL_CASES
 
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
-    return keep_only_n_largest_locations(df, n, count_type)
+    return keep_only_n_largest_locations(df, n, counting)
 
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:

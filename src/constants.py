@@ -220,10 +220,10 @@ class InfoField(AbstractStrictEnum):
 
 class CaseInfo:
     _CASE_TYPES = {
-        (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): CaseType.CONFIRMED,
-        (DiseaseStage.CONFIRMED, Counting.PER_CAPITA,): CaseType.CONFIRMED_PER_CAPITA,
-        (DiseaseStage.DEATH, Counting.TOTAL_CASES): CaseType.DEATHS,
-        (DiseaseStage.DEATH, Counting.PER_CAPITA): CaseType.DEATHS_PER_CAPITA,
+        (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): CaseTypes.CONFIRMED,
+        (DiseaseStage.CONFIRMED, Counting.PER_CAPITA,): CaseTypes.CONFIRMED_PER_CAPITA,
+        (DiseaseStage.DEATH, Counting.TOTAL_CASES): CaseTypes.DEATHS,
+        (DiseaseStage.DEATH, Counting.PER_CAPITA): CaseTypes.DEATHS_PER_CAPITA,
     }
     _THRESHOLDS = {
         (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): 100,
