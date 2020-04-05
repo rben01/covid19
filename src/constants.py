@@ -4,7 +4,7 @@ import itertools
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import NoReturn, Tuple
+from typing import NoReturn, Optional, Tuple
 
 import pandas as pd
 from IPython.display import display  # noqa F401
@@ -133,6 +133,12 @@ class Columns(enum.Enum):
     def location_id_cols(cls):
         return [cls.COUNTRY, cls.STATE, cls.LOCATION_NAME]
 
+    def col_name(self):
+        if self == self.URL:
+            return "URL"
+        else:
+            return self.value.title()
+
 
 class StrictEnumError(Exception):
     pass
@@ -153,28 +159,28 @@ class DiseaseStage(AbstractStrictEnum):
     DEATH = enum.auto()
 
     def __str__(self):
-        return self.name
+        return f"DS.{self.name}"
 
 
-class CountType(AbstractStrictEnum):
-    ABSOLUTE = enum.auto()
+class Counting(AbstractStrictEnum):
+    TOTAL_CASES = enum.auto()
     PER_CAPITA = enum.auto()
 
     def __str__(self):
-        return self.name
+        return f"C.{self.name}"
 
 
 class Constants:
     @staticmethod
     @lru_cache(None)
-    def threshold_for(*, stage: DiseaseStage, count_type: CountType) -> float:
+    def threshold_for(*, stage: DiseaseStage, counting: Counting) -> float:
         THRESHOLDS = {
-            (DiseaseStage.CONFIRMED, CountType.ABSOLUTE): 100,
-            (DiseaseStage.CONFIRMED, CountType.PER_CAPITA): 1e-5,
-            (DiseaseStage.DEATH, CountType.ABSOLUTE): 25,
-            (DiseaseStage.DEATH, CountType.PER_CAPITA): 1e-5,
+            (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): 100,
+            (DiseaseStage.CONFIRMED, Counting.PER_CAPITA): 1e-5,
+            (DiseaseStage.DEATH, Counting.TOTAL_CASES): 25,
+            (DiseaseStage.DEATH, Counting.PER_CAPITA): 1e-5,
         }
-        return THRESHOLDS[(stage, count_type)]
+        return THRESHOLDS[(stage, counting)]
 
     @staticmethod
     @lru_cache(None)
@@ -183,11 +189,11 @@ class Constants:
         return DASH_STYLES[stage]
 
 
-class CaseTypes(enum.Enum):
+class CaseType(enum.Enum):
     # The main ones we use
     CONFIRMED = "Cases"
     DEATHS = "Deaths"
-    CASES_PER_CAPITA = CONFIRMED + " Per Cap."
+    CONFIRMED_PER_CAPITA = CONFIRMED + " Per Cap."
     DEATHS_PER_CAPITA = DEATHS + " Per Cap."
 
     # Not used much, but keep them around
@@ -198,79 +204,80 @@ class CaseTypes(enum.Enum):
     GROWTH_FACTOR = "GrowthFactor"
 
     # Impart type info
-    CONFIRMED: "CaseTypes"
-    DEATHS: "CaseTypes"
-    CASES_PER_CAPITA: "CaseTypes"
-    DEATHS_PER_CAPITA: "CaseTypes"
-    TESTED: "CaseTypes"
-    ACTIVE: "CaseTypes"
-    RECOVERED: "CaseTypes"
-    MORTALITY: "CaseTypes"
-    GROWTH_FACTOR: "CaseTypes"
+    CONFIRMED: "CaseType"
+    DEATHS: "CaseType"
+    CONFIRMED_PER_CAPITA: "CaseType"
+    DEATHS_PER_CAPITA: "CaseType"
+    TESTED: "CaseType"
+    ACTIVE: "CaseType"
+    RECOVERED: "CaseType"
+    MORTALITY: "CaseType"
+    GROWTH_FACTOR: "CaseType"
 
     @classmethod
     @lru_cache(None)
-    def from_specifiers(
-        cls, *, stage: DiseaseStage, count_type: CountType
-    ) -> "CaseTypes":
-        CASE_TYPE_MAP = {
-            (DiseaseStage.CONFIRMED, CountType.ABSOLUTE): cls.CONFIRMED,
-            (DiseaseStage.CONFIRMED, CountType.PER_CAPITA): cls.CASES_PER_CAPITA,
-            (DiseaseStage.DEATH, CountType.ABSOLUTE): cls.DEATHS,
-            (DiseaseStage.DEATH, CountType.PER_CAPITA): cls.DEATHS_PER_CAPITA,
-        }
-        return CASE_TYPE_MAP[(stage, count_type)]
+    def from_specifiers(cls, *, stage: DiseaseStage, counting: Counting) -> "CaseType":
+        DiseaseStage.verify(stage)
+        Counting.verify(counting)
 
-    # We can't create this df until the class is defined, so we make it a staticmethod
-    # and for effiicency purposes memoize it
+        if stage == DiseaseStage.CONFIRMED:
+            if counting == Counting.TOTAL_CASES:
+                return cls.CONFIRMED
+            elif counting == Counting.PER_CAPITA:
+                return cls.CONFIRMED_PER_CAPITA
+            else:
+                counting.raise_for_unhandled_case()
+
+        elif stage == DiseaseStage.DEATH:
+            if counting == Counting.TOTAL_CASES:
+                return cls.DEATHS
+            elif counting == Counting.PER_CAPITA:
+                return cls.DEATHS_PER_CAPITA
+            else:
+                counting.raise_for_unhandled_case()
+
+        else:
+            stage.raise_for_unhandled_case()
+
+    # Return the series that contains the case type mapping defined
+    # in from_specifiers
     @classmethod
     @lru_cache(None)
     def _get_case_type_groups_series(cls) -> pd.Series:
-        return pd.DataFrame.from_records(
-            [
-                {
-                    DiseaseStage.__name__: stage,
-                    CountType.__name__: count_type,
-                    "Case_Type": cls.from_specifiers(
-                        stage=stage, count_type=count_type
-                    ),
-                }
-                for (stage, count_type) in itertools.product(DiseaseStage, CountType)
-            ],
-            index=[DiseaseStage.__name__, CountType.__name__],
-        )["Case_Type"]
+        index = pd.MultiIndex.from_product(
+            [DiseaseStage, Counting], names=[DiseaseStage.__name__, Counting.__name__]
+        )
+        values = index.to_frame().apply(
+            lambda row: cls.from_specifiers(
+                stage=row[DiseaseStage.__name__], counting=row[Counting.__name__]
+            ),
+            axis=1,
+        )
+        return pd.Series(values, index=index, name=cls.__name__)
 
-    # We call this method a ton, no point in not caching its results
+    # Get the Series of case types corresponding to the arguments
+    # If both arguments are a single enum case, result is a 1-element Series
+    # None arguments are converted to slice(None), i.e., are wildcards
     @classmethod
     @lru_cache(None)
     def get_case_types_for(
-        cls, *, stage: DiseaseStage = None, count_type: CountType = None
+        cls,
+        *,
+        stage: Optional[DiseaseStage] = None,
+        counting: Optional[Counting] = None,
     ) -> pd.Series:
 
-        stage = stage or slice(None)
-        count_type = count_type or slice(None)
+        if stage is None:
+            stage = slice(None)
+
+        if counting is None:
+            counting = slice(None)
+
         case_types = cls._get_case_type_groups_series().xs(
-            (stage, count_type),
-            level=(DiseaseStage.__name__, CountType.__name__),
-            axis=0,
+            (stage, counting), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
         )
 
         return case_types
-
-    @classmethod
-    @lru_cache(None)
-    def get_unique_case_type_for(
-        cls, *, stage: DiseaseStage, count_type: CountType
-    ) -> str:
-
-        case_types = cls.get_case_types_for(stage=stage, count_type=count_type)
-        if len(case_types) != 1:
-            raise ValueError(
-                f"Expected just one case type; got {case_types} "
-                + f"for {stage=}, {count_type=}"
-            )
-
-        return case_types.iloc[0]
 
 
 class Locations:
@@ -307,4 +314,7 @@ class Urls:
     }
 
 
-# display(CaseTypes.get_case_types(stage=CaseGroup.Stage.CONFIRMED))
+# display(CaseType.get_case_types(stage=CaseGroup.Stage.CONFIRMED))
+
+
+# %%
