@@ -284,4 +284,5 @@ class SaveFormats(enum.Enum):
             raise ValueError(f"Unhandled case {self} when writing")
 
 
-SaveFormats.CSV.read(from_web=False)
+if __name__ == "__main__":
+    xx = SaveFormats.CSV.read(from_web=False)

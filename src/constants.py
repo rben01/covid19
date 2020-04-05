@@ -228,6 +228,11 @@ class CaseType(enum.Enum):
     MORTALITY: "CaseType"
     GROWTH_FACTOR: "CaseType"
 
+    def __lt__(self, other):
+        if not isinstance(other, type(self)):
+            return False
+        return self.name < other.name
+
     @classmethod
     @lru_cache(None)
     def from_specifiers(cls, *, stage: DiseaseStage, counting: Counting) -> "CaseType":

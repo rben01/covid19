@@ -7,10 +7,9 @@ from IPython.display import display  # noqa F401
 import read_in_data
 from constants import CaseGroup, CaseTypes, Columns, Locations, Paths, Thresholds
 from plotting import plot
-from typing import List
 
 
-def get_data(*, from_web: bool) -> pd.DataFrame:
+def _get_data(*, from_web: bool) -> pd.DataFrame:
     df = read_in_data.SaveFormats.CSV.read(from_web=from_web)
     return df
 
@@ -86,7 +85,7 @@ def clean_up(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
-    df = get_data(from_web=refresh_local_data)
+    df = _get_data(from_web=refresh_local_data)
     df = append_per_capita_data(df)
     df = clean_up(df)
     return df
