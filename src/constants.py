@@ -3,12 +3,14 @@ import enum
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import NoReturn, Optional, Tuple, List, NewType
+from typing import Any, List, NewType, NoReturn, Optional, Union
 
 import pandas as pd
 from IPython.display import display  # noqa F401
 
+Atom = NewType("Atom", Any)
 Column = NewType("Column", str)
+CaseType = NewType("CaseType", str)
 
 # Includes D.C.; has length 51
 USA_STATE_CODES = [
@@ -148,10 +150,7 @@ class Columns:
         POPULATION,
     ]
 
-    @classmethod
-    @lru_cache(None)
-    def location_id_cols(cls) -> List[Column]:
-        return [cls.COUNTRY, cls.STATE, cls.LOCATION_NAME]
+    location_id_cols = [COUNTRY, STATE, LOCATION_NAME]
 
 
 class StrictEnumError(Exception):
@@ -184,7 +183,7 @@ class Counting(AbstractStrictEnum):
         return f"C.{self.name}"
 
 
-class CaseType(enum.Enum):
+class CaseTypes:
     # The main ones we use
     CONFIRMED = "Cases"
     DEATHS = "Deaths"
@@ -208,11 +207,6 @@ class CaseType(enum.Enum):
     RECOVERED: "CaseType"
     MORTALITY: "CaseType"
     GROWTH_FACTOR: "CaseType"
-
-    def __lt__(self, other):
-        if not isinstance(other, type(self)):
-            return False
-        return self.name < other.name
 
 
 class InfoField(AbstractStrictEnum):
@@ -241,8 +235,8 @@ class CaseInfo:
 
     @classmethod
     def get_info_item_for(
-        cls, *, field: InfoField, stage: DiseaseStage, counting: Counting
-    ):
+        cls, field: InfoField, *, stage: DiseaseStage, counting: Counting
+    ) -> Atom:
         InfoField.verify(field)
         DiseaseStage.verify(stage)
         Counting.verify(counting)
@@ -286,30 +280,35 @@ class CaseInfo:
     @lru_cache(None)
     def get_info_items_for(
         cls,
-        *,
-        field: Optional[InfoField] = None,
+        *fields: List[InfoField],
         stage: Optional[DiseaseStage] = None,
         counting: Optional[Counting] = None,
-    ) -> pd.Series:
+        squeeze=True,
+    ) -> Union[pd.Series, pd.DataFrame]:
 
-        if field is None:
-            field = slice(None)
+        if not fields:
+            fields = slice(None)
+        else:
+            fields = list(fields)
+            for field in fields:
+                InfoField.verify(field)
 
         if stage is None:
             stage = slice(None)
+        else:
+            DiseaseStage.verify(stage)
 
         if counting is None:
             counting = slice(None)
+        else:
+            Counting.verify(counting)
 
-        info_df = (
-            cls._get_case_type_groups_df()
-            .xs(
-                (stage, counting),
-                level=(DiseaseStage.__name__, Counting.__name__),
-                axis=0,
-            )
-            .loc(axis=1)[field]
-        )
+        info_df = cls._get_case_type_groups_df().xs(
+            (stage, counting), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
+        )[fields]
+
+        if squeeze and len(fields) == 1:
+            info_df = info_df.iloc[:, 0]
 
         return info_df
 
