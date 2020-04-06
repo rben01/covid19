@@ -243,7 +243,7 @@ def main(namespace: argparse.Namespace = None):
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
         x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
-        stage=None,
+        stage=DiseaseStage.CONFIRMED,
         count=Counting.TOTAL_CASES,
     )
     plot(
@@ -257,7 +257,7 @@ def main(namespace: argparse.Namespace = None):
     plot(
         usa_states_df,
         x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
-        stage=None,
+        stage=DiseaseStage.CONFIRMED,
         count=Counting.TOTAL_CASES,
     )
     plot(

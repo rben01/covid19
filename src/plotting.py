@@ -204,7 +204,7 @@ def _add_doubling_time_lines(
         # texts' boxes clipping the axes, we move things in just a hair)
         ac_x_upper_lim = ac_y_upper_lim = 1
 
-        doubling_times = [2, 3, 4, 7, 14]  # days (x-axis units)
+        doubling_times = [1, 2, 3, 4, 7, 14]  # days (x-axis units)
         for dt in doubling_times:
             # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
             # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
@@ -229,7 +229,7 @@ def _add_doubling_time_lines(
                 transform=ax.transAxes,
                 color="0.0",
                 alpha=0.7,
-                dashes=(3, 2),
+                dashes=(1, 2),
                 linewidth=1,
             )
 
@@ -536,7 +536,6 @@ def _plot_helper(
             for tick in ax.get_xticklabels():
                 tick.set_rotation(80)
 
-            ax.set_ylim(bottom=0.9)
         elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
@@ -550,7 +549,7 @@ def _plot_helper(
             ).values
             ax.set_xlabel(f"Days Since Reaching {_threshold:.3g} {_axis_name}")
 
-            if stage is not None:  # i.e. if all DiseaseStages plotted
+            if stage is not None:  # i.e. if only one DiseaseStage plotted
                 ax.set_ylim(bottom=_threshold / 4)
 
         else:

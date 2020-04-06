@@ -3,7 +3,7 @@ import enum
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, List, NewType, NoReturn, Optional, Union
+from typing import Any, List, Mapping, NewType, NoReturn, Optional, Tuple, Union
 
 import pandas as pd
 from IPython.display import display  # noqa F401
@@ -261,6 +261,10 @@ class InfoField(ABCStrictEnum):
     THRESHOLD = "Threshold_"
     DASH_STYLE = "DashStyle_"
 
+    CASE_TYPE: "InfoField"
+    THRESHOLD: "InfoField"
+    DASH_STYLE: "InfoField"
+
     def __str__(self):
         return f"IF.{self.name}"
 
@@ -279,6 +283,10 @@ class CaseInfo:
         (DiseaseStage.DEATH, Counting.PER_CAPITA): 1e-6,
     }
     _DASH_STYLES = {DiseaseStage.CONFIRMED: (1, 0), DiseaseStage.DEATH: (2, 1)}
+
+    _CASE_TYPES: Mapping[Tuple[DiseaseStage, Counting], CaseType]
+    _THRESHOLDS: Mapping[Tuple[DiseaseStage, Counting], float]
+    _DASH_STYLES: Mapping[DiseaseStage, Tuple]
 
     @classmethod
     def get_info_item_for(
