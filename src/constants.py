@@ -202,6 +202,9 @@ class DiseaseStage(ABCStrictEnum):
     def __str__(self):
         return f"DS.{self.name}"
 
+    def pprint(self):
+        return f"{self.name.capitalize()}"
+
 
 @enum.unique
 class Counting(ABCStrictEnum):
@@ -213,6 +216,9 @@ class Counting(ABCStrictEnum):
 
     def __str__(self):
         return f"C.{self.name}"
+
+    def pprint(self):
+        return f"{self.name.capitalize()}"
 
 
 class CaseTypes:
@@ -339,6 +345,7 @@ class CaseInfo:
             (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
         )[fields]
 
+        # If squeeze and one column, return column (a Series)
         if squeeze and len(fields) == 1:
             info_df = info_df.iloc[:, 0]
 

@@ -280,7 +280,6 @@ def main(namespace: argparse.Namespace = None):
     return df
 
 
-df = main()
 # A little hack -- an ipython cell that will run in an interactive window but not when
 # running this from a terminal
 if False:
