@@ -69,6 +69,12 @@ USA_STATE_CODES = [
 
 
 class Paths:
+    """A namespace for Path constants
+
+    Intelligently determines the project's ROOT directory regardless of CWD when
+    case_tracker.py is run
+    """
+
     # Try to use source filename to get project dir - this works if running from
     # a command line
     ROOT = Path(sys.argv[0]).parent.parent
@@ -95,21 +101,73 @@ class Paths:
 
 
 class StrictEnumError(Exception):
+    """An Exception corresponding to a violation of the StrictEnum assumptions
+    """
+
     pass
 
 
 class ABCStrictEnum(enum.Enum):
+    """An ABC that enums may inherit from in order to gain strict behavior
+
+    Provides a `verify` classmethod that ensures an arbitrary value is indeed a case of
+    the calling enum, and a `raise_for_unhandled_case` instance method that errors when
+    an if/elif/else statement forgets to handle the calling case
+    """
+
     @classmethod
     def verify(cls, item):
+        """Verify that the passed item is a case of this enum
+
+        Raises if `item` is not a case of this enum, else returns
+
+        :param item: The object to test
+        :type item: Any
+        :raises StrictEnumError: If `item` is not a case of this enum
+        """
         if item is not None and item not in cls:
             raise StrictEnumError(f"Invalid {cls} case {item}")
 
     def raise_for_unhandled_case(self) -> NoReturn:
+        """Unconditionally raises; used to signal that this case was unhandled in a
+        if/elif/else statement
+
+        Used as follows:
+        ```
+        if case is value1:
+            pass
+        elif case is value2:
+            pass
+        else: # We did not handle every possible value of `case`
+            case.raise_for_unhandled_case()
+        ```
+
+        :raises StrictEnumError: Always raises, indicating that this case went unhandled
+        :return: Never returns
+        :rtype: NoReturn
+        """
         raise StrictEnumError(f"Unhandled case {self!r}")
 
 
 class ABCStrictTypeComparisonEnum(ABCStrictEnum):
-    def __eq__(self, other):
+    """A subclass of ABCStrictEnum that additionally raises an exception when comparing
+    enum cases to something other than cases of the same enum
+
+    Normally, comparing an enum case to an object of a different type simply returns
+    `False`. This class makes performing such comparisons an error. This is used to
+    catch when an == comparison has been written incorrectly.
+
+    """
+
+    def __eq__(self, other) -> bool:
+        """If `other` is not a case of this enum, raise; else check equality normally
+
+        :param other: The object to check for equality
+        :type other: Any
+        :raises StrictEnumError: Raised when `other` is not a case of this enum
+        :return: Whether the two objects represent the same case
+        :rtype: bool
+        """
         if self.__class__ != other.__class__:
             raise StrictEnumError(
                 f"Cannot compare {self=!r} to object {other!r} of type {type(other)}"
@@ -121,6 +179,9 @@ class ABCStrictTypeComparisonEnum(ABCStrictEnum):
 
 
 class Columns:
+    """A namespace for string constants used as column names
+    """
+
     LATITUDE = "Lat"
     LONGITUDE = "Long"
     CITY = "City"
@@ -179,10 +240,24 @@ class Columns:
     location_id_cols = [COUNTRY, STATE, LOCATION_NAME]
 
     class XAxis(ABCStrictTypeComparisonEnum):
+        """An enum whose cases represent columns that may be used for the x-axis
+
+        Maintains a mapping between cases in this enum and the corresponding column name
+        in `Columns`. Raises an error when compared to an object that's not an `XAxis`.
+        """
+
         DATE = enum.auto()
         DAYS_SINCE_OUTBREAK = enum.auto()
 
         def column(self) -> Column:
+            """Return the column name for this case
+
+            Provides the mapping of `XAxis` to column names
+
+            :return: The corresponding column name
+            :rtype: Column
+            """
+
             if self == self.DATE:
                 return Columns.DATE
             elif self == self.DAYS_SINCE_OUTBREAK:
@@ -190,7 +265,15 @@ class Columns:
             else:
                 self.raise_for_unhandled_case()
 
-        def pprint(self):
+        def pprint(self) -> str:
+            """Get a string describing self
+
+            Useful for e.g., file/folder names based off this case
+
+            :return: A descriptive string representing this case
+            :rtype: str
+            """
+
             if self == self.DATE:
                 return "From_fixed_date"
             elif self == self.DAYS_SINCE_OUTBREAK:
@@ -201,35 +284,49 @@ class Columns:
 
 @enum.unique
 class DiseaseStage(ABCStrictEnum):
+    """An enum whose cases represent stages of the disease (confirmed, dead)
+    """
+
     CONFIRMED = enum.auto()
     DEATH = enum.auto()
 
     CONFIRMED: "DiseaseStage"
     DEATH: "DiseaseStage"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"DS.{self.name}"
 
-    def pprint(self):
+    def pprint(self) -> str:
         return f"{self.name.capitalize()}"
 
 
 @enum.unique
 class Counting(ABCStrictEnum):
+    """An enum whose cases represent how to count cases of COVID for a given disease
+    stage (total cases, per capita) within a given region
+    """
+
     TOTAL_CASES = enum.auto()
     PER_CAPITA = enum.auto()
 
     TOTAL_CASES: "Counting"
     PER_CAPITA: "Counting"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"C.{self.name}"
 
-    def pprint(self):
+    def pprint(self) -> str:
         return f"{self.name.capitalize()}"
 
 
 class CaseTypes:
+    """A namespace containing string constants that describe the different case types
+
+    There are a number of different case types: confirmd, tested, active, revovered,
+    dead, as well as per-capita versions of these. This class collects these cases as
+    string constants for use in interpreting data stored in dataframes.
+    """
+
     # The main ones we use
     CONFIRMED = "Cases"
     DEATHS = "Deaths"
@@ -257,6 +354,14 @@ class CaseTypes:
 
 @enum.unique
 class InfoField(ABCStrictEnum):
+    """An enum whose cases represent a piece of information mapped from a combination
+    of `DiseaseStage` and `Counting`
+
+    Each (`DiseaseStage`, `Counting`) tuple has an associated set of data: the case
+    type, the outbreak threshold, the dash style (for plotting). This enum contains
+    cases for specifying a field to fetch from this data set.
+    """
+
     CASE_TYPE = "CaseType_"
     THRESHOLD = "Threshold_"
     DASH_STYLE = "DashStyle_"
@@ -265,11 +370,18 @@ class InfoField(ABCStrictEnum):
     THRESHOLD: "InfoField"
     DASH_STYLE: "InfoField"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"IF.{self.name}"
 
 
 class CaseInfo:
+    """A namespace for convenience methods to return information related to cases
+
+    Each (`DiseaseStage`, `Counting`) tuple has an associated set of data. This class
+    contains methods for slicing that data set (`DiseaseStage` x `Counting` x
+    `InfoField`) in order to retrieve values for any cross-section thereof
+    """
+
     _CASE_TYPES = {
         (DiseaseStage.CONFIRMED, Counting.TOTAL_CASES): CaseTypes.CONFIRMED,
         (DiseaseStage.CONFIRMED, Counting.PER_CAPITA,): CaseTypes.CONFIRMED_PER_CAPITA,
@@ -292,6 +404,22 @@ class CaseInfo:
     def get_info_item_for(
         cls, field: InfoField, *, stage: DiseaseStage, count: Counting
     ) -> Atom:
+        """Get the single piece of information corresponding to the arguments
+
+        A tuple (`field`, `stage`, `count`), such as (`DASH_STYLE`, `CONFIRMED`,
+        `TOTAL_CASES`), uniquely identifies a piece of information to return. This
+        function returns that information.
+
+        :param field: The field to return for the given `stage`+`count` combination
+        :type field: InfoField
+        :param stage: The disease stage to return information for
+        :type stage: DiseaseStage
+        :param count: The count method to return information for
+        :type count: Counting
+        :return: The single piece of information corresponding to the passed arguments
+        :rtype: Atom
+        """
+
         InfoField.verify(field)
         DiseaseStage.verify(stage)
         Counting.verify(count)
@@ -309,6 +437,17 @@ class CaseInfo:
     @lru_cache
     # Return df multi-indexed by (Stage, Counting), columns are InfoField
     def _get_case_type_groups_df(cls) -> pd.DataFrame:
+        """Get the dataframe containing all (field, stage, count) information
+
+        Returns a dataframe whose index is the product of `DiseaseStage` and `Counting`,
+        whose columns are `InfoField` cases, and whose values are the corresponding
+        values; `df.loc[(stage, count), field] == get_info_item_for(field, stage,
+        count)`. This is effectively a class constant, so we memoize its result.
+
+        :return: [description]
+        :rtype: pd.DataFrame
+        """
+
         enums = [DiseaseStage, Counting]
         enum_names = [e.__name__ for e in enums]
         index = pd.MultiIndex.from_product(enums, names=enum_names)
@@ -340,6 +479,41 @@ class CaseInfo:
         squeeze_rows=False,
         squeeze_cols=True,
     ) -> Union[Atom, pd.Series, pd.DataFrame]:
+        """Retrieve the slice of information corresponding to the passed arguments
+
+        Underlying this is a dataframe containing information corresponding to all
+        (`field`, `stage`, `count`) tuples. This function takes a variable number of
+        fields, a single stage (or None), and a single count (or None), and produces
+        the slice of the data corresponding to them. If multiple fields are given,
+        multiple columns will be returned.
+
+        :param *fields: The fields whose information is to be returned
+        :type *fields: InfoField...
+        :param stage: The `DiseaseStage` to return information for, by default None.
+        Defaults to None (return info for all `DiseaseStage` cases).
+        :type stage: Optional[DiseaseStage], optional
+        :param count: The `Counting` to return information for. Defaults to None (return
+            info for all `Counting` cases).
+        :type count: Optional[Counting], optional
+        :param squeeze_rows: By default False. If True, and the result has a single row,
+        return the result as a Series instead of a DataFrame. Has no effect if the
+        result has >1 row. If the resulting series has length 1 and `squeeze_cols`, then
+        return just the one element of the series.
+        :type squeeze_rows: bool, optional
+        :param squeeze_cols: By default True. If True, and the result has a single
+        column, return the result as a Series instead of a DataFrame. Has no effect
+        if the result has >1 column. If the resulting series has length 1 and
+        `squeeze_rows`, then return just the one element of the series.
+        :type squeeze_cols: bool, optional
+        :return: The slice of the data corresponding to the arguments. The `squeeze_*`
+        parameters attempt to squeeze the resulting dataframe into a smaller-dimensional
+        object. `squeeze_rows` and `squeeze_cols` attempt to squeeze a single row and a
+        single column, respectively, into a Series. If both are True, and the result has
+        one element (i.e., there is one row and one column) then the element itself
+        will be returned.
+        If not squeezed, the data is returned as a DataFrame.
+        :rtype: Union[Atom, pd.Series, pd.DataFrame]
+        """
 
         if not fields:
             fields = slice(None)
@@ -362,12 +536,6 @@ class CaseInfo:
             (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
         )[fields]
 
-        # TODO: update this comment
-        # If squeeze and one column, return the column (a Series)
-        # If squeeze and one row, return the row (a Series)
-        # Even if there's only one element, return a Series, not an atom
-        # (for compatibility with df[col].isin)
-        # If squeeze but no other conditions met, return DataFrame
         # Col squeezing must come first, as after squeezing rows there might not be an
         # axis 1 (but there'll always be an axis 0)
         if squeeze_cols and len(fields) == 1:
@@ -379,6 +547,9 @@ class CaseInfo:
 
 
 class Locations:
+    """Namespace for string constants of commonly used location names
+    """
+
     WORLD = "World"
     WORLD_MINUS_CHINA = "Non-China"
     CHINA = "China"
@@ -394,6 +565,9 @@ class Locations:
 
 
 class Urls:
+    """Namespace for string constants of commonly used URLs
+    """
+
     WAPO_COUNTRIES_DAILY_HISTORICAL = (
         "https://www.washingtonpost.com/graphics/2020/"
         + "world/mapping-spread-new-coronavirus/"

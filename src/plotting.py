@@ -22,7 +22,7 @@ from matplotlib.ticker import (
 )
 
 from constants import (
-    ABCStrictEnum,
+    ABCStrictTypeComparisonEnum,
     CaseInfo,
     CaseTypes,
     Columns,
@@ -52,12 +52,28 @@ ColorPalette = List[SingleColor]
 LocationColorMapping = pd.DataFrame
 
 
-class EdgeGuide(ABCStrictEnum):
+class EdgeGuide(ABCStrictTypeComparisonEnum):
+    """An enum whose cases represent which edge of the graph text is to be aligned with
+    """
+
     RIGHT = "right"
     TOP = "top"
 
+    RIGHT: "EdgeGuide"
+    TOP: "EdgeGuide"
+
 
 def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
+    """Create the column label for the given doubling time days-ago number
+
+    [extended_summary]
+
+    :param day_idx: The iloc[] index giving the time interval (in days) over which to
+    compute the doubling time
+    :type day_idx: int
+    :return: The column label
+    :rtype: Tuple[str, int]
+    """
     return (DOUBLING_TIME, day_idx)
 
 
@@ -68,6 +84,22 @@ def get_current_case_data(
     count: Counting,
     x_axis: Columns.XAxis,
 ) -> pd.DataFrame:
+    """Get the current case information
+
+    For the given stage (optional), count, and x_axis, return a dataframe containing the
+    current case information -- current stage (per capita) count
+
+    :param df: The dataframe containing all case info
+    :type df: pd.DataFrame
+    :param stage: The stage to keep when getting current data
+    :type stage: Optional[DiseaseStage]
+    :param count: The count type to keep when getting current data
+    :type count: Counting
+    :param x_axis: Used to determine which column to sort the current case data by
+    :type x_axis: Columns.XAxis
+    :return: Dataframe representing the current state of affairs
+    :rtype: pd.DataFrame
+    """
 
     Columns.XAxis.verify(x_axis)
 
@@ -176,6 +208,27 @@ def _add_doubling_time_lines(
     stage: DiseaseStage,
     count: Counting,
 ):
+    """Add doubling time lines to the given plot
+
+    On a log-scale graph, doubling time lines originate from a point near the
+    lower-left and show how fast the number of cases (per capita) would grow if it
+    doubled every n days.
+
+    :param fig: The figure containing the plots
+    :type fig: plt.Figure
+    :param ax: The axes object we wish to annotate
+    :type ax: plt.Axes
+    :param x_axis: The column to be used for the x-axis of the graph. We only add
+    doubling time lines for graphs plotted against days since outbreak (and not actual
+    days, as doubling time lines don't make sense then because there is no common
+    origin to speak of)
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage we are plotting
+    :type stage: DiseaseStage
+    :param count: The count method used
+    :type count: Counting
+    """
+
     Columns.XAxis.verify(x_axis)
 
     # For ease of computation, everything will be in axes coordinate system
@@ -351,10 +404,31 @@ def _format_legend(
     *,
     ax: plt.Axes,
     x_axis: Columns.XAxis,
-    count,
+    count: Counting,
     location_heading: str,
     current_case_counts: pd.DataFrame,
 ) -> Legend:
+    """Format the legend correctly so that relevant info is shown in the legends' rows
+
+    In addition to just displaying which location maps to a given line color, and which
+    case type to a given line style, we also display some current data in the legend
+    (e.g., this location currently has this many cases).
+
+    :param ax: The axis to add the legend to
+    :type ax: plt.Axes
+    :param x_axis: The x axis column we're plotting against
+    :type x_axis: Columns.XAxis
+    :param count: Which count we're using
+    :type count: Counting
+    :param location_heading: The name we'll use for the location heading ("Country",
+    "State", etc.)
+    :type location_heading: str
+    :param current_case_counts: Dataframe with current case counts; used to add data
+    to the legend
+    :type current_case_counts: pd.DataFrame
+    :return: The added legend
+    :rtype: Legend
+    """
 
     Columns.XAxis.verify(x_axis)
 
@@ -467,6 +541,31 @@ def _plot_helper(
     savefile_path: Path,
     location_heading: str = None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
+    """Do all the logic required to turn the arguments given into the correct plot
+
+    :param df: The dataframe whose data will be plotted
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column the data will be plotted against
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage (one half of the y-value) that will be plotted
+    :type stage: DiseaseStage
+    :param count: The counting method (the other half of the y-value) that will be
+    plotted
+    :type count: Counting
+    :param savefile_path: Where to save the resulting figure
+    :type savefile_path: Path
+    :param style: The matplotlib plotting style to use, defaults to None
+    :type style: Optional[str], optional
+    :param color_mapping: The seaborn color mapping to use, defaults to None
+    :type color_mapping: LocationColorMapping, optional
+    :param plot_size: The (width inches, height inches) plot size, defaults to None
+    :type plot_size: Tuple[float], optional
+    :param location_heading: What locations are to be called ("Country", "State",
+    etc.); the default of None is equivalent to "Location"
+    :type location_heading: str, optional
+    :return: A list of figures and axes created
+    :rtype: List[Tuple[plt.Figure, plt.Axes]]
+    """
 
     Columns.XAxis.verify(x_axis)
 
@@ -616,6 +715,15 @@ def _plot_helper(
 
 
 def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFrame:
+    """Removes rows prior to the existence of nonzero data
+
+    :param df: The dataframe to alter
+    :type df: pd.DataFrame
+    :param count: The count method to use when looking for 0-rows
+    :type count: Counting
+    :return: The filtered dataframe
+    :rtype: pd.DataFrame
+    """
     start_date = df.loc[
         (
             df[Columns.CASE_TYPE]
@@ -638,6 +746,23 @@ def get_savefile_path_and_location_heading(
     stage: Optional[DiseaseStage],
     count: Counting,
 ) -> Tuple[Path, str]:
+    """Given arguments used to create a plot, return the save path and the location
+    heading for that plot
+
+    :param df: The dataframe to be plotted
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column to be plotted against
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage to be plotted
+    :type stage: Optional[DiseaseStage]
+    :param count: The count type to be plotted
+    :type count: Counting
+    :raises ValueError: Certain know dataframes are explicitly handled; if a dataframe
+    containing data that we don't know how to handle is passed, raise a ValueError
+    :return: A (Path, str) tuple containing the save path and location heading,
+    respectively
+    :rtype: Tuple[Path, str]
+    """
 
     if Locations.WORLD in df[Columns.COUNTRY].values:
         savefile_basename = "World"
@@ -676,6 +801,21 @@ def get_savefile_path_and_location_heading(
 def get_color_palette_assignments(
     df: pd.DataFrame, palette: ColorPalette = None
 ) -> LocationColorMapping:
+    """Get the mapping of colors corresponding to the locations in the given dataframe
+
+    When creating multiple plots, we want to use the same color for a given location in
+    each graph (for instance, if the US is blue in one graph it should be blue in every
+    graph in which it appears). To do this, we compute a color mapping from location ->
+    color
+
+    :param df: The dataframe to be plotted; its locations will be mapped to colors
+    :type df: pd.DataFrame
+    :param palette: The color palette to be used, defaults to None (default palette)
+    :type palette: ColorPalette, optional
+    :return: A map of locations (strings) to colors (RGB tuples); currently this map is
+    implemented as a DataFrame
+    :rtype: LocationColorMapping
+    """
     current_case_data = get_current_case_data(
         df,
         stage=DiseaseStage.CONFIRMED,
@@ -705,6 +845,33 @@ def plot(
     df_with_china: pd.DataFrame = None,
     style=None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
+    """Entry point for plotting
+
+    This function does some basic setup, computing some data necessary for plotting from
+    the passed arguments, before passing along all the necessary data to
+    _plot_helper, which does the actual plotting work
+
+    :param df: The data to plot
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column to plot against
+    :type x_axis: Columns.XAxis
+    :param count: The count type to plot
+    :type count: Counting
+    :param start_date: A date with which to filter the data; only data after this date
+    will be plotted, defaults to None (all data will be plotted)
+    :type start_date: [type], optional
+    :param stage: The disease stage to plot, defaults to None (all stages will be
+    plotted)
+    :type stage: DiseaseStage, optional
+    :param df_with_china: A dataframe to serve as a reference point for creating the
+    color mapping; this keeps colors in sync whether or not China is included in the
+    plot. Defaults to None, in which case `df` is used to create the color mapping.
+    :type df_with_china: pd.DataFrame, optional
+    :param style: The matplotlib style to plot with, defaults to None (default style)
+    :type style: [type], optional
+    :return: A list of plotted objects (Figure, Axes)
+    :rtype: List[Tuple[plt.Figure, plt.Axes]]
+    """
 
     Columns.XAxis.verify(x_axis)
 
