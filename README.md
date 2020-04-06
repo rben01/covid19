@@ -13,18 +13,18 @@ This repository contains graphs of the spread of coronavirus throughout the worl
     - [Raw data table](#Raw-data-table)
   - [:notebook: Notes](#notebook-Notes)
   - [:chart_with_upwards_trend: Graphs](#chart_with_upwards_trend-Graphs)
-    - [Absolute case counts (not adjusted for region population)](#Absolute-case-counts-not-adjusted-for-region-population)
-      - [Number of confirmed cases N days after first day of at least 100 confirmed cases in region](#Number-of-confirmed-cases-N-days-after-first-day-of-at-least-100-confirmed-cases-in-region)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-after-first-day-of-100-confirmed-cases)
-        - [Top 10 US states: confirmed cases after first day of 100 confirmed cases](#Top-10-US-states-confirmed-cases-after-first-day-of-100-confirmed-cases)
-      - [Number of confirmed cases over time](#Number-of-confirmed-cases-over-time)
-        - [China and rest of world: confirmed cases over time (Jan 22 - present)](#China-and-rest-of-world-confirmed-cases-over-time-Jan-22---present)
-        - [Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](#Top-10-countries-excluding-China-confirmed-cases-over-time-Jan-24---present)
-        - [Top 10 US states: confirmed cases over time (Mar 10 - present)](#Top-10-US-states-confirmed-cases-over-time-Mar-10---present)
-    - [Per-capita case counts](#Per-capita-case-counts)
-      - [Cases per capita over time](#Cases-per-capita-over-time)
-        - [Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](#Top-10-countries-excluding-China-nine-countries-total-confirmed-cases-per-capita-over-time-Jan-24---present)
-        - [Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](#Top-10-US-states-confirmed-cases-per-capita-over-time-Mar-10---present)
+    - [World, China, and Rest of World](#World-China-and-Rest-of-World)
+      - [World - Cases over time](#World---Cases-over-time)
+    - [Top Ten Countries, Excluding China](#Top-Ten-Countries-Excluding-China)
+      - [Countries - Cases and deaths over time](#Countries---Cases-and-deaths-over-time)
+      - [Countries - Cases and deaths per capita over time](#Countries---Cases-and-deaths-per-capita-over-time)
+      - [Countries - Cases since hitting 100 cases](#Countries---Cases-since-hitting-100-cases)
+      - [Countries - Deaths since hitting 25 deaths](#Countries---Deaths-since-hitting-25-deaths)
+    - [Top Ten USA States](#Top-Ten-USA-States)
+      - [USA States - Cases and deaths over time](#USA-States---Cases-and-deaths-over-time)
+      - [USA States - Cases and deaths per capita over time](#USA-States---Cases-and-deaths-per-capita-over-time)
+      - [USA States - Cases since hitting 100 cases](#USA-States---Cases-since-hitting-100-cases)
+      - [USA States - Deaths since hitting 25 deaths](#USA-States---Deaths-since-hitting-25-deaths)
 
 ## :hammer_and_wrench: Setup
 
@@ -103,40 +103,44 @@ For example, in a graph of countries and their cases per capita, the first count
 
 ## :chart_with_upwards_trend: Graphs
 
-### Absolute case counts (not adjusted for region population)
+### World, China, and Rest of World
 
-#### Number of confirmed cases N days after first day of at least 100 confirmed cases in region
+#### World - Cases over time
 
-##### Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases
+![World, China, and Rest of World - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/world.png)
 
-![Top 10 countries, excluding China (nine countries total): confirmed cases after first day of 100 confirmed cases](Figures/Absolute/From_local_spread_start/countries_wo_china.png)
+### Top Ten Countries, Excluding China
 
-##### Top 10 US states: confirmed cases after first day of 100 confirmed cases
+#### Countries - Cases and deaths over time
 
-![Top 10 US states: confirmed cases after first day of 100 confirmed cases](Figures/Absolute/From_local_spread_start/states.png)
+![Countries - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png)
 
-#### Number of confirmed cases over time
+#### Countries - Cases and deaths per capita over time
 
-##### China and rest of world: confirmed cases over time (Jan 22 - present)
+![Countries - Case count over time](./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png)
 
-![China and rest of world: confirmed cases over time (Jan 22 - present)](Figures/Absolute/From_fixed_date/world.png)
+#### Countries - Cases since hitting 100 cases
 
-##### Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png)
 
-![Top 10 countries, excluding China: confirmed cases over time (Jan 24 - present)](Figures/Absolute/From_fixed_date/countries_wo_china.png)
+#### Countries - Deaths since hitting 25 deaths
 
-##### Top 10 US states: confirmed cases over time (Mar 10 - present)
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png)
 
-![Top 10 US states: confirmed cases over time (Mar 10 - present)](Figures/Absolute/From_fixed_date/states.png)
+### Top Ten USA States
 
-### Per-capita case counts
+#### USA States - Cases and deaths over time
 
-#### Cases per capita over time
+![Countries - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/states.png)
 
-##### Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)
+#### USA States - Cases and deaths per capita over time
 
-![Top 10 countries, excluding China (nine countries total): confirmed cases per capita over time (Jan 24 - present)](Figures/Per_capita/From_fixed_date/countries_wo_china.png)
+![Countries - Case count over time](./Figures/Per_capita/From_fixed_date/Stage_All/states.png)
 
-##### Top 10 US states: confirmed cases per capita over time (Mar 10 - present)
+#### USA States - Cases since hitting 100 cases
 
-![Top 10 US states: confirmed cases per capita over time (Mar 10 - present)](Figures/Per_capita/From_fixed_date/states.png)
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png)
+
+#### USA States - Deaths since hitting 25 deaths
+
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/states.png)
