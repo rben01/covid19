@@ -270,7 +270,7 @@ class CaseInfo:
         (DiseaseStage.DEATH, Counting.TOTAL_CASES): 25,
         (DiseaseStage.DEATH, Counting.PER_CAPITA): 1e-6,
     }
-    _DASH_STYLES = {DiseaseStage.CONFIRMED: (1, 0), DiseaseStage.DEATH: (1, 1)}
+    _DASH_STYLES = {DiseaseStage.CONFIRMED: (1, 0), DiseaseStage.DEATH: (2, 1)}
 
     @classmethod
     def get_info_item_for(
@@ -321,8 +321,9 @@ class CaseInfo:
         *fields: List[InfoField],
         stage: Optional[DiseaseStage] = None,
         count: Optional[Counting] = None,
-        squeeze=True,
-    ) -> Union[pd.Series, pd.DataFrame]:
+        squeeze_rows=False,
+        squeeze_cols=True,
+    ) -> Union[Atom, pd.Series, pd.DataFrame]:
 
         if not fields:
             fields = slice(None)
@@ -345,9 +346,18 @@ class CaseInfo:
             (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
         )[fields]
 
-        # If squeeze and one column, return column (a Series)
-        if squeeze and len(fields) == 1:
-            info_df = info_df.iloc[:, 0]
+        # TODO: update this comment
+        # If squeeze and one column, return the column (a Series)
+        # If squeeze and one row, return the row (a Series)
+        # Even if there's only one element, return a Series, not an atom
+        # (for compatibility with df[col].isin)
+        # If squeeze but no other conditions met, return DataFrame
+        # Col squeezing must come first, as after squeezing rows there might not be an
+        # axis 1 (but there'll always be an axis 0)
+        if squeeze_cols and len(fields) == 1:
+            info_df = info_df.iloc(axis=1)[0]
+        if squeeze_rows and len(info_df) == 1:
+            info_df = info_df.iloc(axis=0)[0]
 
         return info_df
 

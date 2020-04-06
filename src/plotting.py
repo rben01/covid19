@@ -531,6 +531,7 @@ def _plot_helper(
             ax.xaxis.set_minor_locator(DayLocator())
             for tick in ax.get_xticklabels():
                 tick.set_rotation(80)
+
         elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
@@ -540,8 +541,10 @@ def _plot_helper(
                 InfoField.CASE_TYPE,
                 stage=default_stage,
                 count=count,
-            )
-            ax.set_xlabel(f"Days Since Reaching {_threshold} {_axis_name}")
+                squeeze_rows=True,
+            ).values
+            ax.set_xlabel(f"Days Since Reaching {_threshold:.3g} {_axis_name}")
+
         else:
             x_axis.raise_for_unhandled_case()
 
