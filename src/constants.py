@@ -190,6 +190,14 @@ class Columns:
             else:
                 self.raise_for_unhandled_case()
 
+        def pprint(self):
+            if self == self.DATE:
+                return "From_fixed_date"
+            elif self == self.DAYS_SINCE_OUTBREAK:
+                return "From_local_spread_start"
+            else:
+                self.raise_for_unhandled_case()
+
 
 @enum.unique
 class DiseaseStage(ABCStrictEnum):

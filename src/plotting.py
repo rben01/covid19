@@ -44,7 +44,7 @@ COLOR = "Color_"
 # Don't include 0 here; it'll be added automatically (hence "additional")
 ADTL_DAY_INDICES = [-20, -10]
 
-rcParams.update({"font.family": "sans-serif", "font.size": 12})
+rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 
 SingleColor = Tuple[float, float, float]
@@ -73,16 +73,20 @@ def get_current_case_data(
 
     # Filter in order to compute doubling time
     df = df[df[Columns.CASE_COUNT] > 0]
-    relevant_case_types = CaseInfo.get_info_items_for(
+
+    if stage is None:
+        stage = DiseaseStage.CONFIRMED
+
+    relevant_case_type = CaseInfo.get_info_item_for(
         InfoField.CASE_TYPE, stage=stage, count=count
-    ).values
+    )
 
     day_indices = [0, *ADTL_DAY_INDICES]
 
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
         # Filter to the relevant case type and just the two columns
         relevant_subsection = g.loc[
-            g[Columns.CASE_TYPE].isin(relevant_case_types),
+            g[Columns.CASE_TYPE] == relevant_case_type,
             [Columns.DATE, Columns.CASE_COUNT],
         ]
 
@@ -134,7 +138,7 @@ def get_current_case_data(
         sort_col = form_doubling_time_colname(0)
         sort_ascending = True
     elif x_axis == Columns.XAxis.DATE:
-        sort_col = relevant_case_types.tolist()
+        sort_col = relevant_case_type
         sort_ascending = False
     else:
         x_axis.raise_for_unhandled_case()
@@ -200,7 +204,7 @@ def _add_doubling_time_lines(
         # texts' boxes clipping the axes, we move things in just a hair)
         ac_x_upper_lim = ac_y_upper_lim = 1
 
-        doubling_times = [1, 2, 3, 4, 7, 14]  # days (x-axis units)
+        doubling_times = [2, 3, 4, 7, 14]  # days (x-axis units)
         for dt in doubling_times:
             # Simple math: assuming dc_y_max := dc_y_upper_lim, then if
             # dc_y_max = dc_y_min * 2**((dc_x_max-dc_x_min)/dt),
@@ -471,7 +475,7 @@ def _plot_helper(
     figs_and_axes = []
 
     if plot_size is None:
-        plot_size = (10, 10)
+        plot_size = (10, 12)
 
     fig, ax = plt.subplots(figsize=(8, 8), dpi=200, facecolor="white")
     fig: plt.Figure
@@ -525,13 +529,14 @@ def _plot_helper(
             default_stage = DiseaseStage.CONFIRMED
 
         # Configure axes and ticks
-        # X axis
+        # X axis (and y axis bottom limit, which is kind of x-axis related)
         if x_axis == Columns.XAxis.DATE:
             ax.xaxis.set_major_formatter(DateFormatter(r"%b %-d"))
             ax.xaxis.set_minor_locator(DayLocator())
             for tick in ax.get_xticklabels():
                 tick.set_rotation(80)
 
+            ax.set_ylim(bottom=0.9)
         elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
@@ -545,6 +550,9 @@ def _plot_helper(
             ).values
             ax.set_xlabel(f"Days Since Reaching {_threshold:.3g} {_axis_name}")
 
+            if stage is not None:  # i.e. if all DiseaseStages plotted
+                ax.set_ylim(bottom=_threshold / 4)
+
         else:
             x_axis.raise_for_unhandled_case()
 
@@ -556,7 +564,6 @@ def _plot_helper(
         )
         if count == Counting.TOTAL_CASES:
             ax.set_yscale("log", basey=2, nonposy="mask")
-            ax.set_ylim(bottom=0.9)
             ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_minor_locator(
@@ -626,7 +633,11 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
 
 
 def get_savefile_path_and_location_heading(
-    df: pd.DataFrame, description: str, *, stage: DiseaseStage, count: Counting,
+    df: pd.DataFrame,
+    *,
+    x_axis: Columns.XAxis,
+    stage: Optional[DiseaseStage],
+    count: Counting,
 ) -> Tuple[Path, str]:
 
     if Locations.WORLD in df[Columns.COUNTRY].values:
@@ -656,8 +667,8 @@ def get_savefile_path_and_location_heading(
     savefile_path = (
         Path()
         / count.pprint()
-        / description.capitalize()
-        / f"Stage {stage_name}"
+        / x_axis.pprint()
+        / f"Stage_{stage_name}"
         / Path(savefile_basename.lower()).with_suffix(".png")
     )
     return savefile_path, location_heading
@@ -703,15 +714,13 @@ def plot(
             df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
         df = remove_empty_leading_dates(df, count)
-        description = FROM_FIXED_DATE_DESC
     elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
         df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
-        description = FROM_LOCAL_OUTBREAK_START_DESC
     else:
         x_axis.raise_for_unhandled_case()
 
     savefile_path, location_heading = get_savefile_path_and_location_heading(
-        df, description, stage=stage, count=count
+        df, x_axis=x_axis, stage=stage, count=count
     )
 
     if df_with_china is not None:
