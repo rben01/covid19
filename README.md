@@ -13,14 +13,14 @@ This repository contains graphs of the spread of coronavirus throughout the worl
     - [Raw data table](#Raw-data-table)
   - [:notebook: Notes](#notebook-Notes)
   - [:chart_with_upwards_trend: Graphs](#chart_with_upwards_trend-Graphs)
-    - [World, China, and Rest of World](#World-China-and-Rest-of-World)
+    - [:earth_americas: World, China, and Rest of World](#earth_americas-World-China-and-Rest-of-World)
       - [World - Cases over time](#World---Cases-over-time)
-    - [Top Ten Countries, Excluding China](#Top-Ten-Countries-Excluding-China)
+    - [:world_map: Top Ten Countries, Excluding China](#world_map-Top-Ten-Countries-Excluding-China)
       - [Countries - Cases and deaths over time](#Countries---Cases-and-deaths-over-time)
       - [Countries - Cases and deaths per capita over time](#Countries---Cases-and-deaths-per-capita-over-time)
       - [Countries - Cases since hitting 100 cases](#Countries---Cases-since-hitting-100-cases)
       - [Countries - Deaths since hitting 25 deaths](#Countries---Deaths-since-hitting-25-deaths)
-    - [Top Ten USA States](#Top-Ten-USA-States)
+    - [:us: Top Ten USA States](#us-Top-Ten-USA-States)
       - [USA States - Cases and deaths over time](#USA-States---Cases-and-deaths-over-time)
       - [USA States - Cases and deaths per capita over time](#USA-States---Cases-and-deaths-per-capita-over-time)
       - [USA States - Cases since hitting 100 cases](#USA-States---Cases-since-hitting-100-cases)
@@ -103,13 +103,13 @@ For example, in a graph of countries and their cases per capita, the first count
 
 ## :chart_with_upwards_trend: Graphs
 
-### World, China, and Rest of World
+### :earth_americas: World, China, and Rest of World
 
 #### World - Cases over time
 
 ![World, China, and Rest of World - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/world.png)
 
-### Top Ten Countries, Excluding China
+### :world_map: Top Ten Countries, Excluding China
 
 #### Countries - Cases and deaths over time
 
@@ -127,7 +127,7 @@ For example, in a graph of countries and their cases per capita, the first count
 
 ![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png)
 
-### Top Ten USA States
+### :us: Top Ten USA States
 
 #### USA States - Cases and deaths over time
 

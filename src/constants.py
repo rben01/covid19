@@ -258,9 +258,9 @@ class Columns:
             :rtype: Column
             """
 
-            if self == self.DATE:
+            if self is self.DATE:
                 return Columns.DATE
-            elif self == self.DAYS_SINCE_OUTBREAK:
+            elif self is self.DAYS_SINCE_OUTBREAK:
                 return Columns.DAYS_SINCE_OUTBREAK
             else:
                 self.raise_for_unhandled_case()
@@ -274,9 +274,9 @@ class Columns:
             :rtype: str
             """
 
-            if self == self.DATE:
+            if self is self.DATE:
                 return "From_fixed_date"
-            elif self == self.DAYS_SINCE_OUTBREAK:
+            elif self is self.DAYS_SINCE_OUTBREAK:
                 return "From_local_spread_start"
             else:
                 self.raise_for_unhandled_case()
@@ -424,11 +424,11 @@ class CaseInfo:
         DiseaseStage.verify(stage)
         Counting.verify(count)
 
-        if field == InfoField.CASE_TYPE:
+        if field is InfoField.CASE_TYPE:
             return cls._CASE_TYPES[(stage, count)]
-        elif field == InfoField.DASH_STYLE:
+        elif field is InfoField.DASH_STYLE:
             return cls._DASH_STYLES[stage]
-        elif field == InfoField.THRESHOLD:
+        elif field is InfoField.THRESHOLD:
             return cls._THRESHOLDS[(stage, count)]
         else:
             field.raise_for_unhandled_case()

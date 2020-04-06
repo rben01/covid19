@@ -166,10 +166,10 @@ def get_current_case_data(
             ],
         )
 
-    if x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
+    if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
         sort_col = form_doubling_time_colname(0)
         sort_ascending = True
-    elif x_axis == Columns.XAxis.DATE:
+    elif x_axis is Columns.XAxis.DATE:
         sort_col = relevant_case_type
         sort_ascending = False
     else:
@@ -234,7 +234,7 @@ def _add_doubling_time_lines(
     # For ease of computation, everything will be in axes coordinate system
     # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
     # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
-    if x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
+    if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
 
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
@@ -355,7 +355,7 @@ def _add_doubling_time_lines(
             ac_dist_from_line = 0.005
             # Get text box origin relative to line upper endpoint
             EdgeGuide.verify(edge)
-            if edge == EdgeGuide.RIGHT:
+            if edge is EdgeGuide.RIGHT:
                 # Account for bit of overhang; when slanted, top left corner of the
                 # text box extends left of the bottom left corner, which is its origin
                 # Subtracting that bit of overhang (height * sin(theta)) gets us the
@@ -376,7 +376,7 @@ def _add_doubling_time_lines(
             # happens, it's effectively the same situation as using the top edge from
             # the start
             if (
-                edge == EdgeGuide.TOP  # Must go first to short-circuit
+                edge is EdgeGuide.TOP  # Must go first to short-circuit
                 or ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim
             ):
                 ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
@@ -432,12 +432,12 @@ def _format_legend(
 
     Columns.XAxis.verify(x_axis)
 
-    include_confirmed = x_axis == Columns.XAxis.DATE
-    include_deaths = x_axis == Columns.XAxis.DATE
-    include_doubling_time = x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK
-    include_mortality = x_axis == Columns.XAxis.DATE and count == Counting.TOTAL_CASES
+    include_confirmed = x_axis is Columns.XAxis.DATE
+    include_deaths = x_axis is Columns.XAxis.DATE
+    include_doubling_time = x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK
+    include_mortality = x_axis is Columns.XAxis.DATE and count is Counting.TOTAL_CASES
     include_start_date = (not include_mortality) and (
-        x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK
+        x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK
     )
 
     # Add (formatted) current data to legend labels
@@ -455,7 +455,7 @@ def _format_legend(
         )
         legend_fields.append(this_case_type)
 
-        if count == Counting.TOTAL_CASES:
+        if count is Counting.TOTAL_CASES:
             float_format_func = r"{:,.0f}".format
         else:
             float_format_func = r"{:.2e}".format
@@ -629,13 +629,13 @@ def _plot_helper(
 
         # Configure axes and ticks
         # X axis (and y axis bottom limit, which is kind of x-axis related)
-        if x_axis == Columns.XAxis.DATE:
+        if x_axis is Columns.XAxis.DATE:
             ax.xaxis.set_major_formatter(DateFormatter(r"%b %-d"))
             ax.xaxis.set_minor_locator(DayLocator())
             for tick in ax.get_xticklabels():
                 tick.set_rotation(80)
 
-        elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
+        elif x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
 
@@ -660,7 +660,7 @@ def _plot_helper(
                 InfoField.CASE_TYPE, stage=default_stage, count=count
             )
         )
-        if count == Counting.TOTAL_CASES:
+        if count is Counting.TOTAL_CASES:
             ax.set_yscale("log", basey=2, nonposy="mask")
             ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
             ax.yaxis.set_major_formatter(ScalarFormatter())
@@ -670,7 +670,7 @@ def _plot_helper(
                 LogLocator(base=2, subs=np.linspace(0.5, 1, 5)[1:-1], numticks=1000)
             )
             ax.yaxis.set_minor_formatter(NullFormatter())
-        elif count == Counting.PER_CAPITA:
+        elif count is Counting.PER_CAPITA:
             ax.set_yscale("log", basey=10, nonposy="mask")
             # No need to set minor ticks; 8 is the default number, which makes one cycle
             # n, 2n, 3n, ..., 8n, 9n, 10n
@@ -875,12 +875,12 @@ def plot(
 
     Columns.XAxis.verify(x_axis)
 
-    if x_axis == Columns.XAxis.DATE:
+    if x_axis is Columns.XAxis.DATE:
         if start_date is not None:
             df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
 
         df = remove_empty_leading_dates(df, count)
-    elif x_axis == Columns.XAxis.DAYS_SINCE_OUTBREAK:
+    elif x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
         df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
     else:
         x_axis.raise_for_unhandled_case()
