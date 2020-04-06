@@ -6,6 +6,7 @@ from IPython.display import display  # noqa F401
 
 import read_in_data
 from constants import (
+    ABCStrictEnum,
     CaseInfo,
     CaseTypes,
     Columns,
@@ -100,10 +101,10 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
 
 
 def keep_only_n_largest_locations(
-    df: pd.DataFrame, n: int, counting: Counting
+    df: pd.DataFrame, n: int, count: Counting
 ) -> pd.DataFrame:
     case_type = CaseInfo.get_info_item_for(
-        InfoField.CASE_TYPE, stage=DiseaseStage.CONFIRMED, counting=counting
+        InfoField.CASE_TYPE, stage=DiseaseStage.CONFIRMED, count=count
     )
 
     def get_n_largest_locations(df: pd.DataFrame) -> pd.Series:
@@ -137,11 +138,11 @@ def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_countries_df(
-    df: pd.DataFrame, n: int, counting: Counting = None, *, include_china: bool,
+    df: pd.DataFrame, n: int, count: Counting = None, *, include_china: bool,
 ) -> pd.DataFrame:
 
-    if counting is None:
-        counting = Counting.TOTAL_CASES
+    if count is None:
+        count = Counting.TOTAL_CASES
 
     exclude_locations = set([Locations.WORLD, Locations.WORLD_MINUS_CHINA])
     if not include_china:
@@ -150,18 +151,16 @@ def get_countries_df(
     df = df[
         (~df[Columns.IS_STATE]) & (~df[Columns.LOCATION_NAME].isin(exclude_locations))
     ]
-    return keep_only_n_largest_locations(df, n, counting)
+    return keep_only_n_largest_locations(df, n, count)
 
 
-def get_usa_states_df(
-    df: pd.DataFrame, n: int, counting: Counting = None
-) -> pd.DataFrame:
+def get_usa_states_df(df: pd.DataFrame, n: int, count: Counting = None) -> pd.DataFrame:
 
-    if counting is None:
-        counting = Counting.TOTAL_CASES
+    if count is None:
+        count = Counting.TOTAL_CASES
 
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
-    return keep_only_n_largest_locations(df, n, counting)
+    return keep_only_n_largest_locations(df, n, count)
 
 
 def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -193,10 +192,14 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values([Columns.COUNTRY, Columns.STATE, Columns.DATE])
     )
 
-    for col in CaseTypes.get_case_types(count_type=Counting.TOTAL_CASES):
+    for col in CaseInfo.get_info_items_for(
+        InfoField.CASE_TYPE, count=Counting.TOTAL_CASES
+    ):
         df[col] = pd.to_numeric(df[col], downcast="integer")
 
-    for col in CaseTypes.get_case_types(count_type=Counting.PER_CAPITA):
+    for col in CaseInfo.get_info_items_for(
+        InfoField.CASE_TYPE, count=Counting.PER_CAPITA
+    ):
         df[col] = df[col].map("{:e}".format)
 
     save_path = Paths.DATA / "data_table.csv"
@@ -227,56 +230,57 @@ def main(namespace: argparse.Namespace = None):
     countries_wo_china_df = get_countries_df(df, 9, include_china=False)
 
     # Make absolute count graphs
-    plot(world_df, x_axis_col=Columns.DATE, count_type=Counting.TOTAL_CASES)
+    plot(world_df, x_axis=Columns.XAxis.DATE, count=Counting.TOTAL_CASES)
     plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
-        x_axis_col=Columns.DATE,
-        count_type=Counting.TOTAL_CASES,
+        x_axis=Columns.XAxis.DATE,
+        count=Counting.TOTAL_CASES,
     )
-    plot(usa_states_df, x_axis_col=Columns.DATE, count_type=Counting.TOTAL_CASES)
+    plot(usa_states_df, x_axis=Columns.XAxis.DATE, count=Counting.TOTAL_CASES)
 
     plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
-        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
         stage=DiseaseStage.CONFIRMED,
-        count_type=Counting.TOTAL_CASES,
+        count=Counting.TOTAL_CASES,
     )
     plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
-        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
         stage=DiseaseStage.DEATH,
-        count_type=Counting.TOTAL_CASES,
+        count=Counting.TOTAL_CASES,
     )
     plot(
         usa_states_df,
-        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
         stage=DiseaseStage.CONFIRMED,
-        count_type=Counting.TOTAL_CASES,
+        count=Counting.TOTAL_CASES,
     )
     plot(
         usa_states_df,
-        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
+        x_axis=Columns.XAxis.DAYS_SINCE_OUTBREAK,
         stage=DiseaseStage.DEATH,
-        count_type=Counting.TOTAL_CASES,
+        count=Counting.TOTAL_CASES,
     )
 
     # Make per capita graphs
     plot(
         countries_wo_china_df,
         df_with_china=countries_with_china_df,
-        x_axis_col=Columns.DATE,
-        count_type=Counting.PER_CAPITA,
+        x_axis=Columns.XAxis.DATE,
+        count=Counting.PER_CAPITA,
     )
     plot(
-        usa_states_df, x_axis_col=Columns.DATE, count_type=Counting.PER_CAPITA,
+        usa_states_df, x_axis=Columns.XAxis.DATE, count=Counting.PER_CAPITA,
     )
 
     return df
 
 
+df = main()
 # A little hack -- an ipython cell that will run in an interactive window but not when
 # running this from a terminal
 if False:

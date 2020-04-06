@@ -94,6 +94,32 @@ class Paths:
     DATA: Path
 
 
+class StrictEnumError(Exception):
+    pass
+
+
+class ABCStrictEnum(enum.Enum):
+    @classmethod
+    def verify(cls, item):
+        if item is not None and item not in cls:
+            raise StrictEnumError(f"Invalid {cls} case {item}")
+
+    def raise_for_unhandled_case(self) -> NoReturn:
+        raise StrictEnumError(f"Unhandled case {self!r}")
+
+
+class ABCStrictTypeComparisonEnum(ABCStrictEnum):
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            raise StrictEnumError(
+                f"Cannot compare {self=!r} to object {other!r} of type {type(other)}"
+            )
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
+
 class Columns:
     LATITUDE = "Lat"
     LONGITUDE = "Long"
@@ -152,32 +178,38 @@ class Columns:
 
     location_id_cols = [COUNTRY, STATE, LOCATION_NAME]
 
+    class XAxis(ABCStrictTypeComparisonEnum):
+        DATE = enum.auto()
+        DAYS_SINCE_OUTBREAK = enum.auto()
 
-class StrictEnumError(Exception):
-    pass
-
-
-class AbstractStrictEnum(enum.Enum):
-    @classmethod
-    def verify(cls, item):
-        if item not in cls:
-            raise StrictEnumError(f"Invalid {cls} case {item}")
-
-    def raise_for_unhandled_case(self) -> NoReturn:
-        raise StrictEnumError(f"Unhandled case {self!r}")
+        def column(self) -> Column:
+            if self == self.DATE:
+                return Columns.DATE
+            elif self == self.DAYS_SINCE_OUTBREAK:
+                return Columns.DAYS_SINCE_OUTBREAK
+            else:
+                self.raise_for_unhandled_case()
 
 
-class DiseaseStage(AbstractStrictEnum):
+@enum.unique
+class DiseaseStage(ABCStrictEnum):
     CONFIRMED = enum.auto()
     DEATH = enum.auto()
+
+    CONFIRMED: "DiseaseStage"
+    DEATH: "DiseaseStage"
 
     def __str__(self):
         return f"DS.{self.name}"
 
 
-class Counting(AbstractStrictEnum):
+@enum.unique
+class Counting(ABCStrictEnum):
     TOTAL_CASES = enum.auto()
     PER_CAPITA = enum.auto()
+
+    TOTAL_CASES: "Counting"
+    PER_CAPITA: "Counting"
 
     def __str__(self):
         return f"C.{self.name}"
@@ -209,7 +241,8 @@ class CaseTypes:
     GROWTH_FACTOR: "CaseType"
 
 
-class InfoField(AbstractStrictEnum):
+@enum.unique
+class InfoField(ABCStrictEnum):
     CASE_TYPE = "CaseType_"
     THRESHOLD = "Threshold_"
     DASH_STYLE = "DashStyle_"
@@ -235,18 +268,18 @@ class CaseInfo:
 
     @classmethod
     def get_info_item_for(
-        cls, field: InfoField, *, stage: DiseaseStage, counting: Counting
+        cls, field: InfoField, *, stage: DiseaseStage, count: Counting
     ) -> Atom:
         InfoField.verify(field)
         DiseaseStage.verify(stage)
-        Counting.verify(counting)
+        Counting.verify(count)
 
         if field == InfoField.CASE_TYPE:
-            return cls._CASE_TYPES[(stage, counting)]
+            return cls._CASE_TYPES[(stage, count)]
         elif field == InfoField.DASH_STYLE:
             return cls._DASH_STYLES[stage]
         elif field == InfoField.THRESHOLD:
-            return cls._THRESHOLDS[(stage, counting)]
+            return cls._THRESHOLDS[(stage, count)]
         else:
             field.raise_for_unhandled_case()
 
@@ -254,17 +287,16 @@ class CaseInfo:
     @lru_cache
     # Return df multi-indexed by (Stage, Counting), columns are InfoField
     def _get_case_type_groups_df(cls) -> pd.DataFrame:
-        multiindex_dict = {t.__name__: t for t in [DiseaseStage, Counting]}
-        index = pd.MultiIndex.from_product(
-            multiindex_dict.values(), names=multiindex_dict.keys()
-        )
+        enums = [DiseaseStage, Counting]
+        enum_names = [e.__name__ for e in enums]
+        index = pd.MultiIndex.from_product(enums, names=enum_names)
         values = (
             index.to_frame()
             .apply(
                 lambda row: {
                     field: cls.get_info_item_for(
                         stage=row[DiseaseStage.__name__],
-                        counting=row[Counting.__name__],
+                        count=row[Counting.__name__],
                         field=field,
                     )
                     for field in InfoField
@@ -282,7 +314,7 @@ class CaseInfo:
         cls,
         *fields: List[InfoField],
         stage: Optional[DiseaseStage] = None,
-        counting: Optional[Counting] = None,
+        count: Optional[Counting] = None,
         squeeze=True,
     ) -> Union[pd.Series, pd.DataFrame]:
 
@@ -298,13 +330,13 @@ class CaseInfo:
         else:
             DiseaseStage.verify(stage)
 
-        if counting is None:
-            counting = slice(None)
+        if count is None:
+            count = slice(None)
         else:
-            Counting.verify(counting)
+            Counting.verify(count)
 
         info_df = cls._get_case_type_groups_df().xs(
-            (stage, counting), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
+            (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
         )[fields]
 
         if squeeze and len(fields) == 1:
