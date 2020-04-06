@@ -22,7 +22,7 @@ from matplotlib.ticker import (
 )
 
 from constants import (
-    ABCStrictTypeComparisonEnum,
+    ABCStrictEnum,
     CaseInfo,
     CaseTypes,
     Columns,
@@ -52,7 +52,7 @@ ColorPalette = List[SingleColor]
 LocationColorMapping = pd.DataFrame
 
 
-class EdgeGuide(ABCStrictTypeComparisonEnum):
+class EdgeGuide(ABCStrictEnum):
     """An enum whose cases represent which edge of the graph text is to be aligned with
     """
 
@@ -101,6 +101,8 @@ def get_current_case_data(
     :rtype: pd.DataFrame
     """
 
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     # Filter in order to compute doubling time
@@ -175,9 +177,6 @@ def get_current_case_data(
     else:
         x_axis.raise_for_unhandled_case()
 
-    # display(df.columns)
-    # display(Columns.location_id_cols)
-    # display(df.groupby(Columns.location_id_cols).apply(get_group_stats).columns)
     current_case_counts = (
         df.groupby(Columns.location_id_cols)
         .apply(get_group_stats)
@@ -204,9 +203,9 @@ def _add_doubling_time_lines(
     fig: plt.Figure,
     ax: plt.Axes,
     *,
-    x_axis: Columns.XAxis,
     stage: DiseaseStage,
     count: Counting,
+    x_axis: Columns.XAxis,
 ):
     """Add doubling time lines to the given plot
 
@@ -229,6 +228,8 @@ def _add_doubling_time_lines(
     :type count: Counting
     """
 
+    DiseaseStage.verify(stage)
+    Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     # For ease of computation, everything will be in axes coordinate system
@@ -430,6 +431,7 @@ def _format_legend(
     :rtype: Legend
     """
 
+    Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     include_confirmed = x_axis is Columns.XAxis.DATE
@@ -532,9 +534,9 @@ def _format_legend(
 def _plot_helper(
     df: pd.DataFrame,
     *,
-    x_axis: Columns.XAxis,
-    stage: DiseaseStage,
+    stage: Optional[DiseaseStage],
     count: Counting,
+    x_axis: Columns.XAxis,
     style: Optional[str] = None,
     color_mapping: LocationColorMapping = None,
     plot_size: Tuple[float] = None,
@@ -547,8 +549,9 @@ def _plot_helper(
     :type df: pd.DataFrame
     :param x_axis: The x axis column the data will be plotted against
     :type x_axis: Columns.XAxis
-    :param stage: The disease stage (one half of the y-value) that will be plotted
-    :type stage: DiseaseStage
+    :param stage: The disease stage (one half of the y-value) that will be plotted;
+    None means all stages
+    :type stage: Optional[DiseaseStage]
     :param count: The counting method (the other half of the y-value) that will be
     plotted
     :type count: Counting
@@ -567,6 +570,8 @@ def _plot_helper(
     :rtype: List[Tuple[plt.Figure, plt.Axes]]
     """
 
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     SORTED_POSITION = "Sorted_Position_"
@@ -724,6 +729,9 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
     :return: The filtered dataframe
     :rtype: pd.DataFrame
     """
+
+    Counting.verify(count)
+
     start_date = df.loc[
         (
             df[Columns.CASE_TYPE]
@@ -742,9 +750,9 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
 def get_savefile_path_and_location_heading(
     df: pd.DataFrame,
     *,
-    x_axis: Columns.XAxis,
     stage: Optional[DiseaseStage],
     count: Counting,
+    x_axis: Columns.XAxis,
 ) -> Tuple[Path, str]:
     """Given arguments used to create a plot, return the save path and the location
     heading for that plot
@@ -763,6 +771,10 @@ def get_savefile_path_and_location_heading(
     respectively
     :rtype: Tuple[Path, str]
     """
+
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
 
     if Locations.WORLD in df[Columns.COUNTRY].values:
         savefile_basename = "World"
@@ -838,10 +850,10 @@ def get_color_palette_assignments(
 def plot(
     df: pd.DataFrame,
     *,
-    x_axis: Columns.XAxis,
     start_date=None,
-    stage: DiseaseStage = None,
+    stage: Optional[DiseaseStage] = None,
     count: Counting,
+    x_axis: Columns.XAxis,
     df_with_china: pd.DataFrame = None,
     style=None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
@@ -873,6 +885,8 @@ def plot(
     :rtype: List[Tuple[plt.Figure, plt.Axes]]
     """
 
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     if x_axis is Columns.XAxis.DATE:

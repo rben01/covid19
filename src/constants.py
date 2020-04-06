@@ -116,21 +116,29 @@ class ABCStrictEnum(enum.Enum):
     """
 
     @classmethod
-    def verify(cls, item):
+    def verify(cls, item, *, none_ok: bool = False):
         """Verify that the passed item is a case of this enum
 
-        Raises if `item` is not a case of this enum, else returns
+        If `item is not None`, then raise if `item` is not a case of this enum, else
+        return nothing. If `item is None`, then raise iff `not none_ok`.
 
         :param item: The object to test
         :type item: Any
-        :raises StrictEnumError: If `item` is not a case of this enum
+        :param none_ok: Whether None is permissible (True) or should raise (False). By
+        default False.
+        :raises StrictEnumError: If `item` is not a case of this enum; if `item` is
+        None, raise only if `not none_ok`
         """
-        if item is not None and item not in cls:
-            raise StrictEnumError(f"Invalid {cls} case {item}")
+
+        if (item is None and none_ok) or (item is not None and item in cls):
+            return
+
+        raise StrictEnumError(f"Invalid {cls} case {item}")
 
     def raise_for_unhandled_case(self) -> NoReturn:
         """Unconditionally raises; used to signal that this case was unhandled in a
-        if/elif/else statement
+        if/elif/else statement. Used as a bandaid solution to the problem of no
+        compiler-enforced exhaustive case checking.
 
         Used as follows:
         ```
@@ -147,35 +155,6 @@ class ABCStrictEnum(enum.Enum):
         :rtype: NoReturn
         """
         raise StrictEnumError(f"Unhandled case {self!r}")
-
-
-class ABCStrictTypeComparisonEnum(ABCStrictEnum):
-    """A subclass of ABCStrictEnum that additionally raises an exception when comparing
-    enum cases to something other than cases of the same enum
-
-    Normally, comparing an enum case to an object of a different type simply returns
-    `False`. This class makes performing such comparisons an error. This is used to
-    catch when an == comparison has been written incorrectly.
-
-    """
-
-    def __eq__(self, other) -> bool:
-        """If `other` is not a case of this enum, raise; else check equality normally
-
-        :param other: The object to check for equality
-        :type other: Any
-        :raises StrictEnumError: Raised when `other` is not a case of this enum
-        :return: Whether the two objects represent the same case
-        :rtype: bool
-        """
-        if self.__class__ != other.__class__:
-            raise StrictEnumError(
-                f"Cannot compare {self=!r} to object {other!r} of type {type(other)}"
-            )
-        return super().__eq__(other)
-
-    def __hash__(self):
-        return super().__hash__()
 
 
 class Columns:
@@ -239,7 +218,7 @@ class Columns:
 
     location_id_cols = [COUNTRY, STATE, LOCATION_NAME]
 
-    class XAxis(ABCStrictTypeComparisonEnum):
+    class XAxis(ABCStrictEnum):
         """An enum whose cases represent columns that may be used for the x-axis
 
         Maintains a mapping between cases in this enum and the corresponding column name
@@ -407,7 +386,8 @@ class CaseInfo:
         """Get the single piece of information corresponding to the arguments
 
         A tuple (`field`, `stage`, `count`), such as (`DASH_STYLE`, `CONFIRMED`,
-        `TOTAL_CASES`), uniquely identifies a piece of information to return. This
+        `TOTAL_CASES`), uniquely identifies a piece of information to return (in this
+        case, the dash style to be used when plotting total confirmed cases). This
         function returns that information.
 
         :param field: The field to return for the given `stage`+`count` combination
@@ -525,12 +505,12 @@ class CaseInfo:
         if stage is None:
             stage = slice(None)
         else:
-            DiseaseStage.verify(stage)
+            DiseaseStage.verify(stage, none_ok=True)
 
         if count is None:
             count = slice(None)
         else:
-            Counting.verify(count)
+            Counting.verify(count, none_ok=True)
 
         info_df = cls._get_case_type_groups_df().xs(
             (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,
