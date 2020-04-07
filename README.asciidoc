@@ -27,8 +27,6 @@
 :img-usa-states: states.png
 
 [.lead]
-
-
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 '''
@@ -79,10 +77,12 @@ https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, 
 
 The data used to create these graphs is available link:data/data_table.csv[here].
 
+[[notes]]
 == 📓 Notes
 ****
 While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistics. Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes. It is with this mindset that this document was written.
 ****
+[options="compact"]
 * ✅ These graphs only convey accurate information when the data feeding them is good; garbage in, garbage out. In particular, as the number of (true) cases grows and regions lose the ability to test everyone infected, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
 Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused. For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it. +
 This is also not to mention those who died because of coronavirus, but not _from_ it; there are many who would otherwise have received medical care but, due to the burden placed on the world's healthcare infrastructure by coronavirus, have not been able to.
@@ -108,6 +108,7 @@ For example, in a graph of countries and their cases per capita, the first count
 Of course, the numerator and denominator may themselves be inaccurate to do testing issues. And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 ** The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly 1/2^distance^; again this will be an underestimate.)
 
+[[graphs]]
 == 📈 Graphs
 
 === 🌍 World, China, and Rest of World
