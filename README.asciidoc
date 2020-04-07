@@ -29,7 +29,7 @@
 [.lead]
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-====== 🗂 Contents
+[big]#*🗂 Contents*#
 
 toc::[]
 
