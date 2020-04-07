@@ -97,7 +97,7 @@ World, China, and Rest of World - Case count over time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
-   :scale: 50%
+   :height: 500
    :alt: World, China, and Rest of World - Case count over time
 
 
