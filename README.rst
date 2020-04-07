@@ -52,5 +52,5 @@ The script has a command line interface; check it out with
 * `Wikipedia - List of Countries by Population`_
 * `Wikipedia - List of US States by Population`_
 
-.. tip::
+.. tip:: Tip
 	This source is not currently used, but it seems decent as well: `Corona Data Scraper <https://coronadatascraper.com/#home>`_
