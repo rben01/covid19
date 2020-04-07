@@ -31,7 +31,7 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 
 '''
 
-[big]#**Contents**#
+.Contents
 
 toc::[]
 
