@@ -63,8 +63,8 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
 ###################
 - 📅 In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.
 
-- | ⏳ Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (or "DT" for short). Lines annotated ":math:`n` days" show how the number of coronavirus cases would increase within a region if it doubled every :math:`n` days. Comparing the slope of a region's growth line to the slopes of these benchmark lines gives an indication of that region's doubling time. These graphs' legends also list the doubling times over different periods of time (e.g., "20d DT" means the average doubling time of a region over the past 20 days").
-  | To find the daily percent increase for any doubling time T, simply compute :math:`2^{1/T}`. Below is a list of doubling times and corresponding per-day percent increases.
+- | ⏳ Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (or "DT" for short). Lines annotated "n days" show how the number of coronavirus cases would increase within a region if it doubled every n days. Comparing the slope of a region's growth line to the slopes of these benchmark lines gives an indication of that region's doubling time. These graphs' legends also list the doubling times over different periods of time (e.g., "20d DT" means the average doubling time of a region over the past 20 days").
+  | To find the daily percent increase for any doubling time T, simply compute 2^(1/T). Below is a list of doubling times and corresponding per-day percent increases.
 
   - 1 day: +100% daily
   - 2 days: +41% daily
@@ -84,4 +84,4 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
   - CFR = Case fatality rate = deaths / confirmed.
   - This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won't yet have had time to become fatal. If it's been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not). Of course, the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 
-  - The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the **Confirmed Cases** and **Deaths** lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly :math:`\frac{1}{2}^{\mathrm{distance}}`; again this will be an underestimate.)
+  - The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the **Confirmed Cases** and **Deaths** lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly `(1/2)^distance`; again this will be an underestimate.)
