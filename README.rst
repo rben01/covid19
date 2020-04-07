@@ -4,6 +4,7 @@
 .. |total cases| replace:: confirmed cases and deaths
 
 .. contents::
+  :backlinks: entry
 
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
