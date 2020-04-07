@@ -1,14 +1,21 @@
 2019 COVID-19/Coronavirus Tracker
-#################################
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+.. |total cases| replace:: confirmed cases and deaths
 
 .. contents::
-	backlinks: entry
+	:backlinks: entry
+
+.. sectnum::
+	:suffix: .
 
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-#########
+.. _setup:
+
 🛠 Setup
 #########
+
 
 Clone this GitHub repo (https://github.com/rben01/covid19)
 
