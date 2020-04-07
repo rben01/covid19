@@ -82,6 +82,7 @@ The data used to create these graphs is available link:data/data_table.csv[here]
 ****
 While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistics. Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes. It is with this mindset that this document was written.
 ****
+
 [options="compact"]
 * ✅ These graphs only convey accurate information when the data feeding them is good; garbage in, garbage out. In particular, as the number of (true) cases grows and regions lose the ability to test everyone infected, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
 Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused. For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it. +
