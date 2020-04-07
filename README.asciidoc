@@ -4,8 +4,31 @@
 :toc-placement: macro
 :toc-title: Contents
 :toclevels: 4
+:over-time: over time
+:cases-deaths-count-raw: Cases and deaths
+:cases-deaths-per-cap-raw: Cases and deaths per capita
+:cases-deaths-count-over-time: Cases and deaths {over-time}
+:cases-deaths-per-cap-over-time: Cases and deaths per capita {over-time}
+:cases-since-100: Cases since hitting 100 cases
+:deaths-since-25: Deaths since hitting 25 deaths
+:countries: Countries
+:usa-states: USA States
+:sep: {sp}-{sp}
+:fig-dir: ./Figures
+:total-count-dir: Total_cases
+:per-capita-dir: Per_capita
+:fixed-date-dir: From_fixed_date
+:since-outbreak-dir: From_local_spread_start
+:stage-all-dir: Stage_All
+:stage-confirmed-dir: Stage_Confirmed
+:stage-deaths-dir: Stage_Deaths
+:img-world: world.png
+:img-countries: countries_wo_china.png
+:img-usa-states: states.png
 
 [.lead]
+
+
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 '''
@@ -82,48 +105,42 @@ For example, in a graph of countries and their cases per capita, the first count
 
 === 🌍 World, China, and Rest of World
 
-==== World, China, and Rest of World - Case count over time
+==== World, China, and Rest of World{sep}{cases-deaths-count-over-time}
 
-image::./Figures/Total_cases/From_fixed_date/Stage_All/world.png[World, China, and Rest of World - Case count over time]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[World, China, and Rest of World{sep}{cases-deaths-count-over-time}]
 
 === 🗺 Top Ten Countries, Excluding China
 
-==== Countries - Cases and deaths over time
+==== {countries}{sep}{cases-deaths-count-over-time}
 
-image::./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png[Countries - Case count over time]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-deaths-count-over-time}]
 
-==== Countries - Cases and deaths per capita over time
+==== {countries}{sep}{cases-deaths-per-cap-over-time}
 
-image::./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png[Countries - Case count over time]
+image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-per-cap-over time}]
 
-==== Countries - Cases since hitting 100 cases
+==== {countries}{sep}{cases-since-100}
 
-[caption=Countries - Case count since hitting 100 cases]
-image::./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png[Countries - Case count since hitting 100 cases]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{countries}{sep}{cases-since-100}}]
 
-==== Countries - Deaths since hitting 25 deaths
+==== {countries}{sep}{deaths-since-25}
 
-image::./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png[Countries - Case count since hitting 100 cases]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-deaths-dir}/{img-countries}[{countries}{sep}{deaths-since-25}]
 
 === 🇺🇸 Top Ten USA States
 
-==== USA States - Cases and deaths over time
+==== {usa-states}{sep}{cases-deaths-count-over-time}
 
-image::./Figures/Total_cases/From_fixed_date/Stage_All/states.png[States - Case count over time]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-count-over-time}]
 
-==== USA States - Cases and deaths per capita over time
+==== {usa-states}{sep}{cases-deaths-per-cap-over-time}
 
-// .. image:: ./Figures/Per_capita/From_fixed_date/Stage_All/states.png
-//   :alt: Countries - Case count over time
+image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-per-cap-over-time}]
 
-==== USA States - Cases since hitting 100 cases
+==== {usa-states}{sep}{cases-since-100}
 
-// .. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png
-//   :alt: Countries - Case count since hitting 100 cases
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{usa-states}{sep}{cases-since-100}]
 
-==== USA States - Deaths since hitting 25 deaths
-.USA
-image
+==== {usa-states}{sep}{deaths-since-25}
 
-// .. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Death/states.png
-//   :alt: Countries - Case count since hitting 100 cases
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-deaths-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25}]
