@@ -1,9 +1,8 @@
 # %%
-import enum
 import itertools
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Mapping, Set, Tuple
+from typing import List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
@@ -22,7 +21,17 @@ from matplotlib.ticker import (
     ScalarFormatter,
 )
 
-from constants import CaseGroup, CaseTypes, Columns, Locations, Paths, Thresholds
+from constants import (
+    ABCStrictEnum,
+    CaseInfo,
+    CaseTypes,
+    Columns,
+    Counting,
+    DiseaseStage,
+    InfoField,
+    Locations,
+    Paths,
+)
 
 FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"
@@ -35,7 +44,7 @@ COLOR = "Color_"
 # Don't include 0 here; it'll be added automatically (hence "additional")
 ADTL_DAY_INDICES = [-20, -10]
 
-rcParams.update({"font.family": "sans-serif", "font.size": 12})
+rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 
 SingleColor = Tuple[float, float, float]
@@ -43,69 +52,67 @@ ColorPalette = List[SingleColor]
 LocationColorMapping = pd.DataFrame
 
 
-class Style:
-    class Dash:
-        PRIMARY = (1, 0)
-        SECONDARY = (1, 1)
+class EdgeGuide(ABCStrictEnum):
+    """An enum whose cases represent which edge of the graph text is to be aligned with
+    """
 
-
-class EdgeGuide(enum.Enum):
     RIGHT = "right"
     TOP = "top"
 
-
-# Contains fields used to do per-series configuration when plotting
-class ConfigFields(enum.Enum):
-    CASE_TYPE = enum.auto()
-    DASH_STYLE = enum.auto()
-    INCLUDE = enum.auto()
-
-    # https://docs.python.org/3/library/enum.html#omitting-values
-    # Note that the VSCode interactive window has a bug where text between <> is
-    # omitted; if you try to print this and are getting empty output, that might be why
-    def __repr__(self):
-        return "<%s.%s>" % (self.__class__.__name__, self.name)
-
-    @classmethod
-    def validate_fields(cls, fields):
-        given_fields = set(fields)
-        expected_fields = set(cls)  # Magic; Enum is iterable and produces its cases
-        given_fields: Set[ConfigFields]
-        expected_fields: Set[ConfigFields]
-
-        if given_fields == expected_fields:
-            return
-
-        missing_fields = list(expected_fields.difference(given_fields))
-        unexpected_fields = list(given_fields.difference(expected_fields))
-
-        err_str_components = []
-        if missing_fields:
-            err_str_components.append(
-                f"missing {len(missing_fields)} expected field(s) {missing_fields}"
-            )
-        if unexpected_fields:
-            err_str_components.append(
-                f"{len(unexpected_fields)} unexpected field(s) {unexpected_fields}"
-            )
-        err_str_components.append(f"given {fields}")
-        err_str = "; ".join(err_str_components)
-        err_str = err_str[0].upper() + err_str[1:]
-        raise ValueError(err_str)
+    RIGHT: "EdgeGuide"
+    TOP: "EdgeGuide"
 
 
 def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
+    """Create the column label for the given doubling time days-ago number
+
+    [extended_summary]
+
+    :param day_idx: The iloc[] index giving the time interval (in days) over which to
+    compute the doubling time
+    :type day_idx: int
+    :return: The column label
+    :rtype: Tuple[str, int]
+    """
     return (DOUBLING_TIME, day_idx)
 
 
 def get_current_case_data(
-    df: pd.DataFrame, count_type: CaseGroup.CountType, x_axis_col: bool
+    df: pd.DataFrame,
+    *,
+    stage: Optional[DiseaseStage],
+    count: Counting,
+    x_axis: Columns.XAxis,
 ) -> pd.DataFrame:
+    """Get the current case information
+
+    For the given stage (optional), count, and x_axis, return a dataframe containing the
+    current case information -- current stage (per capita) count
+
+    :param df: The dataframe containing all case info
+    :type df: pd.DataFrame
+    :param stage: The stage to keep when getting current data
+    :type stage: Optional[DiseaseStage]
+    :param count: The count type to keep when getting current data
+    :type count: Counting
+    :param x_axis: Used to determine which column to sort the current case data by
+    :type x_axis: Columns.XAxis
+    :return: Dataframe representing the current state of affairs
+    :rtype: pd.DataFrame
+    """
+
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
 
     # Filter in order to compute doubling time
     df = df[df[Columns.CASE_COUNT] > 0]
-    relevant_case_type = CaseTypes.get_case_types(
-        stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+
+    if stage is None:
+        stage = DiseaseStage.CONFIRMED
+
+    relevant_case_type = CaseInfo.get_info_item_for(
+        InfoField.CASE_TYPE, stage=stage, count=count
     )
 
     day_indices = [0, *ADTL_DAY_INDICES]
@@ -130,7 +137,7 @@ def get_current_case_data(
                 doubling_times[col_name] = np.nan
                 continue
 
-            # $ currentCount = initialCount * 2^(n_days/doublingTime) $
+            # $ currentCount = initialCount * 2^{_days/doublingTime} $
             then_date = then_row[Columns.DATE]
             then_count = then_row[Columns.CASE_COUNT]
 
@@ -141,32 +148,37 @@ def get_current_case_data(
 
         data_dict = {
             START_DATE: g[Columns.DATE].min(),
-            **{
-                col_name: doubling_time
-                for col_name, doubling_time in doubling_times.items()
-            },
+            **doubling_times,
             # Get last case count of each case type for current group
             # .tail(1).sum() is a trick to get the last value if it exists,
             # else 0 (remember, this is sorted by date)
-            **g.groupby(Columns.CASE_TYPE)[Columns.CASE_COUNT]
-            .apply(lambda h: h.tail(1).sum())
-            .to_dict(),
+            **(
+                g.groupby(Columns.CASE_TYPE)[Columns.CASE_COUNT]
+                .apply(lambda h: h.tail(1).sum())
+                .to_dict()
+            ),
         }
 
         return pd.Series(
             data_dict,
-            index=[START_DATE, *doubling_times.keys(), *CaseTypes.get_case_types()],
+            index=[
+                START_DATE,
+                *doubling_times.keys(),
+                *CaseInfo.get_info_items_for(InfoField.CASE_TYPE),
+            ],
         )
 
-    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+    if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
         sort_col = form_doubling_time_colname(0)
         sort_ascending = True
-    else:
+    elif x_axis is Columns.XAxis.DATE:
         sort_col = relevant_case_type
         sort_ascending = False
+    else:
+        x_axis.raise_for_unhandled_case()
 
     current_case_counts = (
-        df.groupby(Columns.id_cols)
+        df.groupby(Columns.location_id_cols)
         .apply(get_group_stats)
         # Order locations by decreasing current confirmed case count
         # This is used to keep plot legend in sync with the order of lines on the graph
@@ -176,26 +188,54 @@ def get_current_case_data(
         .reset_index()
     )
 
+    confirmed_col, death_col = [
+        CaseInfo.get_info_item_for(InfoField.CASE_TYPE, stage=stage, count=count)
+        for stage in [DiseaseStage.CONFIRMED, DiseaseStage.DEATH]
+    ]
     current_case_counts[CaseTypes.MORTALITY] = (
-        current_case_counts[
-            CaseTypes.get_case_types(stage=CaseGroup.Stage.DEATH, count_type=count_type)
-        ]
-        / current_case_counts[
-            CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            )
-        ]
+        current_case_counts[death_col] / current_case_counts[confirmed_col]
     )
 
     return current_case_counts
 
 
-def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count_type):
+def _add_doubling_time_lines(
+    fig: plt.Figure,
+    ax: plt.Axes,
+    *,
+    stage: DiseaseStage,
+    count: Counting,
+    x_axis: Columns.XAxis,
+):
+    """Add doubling time lines to the given plot
+
+    On a log-scale graph, doubling time lines originate from a point near the
+    lower-left and show how fast the number of cases (per capita) would grow if it
+    doubled every n days.
+
+    :param fig: The figure containing the plots
+    :type fig: plt.Figure
+    :param ax: The axes object we wish to annotate
+    :type ax: plt.Axes
+    :param x_axis: The column to be used for the x-axis of the graph. We only add
+    doubling time lines for graphs plotted against days since outbreak (and not actual
+    days, as doubling time lines don't make sense then because there is no common
+    origin to speak of)
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage we are plotting
+    :type stage: DiseaseStage
+    :param count: The count method used
+    :type count: Counting
+    """
+
+    DiseaseStage.verify(stage)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
 
     # For ease of computation, everything will be in axes coordinate system
     # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
     # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
-    if x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+    if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
 
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
@@ -206,12 +246,9 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 
         # Getting min x,y bounds of lines is easy
         dc_x_min = 0
-        if count_type == CaseGroup.CountType.ABSOLUTE:
-            dc_y_min = Thresholds.CASE_COUNT
-        elif count_type == CaseGroup.CountType.PER_CAPITA:
-            dc_y_min = Thresholds.CASES_PER_CAPITA
-        else:
-            raise ValueError(f"{count_type=} not understood")
+        dc_y_min = CaseInfo.get_info_item_for(
+            InfoField.THRESHOLD, stage=stage, count=count
+        )
 
         ac_x_min, ac_y_min = dc_to_ac.transform((dc_x_min, dc_y_min))
 
@@ -246,7 +283,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
                 transform=ax.transAxes,
                 color="0.0",
                 alpha=0.7,
-                dashes=(3, 2),
+                dashes=(1, 2),
                 linewidth=1,
             )
 
@@ -318,8 +355,8 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # Perpendicular distance from text to corresponding line
             ac_dist_from_line = 0.005
             # Get text box origin relative to line upper endpoint
-            assert edge in EdgeGuide
-            if edge == EdgeGuide.RIGHT:
+            EdgeGuide.verify(edge)
+            if edge is EdgeGuide.RIGHT:
                 # Account for bit of overhang; when slanted, top left corner of the
                 # text box extends left of the bottom left corner, which is its origin
                 # Subtracting that bit of overhang (height * sin(theta)) gets us the
@@ -340,7 +377,7 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
             # happens, it's effectively the same situation as using the top edge from
             # the start
             if (
-                edge == EdgeGuide.TOP  # Must go first to short-circuit
+                edge is EdgeGuide.TOP  # Must go first to short-circuit
                 or ac_text_origin_y + ac_rot_text_height > ac_y_upper_lim
             ):
                 ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
@@ -367,20 +404,42 @@ def _add_doubling_time_lines(fig: plt.Figure, ax: plt.Axes, *, x_axis_col, count
 def _format_legend(
     *,
     ax: plt.Axes,
-    x_axis_col,
-    count_type,
+    x_axis: Columns.XAxis,
+    count: Counting,
     location_heading: str,
     current_case_counts: pd.DataFrame,
 ) -> Legend:
+    """Format the legend correctly so that relevant info is shown in the legends' rows
 
-    include_confirmed = x_axis_col == Columns.DATE
-    include_deaths = x_axis_col == Columns.DATE
-    include_doubling_time = x_axis_col == Columns.DAYS_SINCE_OUTBREAK
-    include_mortality = (
-        x_axis_col == Columns.DATE and count_type == CaseGroup.CountType.ABSOLUTE
-    )
+    In addition to just displaying which location maps to a given line color, and which
+    case type to a given line style, we also display some current data in the legend
+    (e.g., this location currently has this many cases).
+
+    :param ax: The axis to add the legend to
+    :type ax: plt.Axes
+    :param x_axis: The x axis column we're plotting against
+    :type x_axis: Columns.XAxis
+    :param count: Which count we're using
+    :type count: Counting
+    :param location_heading: The name we'll use for the location heading ("Country",
+    "State", etc.)
+    :type location_heading: str
+    :param current_case_counts: Dataframe with current case counts; used to add data
+    to the legend
+    :type current_case_counts: pd.DataFrame
+    :return: The added legend
+    :rtype: Legend
+    """
+
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
+
+    include_confirmed = x_axis is Columns.XAxis.DATE
+    include_deaths = x_axis is Columns.XAxis.DATE
+    include_doubling_time = x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK
+    include_mortality = x_axis is Columns.XAxis.DATE and count is Counting.TOTAL_CASES
     include_start_date = (not include_mortality) and (
-        x_axis_col == Columns.DAYS_SINCE_OUTBREAK
+        x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK
     )
 
     # Add (formatted) current data to legend labels
@@ -393,12 +452,12 @@ def _format_legend(
     case_count_str_cols: List[pd.Series]
 
     if include_confirmed:
-        this_case_type = CaseTypes.get_case_types(
-            stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+        this_case_type = CaseInfo.get_info_item_for(
+            InfoField.CASE_TYPE, stage=DiseaseStage.CONFIRMED, count=count
         )
         legend_fields.append(this_case_type)
 
-        if count_type == CaseGroup.CountType.ABSOLUTE:
+        if count is Counting.TOTAL_CASES:
             float_format_func = r"{:,.0f}".format
         else:
             float_format_func = r"{:.2e}".format
@@ -408,8 +467,8 @@ def _format_legend(
         )
 
     if include_deaths:
-        this_case_type = CaseTypes.get_case_types(
-            stage=CaseGroup.Stage.DEATH, count_type=count_type
+        this_case_type = CaseInfo.get_info_item_for(
+            InfoField.CASE_TYPE, stage=DiseaseStage.DEATH, count=count
         )
         legend_fields.append(this_case_type)
         case_count_str_cols.append(
@@ -475,30 +534,68 @@ def _format_legend(
 def _plot_helper(
     df: pd.DataFrame,
     *,
-    x_axis_col: str,
-    count_type: CaseGroup.CountType,
-    style=None,
+    stage: Optional[DiseaseStage],
+    count: Counting,
+    x_axis: Columns.XAxis,
+    style: Optional[str] = None,
     color_mapping: LocationColorMapping = None,
-    case_type_config_list: List[Mapping],
     plot_size: Tuple[float] = None,
     savefile_path: Path,
     location_heading: str = None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
+    """Do all the logic required to turn the arguments given into the correct plot
+
+    :param df: The dataframe whose data will be plotted
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column the data will be plotted against
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage (one half of the y-value) that will be plotted;
+    None means all stages
+    :type stage: Optional[DiseaseStage]
+    :param count: The counting method (the other half of the y-value) that will be
+    plotted
+    :type count: Counting
+    :param savefile_path: Where to save the resulting figure
+    :type savefile_path: Path
+    :param style: The matplotlib plotting style to use, defaults to None
+    :type style: Optional[str], optional
+    :param color_mapping: The seaborn color mapping to use, defaults to None
+    :type color_mapping: LocationColorMapping, optional
+    :param plot_size: The (width inches, height inches) plot size, defaults to None
+    :type plot_size: Tuple[float], optional
+    :param location_heading: What locations are to be called ("Country", "State",
+    etc.); the default of None is equivalent to "Location"
+    :type location_heading: str, optional
+    :return: A list of figures and axes created
+    :rtype: List[Tuple[plt.Figure, plt.Axes]]
+    """
+
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
 
     SORTED_POSITION = "Sorted_Position_"
 
     figs_and_axes = []
 
     if plot_size is None:
-        plot_size = (10, 10)
+        plot_size = (10, 12)
 
     fig, ax = plt.subplots(figsize=(8, 8), dpi=200, facecolor="white")
     fig: plt.Figure
     ax: plt.Axes
 
-    current_case_counts = get_current_case_data(df, count_type, x_axis_col)
+    current_case_counts = get_current_case_data(
+        df, stage=stage, count=count, x_axis=x_axis
+    )
 
-    df = df[df[Columns.CASE_TYPE].isin(CaseTypes.get_case_types(count_type=count_type))]
+    df = df[
+        df[Columns.CASE_TYPE].isin(
+            CaseInfo.get_info_items_for(
+                InfoField.CASE_TYPE, stage=stage, count=count
+            ).values
+        )
+    ]
 
     # Filter and sort color mapping correctly so that colors 1. are assigned to the
     # same locations across graphs (for continuity) and 2. are placed correctly in the
@@ -514,50 +611,62 @@ def _plot_helper(
     )
     color_mapping = color_mapping.sort_values(SORTED_POSITION)
 
-    # Apply default config and validate resulting dicts
-    for config_dict in case_type_config_list:
-        config_dict.setdefault(ConfigFields.INCLUDE, True)
-        ConfigFields.validate_fields(config_dict)
-
-    config_df = pd.DataFrame.from_records(case_type_config_list)
-    config_df = config_df[config_df[ConfigFields.INCLUDE]]
+    config_df = CaseInfo.get_info_items_for(
+        InfoField.CASE_TYPE, InfoField.DASH_STYLE, stage=stage, count=count
+    )
 
     with plt.style.context(style or "default"):
         g = sns.lineplot(
             data=df,
-            x=x_axis_col,
+            x=x_axis.column(),
             y=Columns.CASE_COUNT,
             hue=Columns.LOCATION_NAME,
             hue_order=color_mapping[Columns.LOCATION_NAME].tolist(),
             style=Columns.CASE_TYPE,
-            style_order=config_df[ConfigFields.CASE_TYPE].tolist(),
-            dashes=config_df[ConfigFields.DASH_STYLE].tolist(),
+            style_order=config_df[InfoField.CASE_TYPE].tolist(),
+            dashes=config_df[InfoField.DASH_STYLE].tolist(),
             palette=color_mapping[COLOR].tolist(),
         )
 
+        default_stage = stage
+        if default_stage is None:
+            default_stage = DiseaseStage.CONFIRMED
+
         # Configure axes and ticks
-        # X axis
-        if x_axis_col == Columns.DATE:  # Update this if other date columns appear
+        # X axis (and y axis bottom limit, which is kind of x-axis related)
+        if x_axis is Columns.XAxis.DATE:
             ax.xaxis.set_major_formatter(DateFormatter(r"%b %-d"))
             ax.xaxis.set_minor_locator(DayLocator())
             for tick in ax.get_xticklabels():
                 tick.set_rotation(80)
-        elif x_axis_col == Columns.DAYS_SINCE_OUTBREAK:
+
+        elif x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
             ax.xaxis.set_major_locator(MultipleLocator(5))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
-            ax.set_xlabel(f"Days Since Reaching {Thresholds.CASE_COUNT} Cases")
+
+            _threshold, _axis_name = CaseInfo.get_info_items_for(
+                InfoField.THRESHOLD,
+                InfoField.CASE_TYPE,
+                stage=default_stage,
+                count=count,
+                squeeze_rows=True,
+            ).values
+            ax.set_xlabel(f"Days Since Reaching {_threshold:.3g} {_axis_name}")
+
+            if stage is not None:  # i.e. if only one DiseaseStage plotted
+                ax.set_ylim(bottom=_threshold / 4)
+
         else:
-            raise ValueError(f"Unexpected {x_axis_col=}")
+            x_axis.raise_for_unhandled_case()
 
         # Y axis
         ax.set_ylabel(
-            CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+            CaseInfo.get_info_item_for(
+                InfoField.CASE_TYPE, stage=default_stage, count=count
             )
         )
-        if count_type == CaseGroup.CountType.ABSOLUTE:
+        if count is Counting.TOTAL_CASES:
             ax.set_yscale("log", basey=2, nonposy="mask")
-            ax.set_ylim(bottom=0.9)
             ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_minor_locator(
@@ -566,12 +675,12 @@ def _plot_helper(
                 LogLocator(base=2, subs=np.linspace(0.5, 1, 5)[1:-1], numticks=1000)
             )
             ax.yaxis.set_minor_formatter(NullFormatter())
-        elif count_type == CaseGroup.CountType.PER_CAPITA:
+        elif count is Counting.PER_CAPITA:
             ax.set_yscale("log", basey=10, nonposy="mask")
             # No need to set minor ticks; 8 is the default number, which makes one cycle
             # n, 2n, 3n, ..., 8n, 9n, 10n
         else:
-            raise ValueError(f"Unexpected y_axis_col {count_type}")
+            count.raise_for_unhandled_case()
 
         # Configure plot design
         now_str = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
@@ -584,8 +693,8 @@ def _plot_helper(
 
         _format_legend(
             ax=ax,
-            x_axis_col=x_axis_col,
-            count_type=count_type,
+            x_axis=x_axis,
+            count=count,
             location_heading=location_heading,
             current_case_counts=current_case_counts,
         )
@@ -595,7 +704,9 @@ def _plot_helper(
         # x_max = pd.Timestamp(matplotlib.dates.num2epoch(ax.get_xlim()[1]), unit="s")
 
         # Add doubling time lines
-        _add_doubling_time_lines(fig, ax, x_axis_col=x_axis_col, count_type=count_type)
+        _add_doubling_time_lines(
+            fig, ax, x_axis=x_axis, stage=default_stage, count=count
+        )
 
         # Save
         savefile_path = Paths.FIGURES / savefile_path
@@ -608,14 +719,24 @@ def _plot_helper(
     return figs_and_axes
 
 
-def remove_empty_leading_dates(
-    df: pd.DataFrame, count_type: CaseGroup.CountType
-) -> pd.DataFrame:
+def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFrame:
+    """Removes rows prior to the existence of nonzero data
+
+    :param df: The dataframe to alter
+    :type df: pd.DataFrame
+    :param count: The count method to use when looking for 0-rows
+    :type count: Counting
+    :return: The filtered dataframe
+    :rtype: pd.DataFrame
+    """
+
+    Counting.verify(count)
+
     start_date = df.loc[
         (
             df[Columns.CASE_TYPE]
-            == CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
+            == CaseInfo.get_info_item_for(
+                InfoField.CASE_TYPE, stage=DiseaseStage.CONFIRMED, count=count
             )
         )
         & (df[Columns.CASE_COUNT] > 0),
@@ -627,8 +748,33 @@ def remove_empty_leading_dates(
 
 
 def get_savefile_path_and_location_heading(
-    df: pd.DataFrame, description: str, count_type: CaseGroup.CountType
+    df: pd.DataFrame,
+    *,
+    stage: Optional[DiseaseStage],
+    count: Counting,
+    x_axis: Columns.XAxis,
 ) -> Tuple[Path, str]:
+    """Given arguments used to create a plot, return the save path and the location
+    heading for that plot
+
+    :param df: The dataframe to be plotted
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column to be plotted against
+    :type x_axis: Columns.XAxis
+    :param stage: The disease stage to be plotted
+    :type stage: Optional[DiseaseStage]
+    :param count: The count type to be plotted
+    :type count: Counting
+    :raises ValueError: Certain know dataframes are explicitly handled; if a dataframe
+    containing data that we don't know how to handle is passed, raise a ValueError
+    :return: A (Path, str) tuple containing the save path and location heading,
+    respectively
+    :rtype: Tuple[Path, str]
+    """
+
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
 
     if Locations.WORLD in df[Columns.COUNTRY].values:
         savefile_basename = "World"
@@ -649,10 +795,16 @@ def get_savefile_path_and_location_heading(
     else:
         raise ValueError("DataFrame contents not understood")
 
+    if stage is None:
+        stage_name = "All"
+    else:
+        stage_name = stage.pprint()
+
     savefile_path = (
         Path()
-        / count_type.name.capitalize()
-        / description.capitalize()
+        / count.pprint()
+        / x_axis.pprint()
+        / f"Stage_{stage_name}"
         / Path(savefile_basename.lower()).with_suffix(".png")
     )
     return savefile_path, location_heading
@@ -661,8 +813,26 @@ def get_savefile_path_and_location_heading(
 def get_color_palette_assignments(
     df: pd.DataFrame, palette: ColorPalette = None
 ) -> LocationColorMapping:
+    """Get the mapping of colors corresponding to the locations in the given dataframe
+
+    When creating multiple plots, we want to use the same color for a given location in
+    each graph (for instance, if the US is blue in one graph it should be blue in every
+    graph in which it appears). To do this, we compute a color mapping from location ->
+    color
+
+    :param df: The dataframe to be plotted; its locations will be mapped to colors
+    :type df: pd.DataFrame
+    :param palette: The color palette to be used, defaults to None (default palette)
+    :type palette: ColorPalette, optional
+    :return: A map of locations (strings) to colors (RGB tuples); currently this map is
+    implemented as a DataFrame
+    :rtype: LocationColorMapping
+    """
     current_case_data = get_current_case_data(
-        df, CaseGroup.CountType.ABSOLUTE, x_axis_col=Columns.DATE
+        df,
+        stage=DiseaseStage.CONFIRMED,
+        count=Counting.TOTAL_CASES,
+        x_axis=Columns.XAxis.DATE,
     )
     if palette is None:
         palette = sns.color_palette(n_colors=len(current_case_data))
@@ -677,83 +847,61 @@ def get_color_palette_assignments(
     )
 
 
-def plot_cases_from_fixed_date(
+def plot(
     df: pd.DataFrame,
     *,
-    count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
-    style=None,
     start_date=None,
-) -> List[Tuple[plt.Figure, plt.Axes]]:
-
-    if start_date is not None:
-        df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
-
-    df = remove_empty_leading_dates(df, count_type)
-
-    configs = [
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.PRIMARY,
-        },
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.DEATH, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.SECONDARY,
-        },
-    ]
-
-    savefile_path, location_heading = get_savefile_path_and_location_heading(
-        df, FROM_FIXED_DATE_DESC, count_type
-    )
-
-    if df_with_china is not None:
-        color_mapping = get_color_palette_assignments(df_with_china)
-    else:
-        color_mapping = get_color_palette_assignments(df)
-
-    return _plot_helper(
-        df,
-        x_axis_col=Columns.DATE,
-        count_type=count_type,
-        style=style,
-        color_mapping=color_mapping,
-        case_type_config_list=configs,
-        savefile_path=savefile_path,
-        location_heading=location_heading,
-    )
-
-
-def plot_cases_by_days_since_first_widespread_locally(
-    df: pd.DataFrame,
-    *,
-    count_type: CaseGroup.CountType,
-    df_with_china: pd.DataFrame = None,  # For keeping consistent color assignments
+    stage: Optional[DiseaseStage] = None,
+    count: Counting,
+    x_axis: Columns.XAxis,
+    df_with_china: pd.DataFrame = None,
     style=None,
 ) -> List[Tuple[plt.Figure, plt.Axes]]:
-    configs = [
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.CONFIRMED, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.PRIMARY,
-        },
-        {
-            ConfigFields.CASE_TYPE: CaseTypes.get_case_types(
-                stage=CaseGroup.Stage.DEATH, count_type=count_type
-            ),
-            ConfigFields.DASH_STYLE: Style.Dash.SECONDARY,
-        },
-    ]
+    """Entry point for plotting
+
+    This function does some basic setup, computing some data necessary for plotting from
+    the passed arguments, before passing along all the necessary data to
+    _plot_helper, which does the actual plotting work
+
+    :param df: The data to plot
+    :type df: pd.DataFrame
+    :param x_axis: The x axis column to plot against
+    :type x_axis: Columns.XAxis
+    :param count: The count type to plot
+    :type count: Counting
+    :param start_date: A date with which to filter the data; only data after this date
+    will be plotted, defaults to None (all data will be plotted)
+    :type start_date: [type], optional
+    :param stage: The disease stage to plot, defaults to None (all stages will be
+    plotted)
+    :type stage: DiseaseStage, optional
+    :param df_with_china: A dataframe to serve as a reference point for creating the
+    color mapping; this keeps colors in sync whether or not China is included in the
+    plot. Defaults to None, in which case `df` is used to create the color mapping.
+    :type df_with_china: pd.DataFrame, optional
+    :param style: The matplotlib style to plot with, defaults to None (default style)
+    :type style: [type], optional
+    :return: A list of plotted objects (Figure, Axes)
+    :rtype: List[Tuple[plt.Figure, plt.Axes]]
+    """
+
+    DiseaseStage.verify(stage, none_ok=True)
+    Counting.verify(count)
+    Columns.XAxis.verify(x_axis)
+
+    if x_axis is Columns.XAxis.DATE:
+        if start_date is not None:
+            df = df[df[Columns.DATE] >= pd.Timestamp(start_date)]
+
+        df = remove_empty_leading_dates(df, count)
+    elif x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
+        df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
+    else:
+        x_axis.raise_for_unhandled_case()
 
     savefile_path, location_heading = get_savefile_path_and_location_heading(
-        df, FROM_LOCAL_OUTBREAK_START_DESC, count_type
+        df, x_axis=x_axis, stage=stage, count=count
     )
-
-    df = df[df[Columns.DAYS_SINCE_OUTBREAK] >= -1]
 
     if df_with_china is not None:
         color_mapping = get_color_palette_assignments(df_with_china)
@@ -762,11 +910,11 @@ def plot_cases_by_days_since_first_widespread_locally(
 
     return _plot_helper(
         df,
-        x_axis_col=Columns.DAYS_SINCE_OUTBREAK,
-        count_type=count_type,
+        x_axis=x_axis,
+        stage=stage,
+        count=count,
         style=style,
         color_mapping=color_mapping,
-        case_type_config_list=configs,
         savefile_path=savefile_path,
         location_heading=location_heading,
     )
