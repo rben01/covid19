@@ -14,7 +14,7 @@ Clone this GitHub repo (https://github.com/rben01/covid19)
 
 Create the conda environment using
 
-.. code:: bash
+.. code-block:: bash
 
 	conda env create -f environment.yml
 
@@ -26,13 +26,13 @@ Activate the environment with
 
 Finally, run the graphing script
 
-.. code:: bash
+.. code-block:: bash
 
 	python src/case_tracker.py
 
 The script has a command line interface; check it out with
 
-.. code:: bash
+.. code-block:: bash
 
 	python src/case_tracker.py --help
 
@@ -52,4 +52,4 @@ The script has a command line interface; check it out with
 * `Wikipedia - List of Countries by Population`_
 * `Wikipedia - List of US States by Population`_
 
-.. seealso:: This source is not currently used, but it seems decent as well: `Corona Data Scraper <https://coronadatascraper.com/#home>`_
+.. note:: This source is not currently used, but it seems decent as well: `Corona Data Scraper <https://coronadatascraper.com/#home>`_
