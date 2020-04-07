@@ -73,12 +73,13 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
   - 4 days: +19% daily
   - 5 days: +15% daily
   - 6 days: +12% daily
-  - 1 week: + 10% daily
+  - 1 week: +10% daily
+  - 2 weeks: +5% daily
 
 - | 🔟 In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases, cases per capita, or doubling time thereof).
   | For example, in a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world (the country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which it's obviously not given its population of 33k).
 
-- 🔄 The data sources used may change due to changing quality and up-to-dateness, which may affect data for past dates (it shouldn't, but it might).
+- 🔄 Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change. Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data.
 
 - 📝 Case Fatality Rate (CFR) notes
 
