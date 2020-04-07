@@ -564,6 +564,3 @@ class Urls:
             + " Version/13.1 Safari/605.1.15"
         )
     }
-
-
-# display(CaseType.get_case_types(stage=CaseGroup.Stage.CONFIRMED))
