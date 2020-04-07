@@ -94,10 +94,9 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 .. figure:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
+  :alt: World, China, and Rest of World - Case count over time
 
   World, China, and Rest of World - Case count over time
-
-  :alt: World, China, and Rest of World - Case count over time
 
 
 
