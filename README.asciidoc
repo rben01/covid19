@@ -21,7 +21,7 @@
 :since-outbreak-dir: From_local_spread_start
 :stage-all-dir: Stage_All
 :stage-confirmed-dir: Stage_Confirmed
-:stage-deaths-dir: Stage_Deaths
+:stage-death-dir: Stage_Death
 :img-world: world.png
 :img-countries: countries_wo_china.png
 :img-usa-states: states.png
@@ -125,7 +125,7 @@ image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{i
 
 ==== {countries}{sep}{deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-deaths-dir}/{img-countries}[{countries}{sep}{deaths-since-25}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}[{countries}{sep}{deaths-since-25}]
 
 === 🇺🇸 Top Ten USA States
 
@@ -143,4 +143,4 @@ image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{i
 
 ==== {usa-states}{sep}{deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-deaths-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25}]
