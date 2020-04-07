@@ -8,11 +8,12 @@
 
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-.. _setup:
+.. _setup-setup:
 
 🛠 Setup
 #########
 
+This is :ref:`setup-setup`
 
 Clone this GitHub repo (https://github.com/rben01/covid19)
 
