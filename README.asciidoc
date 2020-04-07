@@ -14,5 +14,32 @@ toc::[]
 [[setup]]
 == 🛠Setup
 
-[TIP]
-a note
+Clone this GitHub repo (https://github.com/rben01/covid19)
+
+Create the conda environment using
+
+[source,bash]
+conda env create -f environment.yml
+
+Activate the environment with
+
+.. code-block:: bash
+
+	conda activate covid
+
+Finally, run the graphing script
+
+.. code-block:: bash
+
+	python src/case_tracker.py
+
+The script has a command line interface; check it out with
+
+.. code-block:: bash
+
+	python src/case_tracker.py --help
+
+.Note
+*********************
+Data source used
+*********************
