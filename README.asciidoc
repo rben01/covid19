@@ -81,8 +81,9 @@ For example, in a graph of countries and their cases per capita, the first count
 
 === 🌍 World, China, and Rest of World
 
-// World, China, and Rest of World - Case count over time
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+==== World, China, and Rest of World - Case count over time
+.World, China, and Rest of World - Case count over time
+image:./Figures/Total_cases/From_fixed_date/Stage_All/world.png[World, China, and Rest of World - Case count over time]
 
 // .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
 //   :alt: World, China, and Rest of World - Case count over time
