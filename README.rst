@@ -93,10 +93,12 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
 🌍 World, China, and Rest of World
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-.. figure:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
+World, China, and Rest of World - Case count over time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+.. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
    :scale: 50%
    :alt: World, China, and Rest of World - Case count over time
 
-   World, China, and Rest of World - Case count over time
 
 More text
