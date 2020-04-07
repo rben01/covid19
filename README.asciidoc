@@ -2,7 +2,7 @@
 :sectlinks:
 :toc:
 :toc-placement: macro
-:toc-title: Contents
+:toc-title:
 :toclevels: 4
 :over-time: over time
 :cases-deaths-count-raw: Cases and deaths
@@ -30,6 +30,8 @@
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 '''
+
+[big]#**Contents**#
 
 toc::[]
 
