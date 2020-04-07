@@ -31,14 +31,14 @@ This repository contains graphs of the spread of coronavirus throughout the worl
 
 '''
 
-.Contents
+== 🗂 Contents
 
 toc::[]
 
 '''
 
 [[setup]]
-== 🛠Setup
+== 🛠 Setup
 
 Clone this GitHub repo (https://github.com/rben01/covid19)
 
