@@ -97,7 +97,7 @@ World, China, and Rest of World - Case count over time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
-   :alt: World, China, and Rest of World - Case count over time
+  :alt: World, China, and Rest of World - Case count over time
 
 🗺 Top Ten Countries, Excluding China
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -108,38 +108,47 @@ Countries - Cases and deaths over time
 .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png
   :alt: Countries - Case count over time
 
-
-
 Countries - Cases and deaths per capita over time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 .. image:: ./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png
   :alt: Countries - Case count over time
 
+Countries - Cases since hitting 100 cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### Countries - Cases since hitting 100 cases
+.. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png
+  :alt: Countries - Case count since hitting 100 cases
 
-![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png)
+Countries - Deaths since hitting 25 deaths
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### Countries - Deaths since hitting 25 deaths
+.. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png
+  :alt: Countries - Case count since hitting 100 cases
 
-![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png)
+🇺🇸 Top Ten USA States
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-### :us: Top Ten USA States
+USA States - Cases and deaths over time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### USA States - Cases and deaths over time
+.. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/states.png
+  :alt: Countries - Case count over time
 
-![Countries - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/states.png)
+USA States - Cases and deaths per capita over time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### USA States - Cases and deaths per capita over time
+.. image:: ./Figures/Per_capita/From_fixed_date/Stage_All/states.png
+  :alt: Countries - Case count over time
 
-![Countries - Case count over time](./Figures/Per_capita/From_fixed_date/Stage_All/states.png)
+USA States - Cases since hitting 100 cases
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### USA States - Cases since hitting 100 cases
+.. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png
+  :alt: Countries - Case count since hitting 100 cases
 
-![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png)
+USA States - Deaths since hitting 25 deaths
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#### USA States - Deaths since hitting 25 deaths
-
-![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/states.png)
-More text
+.. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Death/states.png
+  :alt: Countries - Case count since hitting 100 cases
