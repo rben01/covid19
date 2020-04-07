@@ -3,7 +3,7 @@
 :sectlinks: true
 :sectanchors: true
 :toc: true
-:toc-placement: manual
+:toc-placement: macro
 :toc-title: Contents
 
 [.lead]
@@ -23,21 +23,18 @@ conda env create -f environment.yml
 
 Activate the environment with
 
-.. code-block:: bash
-
-	conda activate covid
+[source,bash]
+conda activate covid
 
 Finally, run the graphing script
 
-.. code-block:: bash
-
-	python src/case_tracker.py
+[source,bash]
+python src/case_tracker.py
 
 The script has a command line interface; check it out with
 
-.. code-block:: bash
-
-	python src/case_tracker.py --help
+[source,bash]
+python src/case_tracker.py --help
 
 .Note
 *********************
