@@ -3,6 +3,7 @@
 :toc:
 :toc-placement: macro
 :toc-title: Contents
+:toclevels: 4
 
 [.lead]
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
@@ -82,41 +83,33 @@ For example, in a graph of countries and their cases per capita, the first count
 === 🌍 World, China, and Rest of World
 
 ==== World, China, and Rest of World - Case count over time
-.World, China, and Rest of World - Case count over time
-image:./Figures/Total_cases/From_fixed_date/Stage_All/world.png[World, China, and Rest of World - Case count over time]
 
-// .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
-//   :alt: World, China, and Rest of World - Case count over time
+image::./Figures/Total_cases/From_fixed_date/Stage_All/world.png[World, China, and Rest of World - Case count over time]
 
 === 🗺 Top Ten Countries, Excluding China
 
-
 ==== Countries - Cases and deaths over time
 
-// .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png
-//   :alt: Countries - Case count over time
+image::./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png[Countries - Case count over time]
 
 ==== Countries - Cases and deaths per capita over time
 
-// .. image:: ./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png
-//   :alt: Countries - Case count over time
+image::./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png[Countries - Case count over time]
 
 ==== Countries - Cases since hitting 100 cases
 
-// .. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png
-//   :alt: Countries - Case count since hitting 100 cases
+[caption=Countries - Case count since hitting 100 cases]
+image::./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png[Countries - Case count since hitting 100 cases]
 
 ==== Countries - Deaths since hitting 25 deaths
 
-// .. image:: ./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png
-//   :alt: Countries - Case count since hitting 100 cases
+image::./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png[Countries - Case count since hitting 100 cases]
 
 === 🇺🇸 Top Ten USA States
 
 ==== USA States - Cases and deaths over time
 
-// .. image:: ./Figures/Total_cases/From_fixed_date/Stage_All/states.png
-//   :alt: Countries - Case count over time
+image::./Figures/Total_cases/From_fixed_date/Stage_All/states.png[States - Case count over time]
 
 ==== USA States - Cases and deaths per capita over time
 
