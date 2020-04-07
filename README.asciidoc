@@ -1,7 +1,6 @@
 = 2019 COVID-19/Coronavirus Tracker
-
-:sectlinks: true
-:toc: true
+:sectlinks:
+:toc:
 :toc-placement: macro
 :toc-title: Contents
 
@@ -46,7 +45,4 @@ python src/case_tracker.py --help
 
 
 [NOTE]
-.Note
---
 https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well.
---
