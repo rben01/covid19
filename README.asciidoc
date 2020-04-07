@@ -2,7 +2,7 @@
 
 :sectlinks: true
 :sectanchors: true
-:toc:
+:toc: true
 :toc-placement: manual
 :toc-title: Contents
 
