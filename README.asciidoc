@@ -1,10 +1,10 @@
+= 2019 COVID-19/Coronavirus Tracker
+
 :sectlinks: true
 :sectanchors: true
-:toc: true
-:toc-placement: auto
+:toc:
+:toc-placement: manual
 :toc-title: Contents
-
-= 2019 COVID-19/Coronavirus Tracker
 
 [.lead]
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
