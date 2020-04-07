@@ -6,9 +6,6 @@
 .. contents::
 	:backlinks: entry
 
-.. sectnum::
-	:suffix: .
-
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 .. _setup:
