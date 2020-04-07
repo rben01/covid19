@@ -1,7 +1,15 @@
+:sectlinks: true
+:sectanchors: true
+:toc: true
+
 = 2019 COVID-19/Coronavirus Tracker
 
 [.lead]
 This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-[NOTE]
+
+[[setup]]
+== 🛠Setup
+
+[TIP]
 a note
