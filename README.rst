@@ -86,3 +86,53 @@ The data used to create these graphs is available `here <data/data_table.csv>`_.
   - This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won't yet have had time to become fatal. If it's been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not). Of course, the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 
   - The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the **Confirmed Cases** and **Deaths** lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly 1/2\ :sup:`distance`; again this will be an underestimate.)
+
+📈 Graphs
+################
+
+🌍 World, China, and Rest of World
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+.. figure:: ./Figures/Total_cases/From_fixed_date/Stage_All/world.png
+
+  World, China, and Rest of World - Case count over time
+
+  :alt: World, China, and Rest of World - Case count over time
+
+
+
+### :world_map: Top Ten Countries, Excluding China
+
+#### Countries - Cases and deaths over time
+
+![Countries - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png)
+
+#### Countries - Cases and deaths per capita over time
+
+![Countries - Case count over time](./Figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png)
+
+#### Countries - Cases since hitting 100 cases
+
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png)
+
+#### Countries - Deaths since hitting 25 deaths
+
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png)
+
+### :us: Top Ten USA States
+
+#### USA States - Cases and deaths over time
+
+![Countries - Case count over time](./Figures/Total_cases/From_fixed_date/Stage_All/states.png)
+
+#### USA States - Cases and deaths per capita over time
+
+![Countries - Case count over time](./Figures/Per_capita/From_fixed_date/Stage_All/states.png)
+
+#### USA States - Cases since hitting 100 cases
+
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png)
+
+#### USA States - Deaths since hitting 25 deaths
+
+![Countries - Case count since hitting 100 cases](./Figures/Total_cases/From_local_spread_start/Stage_Death/states.png)
