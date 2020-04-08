@@ -398,7 +398,7 @@ def _add_doubling_time_lines(
         # Adding stuff causes the axis to resize itself, and we have to stop it
         # from doing so (by setting it back to its original size)
         ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
-        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
+        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim * 1.1)
 
 
 def _format_legend(
