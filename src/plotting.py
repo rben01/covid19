@@ -236,13 +236,20 @@ def _add_doubling_time_lines(
     # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
     # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
     if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
+        # Create transformation from data coords to axes coords
+        # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
+        dc_to_ac = ax.transData + ax.transAxes.inverted()
 
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
         dc_y_lower_lim, dc_y_upper_lim = ax.get_ylim()
 
-        # Create transformation from data coords to axes coords
-        # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
-        dc_to_ac = ax.transData + ax.transAxes.inverted()
+        # Adding stuff causes the axis to resize itself, and we have to stop it
+        # from doing so (by setting it back to its original size)
+        # Also need to add back margin
+        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
+
+        dc_y_upper_lim = dc_to_ac.inverted().transform((0, 1.1))[1]
+        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
 
         # Getting min x,y bounds of lines is easy
         dc_x_min = 0
@@ -394,11 +401,6 @@ def _add_doubling_time_lines(
             plotted_text.set_verticalalignment("bottom")
             plotted_text.set_rotation(ac_text_angle_rad * 180 / np.pi)  # takes degrees
             plotted_text.set_rotation_mode("anchor")
-
-        # Adding stuff causes the axis to resize itself, and we have to stop it
-        # from doing so (by setting it back to its original size)
-        ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
-        ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim * 1.1)
 
 
 def _format_legend(
