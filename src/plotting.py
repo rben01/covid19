@@ -119,17 +119,20 @@ def get_current_case_data(
 
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
         # Filter to the relevant case type and just the two columns
-        g = g.loc[g[Columns.CASE_TYPE] == relevant_case_type]
+        doubling_time_group = g.loc[
+            g[Columns.CASE_TYPE] == relevant_case_type,
+            [Columns.DATE, Columns.CASE_COUNT],
+        ]
 
         # Get the doubling times for selected day indices (fed to iloc)
         # Keys are stringified iloc positions (0, k, -j, etc),
         # Values are values at that iloc
         doubling_times = {}
-        current_date, current_count = g[[Columns.DATE, Columns.CASE_COUNT]].iloc[-1]
+        current_date, current_count = doubling_time_group.iloc[-1]
         for day_idx in day_indices:
             col_name = form_doubling_time_colname(day_idx)
             try:
-                then_row = g[[Columns.DATE, Columns.CASE_COUNT]].iloc[day_idx]
+                then_row = doubling_time_group.iloc[day_idx]
             except IndexError:
                 doubling_times[col_name] = np.nan
                 continue
@@ -144,7 +147,7 @@ def get_current_case_data(
             doubling_times[col_name] = n_days / np.log2(count_ratio)
 
         data_dict = {
-            START_DATE: g[Columns.DATE].min(),
+            START_DATE: doubling_time_group[Columns.DATE].min(),
             **doubling_times,
             # Get last case count of each case type for current group
             # .tail(1).sum() is a trick to get the last value if it exists,
