@@ -119,20 +119,17 @@ def get_current_case_data(
 
     def get_group_stats(g: pd.DataFrame) -> pd.Series:
         # Filter to the relevant case type and just the two columns
-        relevant_subsection = g.loc[
-            g[Columns.CASE_TYPE] == relevant_case_type,
-            [Columns.DATE, Columns.CASE_COUNT],
-        ]
+        g = g.loc[g[Columns.CASE_TYPE] == relevant_case_type]
 
         # Get the doubling times for selected day indices (fed to iloc)
         # Keys are stringified iloc positions (0, k, -j, etc),
         # Values are values at that iloc
         doubling_times = {}
-        current_date, current_count = relevant_subsection.iloc[-1]
+        current_date, current_count = g[[Columns.DATE, Columns.CASE_COUNT]].iloc[-1]
         for day_idx in day_indices:
             col_name = form_doubling_time_colname(day_idx)
             try:
-                then_row = relevant_subsection.iloc[day_idx]
+                then_row = g[[Columns.DATE, Columns.CASE_COUNT]].iloc[day_idx]
             except IndexError:
                 doubling_times[col_name] = np.nan
                 continue
