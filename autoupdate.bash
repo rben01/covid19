@@ -4,7 +4,7 @@ ghpages_branch='master'
 curr_branch="$(git rev-parse --abbrev-ref HEAD)" &&
 	git checkout "$ghpages_branch" &&
 	python src/case_tracker.py --use-web-data --create-data-table &&
-	asciidoctor --base-dir docs -o docs/index.html README.asciidoc &&
+	asciidoctor --base-dir docs -o index.html README.asciidoc &&
 	git add -A . &&
 	git commit -m "Auto update with new data" &&
 	git push &&
