@@ -10,6 +10,7 @@
 :over-time: over time
 :fig-dir: ./figures
 :stylesheet: ./site/adoc-maker.css
+:linkcss:
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
@@ -44,7 +45,7 @@ This page contains graphs of the spread of coronavirus throughout the world and 
 
 // '''
 
-[[setup]]
+[[sect-setup]]
 == 🛠 Setup
 
 Clone the GitHub repo (https://github.com/rben01/covid19)
@@ -69,7 +70,7 @@ The script has a command line interface; check it out with
 [source,bash]
 python src/case_tracker.py --help
 
-[[data-sources]]
+[[sect-data-sources]]
 == 💾 Data Sources
 
 
@@ -85,7 +86,7 @@ https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, 
 [TIP]
 The data used to create these graphs is available link:data/data_table.csv[here].
 
-[[notes]]
+[[sect-notes]]
 == 📓 Notes
 ****
 While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistics. Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes. It is with this mindset that this document was written.
@@ -117,47 +118,60 @@ For example, in a graph of countries and their cases per capita, the first count
 Of course, the numerator and denominator may themselves be inaccurate to do testing issues. And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 ** The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly 1/2^distance^; again this will be an underestimate.)
 
-[[graphs]]
+[[sect-graphs]]
 == 📈 Graphs
 
+[[graphs-world-china-row]]
 === 🌍 World, China, and Rest of World
 
+[[world-china-row-cases-deaths]]
 ==== World, China, and Rest of World{sep}{cases-deaths-count-over-time}
 
 image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[World, China, and Rest of World{sep}{cases-deaths-count-over-time},{img-opts}]
 
+[[graphs-top-ten-countries-no-china]]
 === 🗺 Top Ten Countries, Excluding China
 
+[[top-ten-countries-no-china-cases-deaths-total]]
 ==== {countries}{sep}{cases-deaths-count-over-time}
 
 image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-deaths-count-over-time},{img-opts}]
 
+[[top-ten-countries-no-china-cases-deaths-per-capita]]
 ==== {countries}{sep}{cases-deaths-per-cap-over-time}
 
 image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-per-cap-over time},{img-opts}]
 
+[[top-ten-countries-no-china-cases-since]]
 ==== {countries}{sep}{cases-since-100}
 
 image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{countries}{sep}{cases-since-100}},{img-opts}]
 
+[[top-ten-countries-no-china-deaths-since]]
 ==== {countries}{sep}{deaths-since-25}
 
 image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}[{countries}{sep}{deaths-since-25},{img-opts}]
 
+
+[[graphs-usa-top-states]]
 === 🇺🇸 Top Ten USA States
 
+[[usa-top-states-cases-deaths-total]]
 ==== {usa-states}{sep}{cases-deaths-count-over-time}
 
 image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-count-over-time},{img-opts}]
 
+[[usa-top-states-cases-deaths-per-capita]]
 ==== {usa-states}{sep}{cases-deaths-per-cap-over-time}
 
 image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-per-cap-over-time},{img-opts}]
 
+[[usa-top-states-cases-since]]
 ==== {usa-states}{sep}{cases-since-100}
 
 image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{usa-states}{sep}{cases-since-100},{img-opts}]
 
+[[usa-top-states-deaths-since]]
 ==== {usa-states}{sep}{deaths-since-25}
 
 image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25},{img-opts}]
