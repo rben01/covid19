@@ -1,7 +1,8 @@
 = 2019 COVID-19/Coronavirus Tracker
+:data-uri:
 :sectlinks:
-:toc:
-:toc-placement: macro
+:toc2:
+:toc-placement: auto
 :toc-title:
 :toclevels: 4
 :over-time: over time
@@ -25,18 +26,16 @@
 :img-world: world.png
 :img-countries: countries_wo_china.png
 :img-usa-states: states.png
+:img-opts: width=750
 
 [.lead]
-This repository contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
+This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
-'''
+// '''
 
-[float]
-== Contents
+// toc::[]
 
-toc::[]
-
-'''
+// '''
 
 [[setup]]
 == 🛠 Setup
@@ -76,8 +75,7 @@ python src/case_tracker.py --help
 [NOTE]
 https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well.
 
-=== Raw Data Table
-
+[TIP]
 The data used to create these graphs is available link:data/data_table.csv[here].
 
 [[notes]]
@@ -119,40 +117,40 @@ Of course, the numerator and denominator may themselves be inaccurate to do test
 
 ==== World, China, and Rest of World{sep}{cases-deaths-count-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[World, China, and Rest of World{sep}{cases-deaths-count-over-time}]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[World, China, and Rest of World{sep}{cases-deaths-count-over-time},{img-opts}]
 
 === 🗺 Top Ten Countries, Excluding China
 
 ==== {countries}{sep}{cases-deaths-count-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-deaths-count-over-time}]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-deaths-count-over-time},{img-opts}]
 
 ==== {countries}{sep}{cases-deaths-per-cap-over-time}
 
-image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-per-cap-over time}]
+image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-per-cap-over time},{img-opts}]
 
 ==== {countries}{sep}{cases-since-100}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{countries}{sep}{cases-since-100}}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{countries}{sep}{cases-since-100}},{img-opts}]
 
 ==== {countries}{sep}{deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}[{countries}{sep}{deaths-since-25}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}[{countries}{sep}{deaths-since-25},{img-opts}]
 
 === 🇺🇸 Top Ten USA States
 
 ==== {usa-states}{sep}{cases-deaths-count-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-count-over-time}]
+image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-count-over-time},{img-opts}]
 
 ==== {usa-states}{sep}{cases-deaths-per-cap-over-time}
 
-image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-per-cap-over-time}]
+image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-per-cap-over-time},{img-opts}]
 
 ==== {usa-states}{sep}{cases-since-100}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{usa-states}{sep}{cases-since-100}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{usa-states}{sep}{cases-since-100},{img-opts}]
 
 ==== {usa-states}{sep}{deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25}]
+image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25},{img-opts}]
