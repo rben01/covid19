@@ -318,11 +318,6 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     ):
         df[col] = pd.to_numeric(df[col], downcast="integer")
 
-    for col in CaseInfo.get_info_items_for(
-        InfoField.CASE_TYPE, count=Counting.PER_CAPITA
-    ):
-        df[col] = df[col].map("{:e}".format)
-
     save_path = Paths.DATA / "data_table.csv"
     df.to_csv(save_path, index=False)
     print(f"Saved data to {save_path.relative_to(Paths.ROOT)}")
