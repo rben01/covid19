@@ -1,7 +1,7 @@
 = COVID-19/Coronavirus Tracker
 :author: Robert Bennett
-:stylesheet: site/adoc-maker.css
-:data-uri:
+:description: Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.
+:keywords: coronavirus, covid, covid-19, pandemic, visualization, graph
 :sectlinks:
 :toc2:
 :toc-placement: auto
