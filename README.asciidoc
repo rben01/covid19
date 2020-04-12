@@ -8,6 +8,8 @@
 :toc-title: Contents
 :toclevels: 4
 :over-time: over time
+:fig-dir: ./figures
+:stylesheet: ./site/adoc-maker.css
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
@@ -17,7 +19,6 @@
 :countries: Countries
 :usa-states: USA States
 :sep: {sp}-{sp}
-:fig-dir: ./Figures
 :total-count-dir: Total_cases
 :per-capita-dir: Per_capita
 :fixed-date-dir: From_fixed_date
@@ -36,6 +37,7 @@
 This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 
+
 // '''
 
 // toc::[]
@@ -45,7 +47,7 @@ This page contains graphs of the spread of coronavirus throughout the world and 
 [[setup]]
 == 🛠 Setup
 
-Clone this GitHub repo (https://github.com/rben01/covid19)
+Clone the GitHub repo (https://github.com/rben01/covid19)
 
 Create the conda environment using
 

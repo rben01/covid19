@@ -93,7 +93,7 @@ class Paths:
 
     ROOT: Path
 
-    FIGURES = ROOT / "Figures"
+    FIGURES = ROOT / "docs" / "figures"
     DATA = ROOT / "data"
 
     FIGURES: Path
