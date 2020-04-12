@@ -1,10 +1,11 @@
 = COVID-19/Coronavirus Tracker
+:author: Robert Bennett
 :stylesheet: site/adoc-maker.css
 :data-uri:
 :sectlinks:
 :toc2:
 :toc-placement: auto
-:toc-title:
+:toc-title: Contents
 :toclevels: 4
 :over-time: over time
 :cases-deaths-count-raw: Cases and deaths
@@ -29,8 +30,11 @@
 :img-usa-states: states.png
 :img-opts: width=750
 
+'''
+
 [.lead]
 This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
+
 
 // '''
 
