@@ -1,4 +1,4 @@
-= 2019 COVID-19/Coronavirus Tracker
+= COVID-19/Coronavirus Tracker
 :stylesheet: site/adoc-maker.css
 :data-uri:
 :sectlinks:
