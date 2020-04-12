@@ -10,7 +10,7 @@
 :over-time: over time
 :fig-dir: ./figures
 :stylesheet: ./site/adoc-maker.css
-:linkcss:
+:linkcss!:
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
