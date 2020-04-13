@@ -11,15 +11,16 @@
 :toc-title: Contents
 :toclevels: 4
 :over-time: over time
-:fig-dir: ./figures
 :stylesheet: ./styles/clean.css
 :linkcss!:
 :icons: font
 ifdef::env-github[]
 :data-table-source: link:data/data_table.csv
+:fig-dir: ./docs/figures
 endif::[]
 ifndef::env-github[]
 :data-table-source: {github-repo}/blob/master/data/data_table.csv
+:fig-dir: ./figures
 endif::[]
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
