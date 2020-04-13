@@ -85,7 +85,9 @@ https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, 
 ****
 
 [TIP]
+--
 The data used to create these graphs is available link:data/data_table.csv[here].
+--
 
 [[sect-notes]]
 == 📓 Notes
