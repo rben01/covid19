@@ -6,6 +6,7 @@
 :description: Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.
 :keywords: coronavirus, covid, covid-19, pandemic, visualization, graph
 :hide-uri-scheme:
+:favicon: ./SARS-CoV-2_favicon.png
 :sectlinks:
 :toc: left
 :toc-placement: auto
@@ -17,6 +18,7 @@
 :icons: font
 ifdef::env-github[]
 :tip-caption: :bulb:
+:note-caption: :information_source:
 :data-table-source: link:data/data_table.csv
 :fig-dir: ./docs/figures
 endif::[]
@@ -92,12 +94,12 @@ cd covid19
 ----
 
 . Create the conda environment using
++
+--
 [source,bash]
 conda env create -f environment.yml
-+
-[NOTE]
---
-If you do not already have `conda` installed, you can install it from https://www.anaconda.com/distribution/[here].
+
+NOTE: If you do not already have `conda` installed, you can install it from https://www.anaconda.com/distribution/[here].
 --
 
 . Activate the environment with
@@ -126,10 +128,7 @@ python src/case_tracker.py --help
 https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well. +
 ****
 
-[TIP]
---
-The data used to create these graphs is available {data-table-source}[here].
---
+TIP: The data used to create these graphs is available {data-table-source}[here].
 
 [[sect-notes]]
 == 📓 Notes
