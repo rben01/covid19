@@ -43,6 +43,13 @@ endif::[]
 :img-usa-states: states.png
 :img-opts: width=750
 
+[pass]
+++++
+<style>
+body { font-family: sans-serif !important; }
+</style>
+++++
+
 
 [.lead]
 This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
@@ -64,23 +71,19 @@ endif::[]
 
 Clone the GitHub repo ({github-repo})
 
-Create the conda environment using
-
+. Create the conda environment using
 [source,bash]
 conda env create -f environment.yml
 
-Activate the environment with
-
+. Activate the environment with
 [source,bash]
 conda activate covid
 
-Finally, run the graphing script
-
+. Finally, run the graphing script
 [source,bash]
 python src/case_tracker.py
 
-The script has a command line interface; check it out with
-
+. The script has a command line interface; check it out with
 [source,bash]
 python src/case_tracker.py --help
 
