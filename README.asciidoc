@@ -16,6 +16,7 @@
 :linkcss!:
 :icons: font
 ifdef::env-github[]
+:tip-caption: :bulb:
 :data-table-source: link:data/data_table.csv
 :fig-dir: ./docs/figures
 endif::[]
@@ -53,7 +54,6 @@ endif::[]
 :title-usa-states-cases-deaths-per-capita: {usa-states}{sep}{cases-deaths-per-cap-over-time}
 :title-usa-states-cases-since-100: {usa-states}{sep}{cases-since-100}
 :title-usa-states-deaths-since-25: {usa-states}{sep}{deaths-since-25}
-
 
 ifndef::env-github[]
 [pass]
