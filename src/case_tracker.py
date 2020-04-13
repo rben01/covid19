@@ -357,6 +357,15 @@ def is_new_data(df: pd.DataFrame) -> bool:
 
     existing_data = read_data_table(as_text=True)
 
+    # for li, (el, nl) in enumerate(
+    #     zip(existing_data.splitlines(), new_data.splitlines())
+    # ):
+    #     if el != nl:
+    #         print(li)
+    #         print(el)
+    #         print(nl)
+    #         print()
+
     return new_data != existing_data
 
 
@@ -385,9 +394,11 @@ def main(namespace: argparse.Namespace = None) -> pd.DataFrame:
     if not is_new_data(df):
         print("No new data; old data table is up to date")
         return
+    else:
+        print("Got new data")
 
     if namespace.create_data_table:
-        create_data_table(df)
+        save_as_data_table(df)
 
     if namespace.no_graphs:
         return
