@@ -55,12 +55,14 @@ endif::[]
 :title-usa-states-deaths-since-25: {usa-states}{sep}{deaths-since-25}
 
 
+ifndef::env-github[]
 [pass]
 ++++
 <style>
 body { font-family: sans-serif !important; }
 </style>
 ++++
+endif::[]
 
 
 [.lead]
