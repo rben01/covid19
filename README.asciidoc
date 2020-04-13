@@ -9,8 +9,9 @@
 :toclevels: 4
 :over-time: over time
 :fig-dir: ./figures
-:stylesheet: ./styles/adoc-rubygems.css
+:stylesheet: ./styles/adoc-maker.css
 :linkcss!:
+:icons: font
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
@@ -79,12 +80,11 @@ python src/case_tracker.py --help
 * https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population[Wikipedia - List of US States by Population]
 
 
-[TIP]
---
+[sidebar]
 https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well. +
 
+[TIP]
 The data used to create these graphs is available link:data/data_table.csv[here].
---
 
 [[sect-notes]]
 == 📓 Notes
