@@ -1,5 +1,7 @@
 # %%
+import io
 import argparse
+from typing import Union
 
 import pandas as pd
 from IPython.display import display  # noqa F401
@@ -16,6 +18,8 @@ from constants import (
     Paths,
 )
 from plotting import plot
+
+DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
 
 
 def _get_data(*, from_web: bool) -> pd.DataFrame:
@@ -318,11 +322,42 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     ):
         df[col] = pd.to_numeric(df[col], downcast="integer")
 
-    save_path = Paths.DATA / "data_table.csv"
-    df.to_csv(save_path, index=False)
-    print(f"Saved data to {save_path.relative_to(Paths.ROOT)}")
+    # save_path = Paths.DATA / "data_table.csv"
+    # df.to_csv(save_path, index=False)
+    # print(f"Saved data to {save_path.relative_to(Paths.ROOT)}")
 
     return df
+
+
+def save_as_data_table(df: pd.DataFrame, dest=None):
+    if dest is None:
+        dest = DATA_TABLE_PATH
+
+    data_table = create_data_table(df)
+    data_table.to_csv(dest, index=False)
+
+
+def read_data_table(*, as_text=False) -> Union[pd.DataFrame, str]:
+    if as_text:
+        with open(DATA_TABLE_PATH) as f:
+            return f.read()
+
+    return pd.read_csv(DATA_TABLE_PATH)
+
+
+# Two dataframes are equal (up to dtypes) iff the CSVs they'd produce are the same
+# This is easier than comparing actual df values because of the way pandas converts
+# values when reading from csv (it's hard to 100% round trip data, e.g., is a blank
+# cell NaN or an empty string?)
+# Also this is probably faster than DataFrame.equals() because no parsing happens
+def is_new_data(df: pd.DataFrame) -> bool:
+    with io.StringIO() as s:
+        save_as_data_table(df, s)
+        new_data = s.getvalue()
+
+    existing_data = read_data_table(as_text=True)
+
+    return new_data != existing_data
 
 
 def main(namespace: argparse.Namespace = None) -> pd.DataFrame:
@@ -346,6 +381,10 @@ def main(namespace: argparse.Namespace = None) -> pd.DataFrame:
         namespace.no_graphs = False
 
     df = get_df(refresh_local_data=namespace.refresh)
+
+    if not is_new_data(df):
+        print("No new data; old data table is up to date")
+        return
 
     if namespace.create_data_table:
         create_data_table(df)
