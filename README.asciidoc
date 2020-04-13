@@ -1,6 +1,8 @@
 = COVID-19/Coronavirus Tracker
 :author: Robert Bennett
-:email: https://github.com/rben01[GitHub Profile]
+:github-profile: https://github.com/rben01
+:github-repo: {github-profile}/covid19
+:email: {github-profile}[GitHub Profile]
 :description: Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.
 :keywords: coronavirus, covid, covid-19, pandemic, visualization, graph
 :sectlinks:
@@ -13,6 +15,12 @@
 :stylesheet: ./styles/clean.css
 :linkcss!:
 :icons: font
+ifdef::env-github[]
+:data-table-source: link:data/data_table.csv
+endif::[]
+ifndef::env-github[]
+:data-table-source: {github-repo}/blob/master/data/data_table.csv
+endif::[]
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
@@ -49,7 +57,7 @@ This page contains graphs of the spread of coronavirus throughout the world and 
 [[sect-setup]]
 == 🛠 Setup
 
-Clone the GitHub repo (https://github.com/rben01/covid19)
+Clone the GitHub repo ({github-repo})
 
 Create the conda environment using
 
@@ -87,7 +95,7 @@ https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, 
 
 [TIP]
 --
-The data used to create these graphs is available link:data/data_table.csv[here].
+The data used to create these graphs is available {data-table-source}[here].
 --
 
 [[sect-notes]]

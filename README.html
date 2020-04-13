@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="description" content="Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.">
+<meta name="keywords" content="coronavirus, covid, covid-19, pandemic, visualization, graph">
+<meta name="author" content="Robert Bennett">
+<title>COVID-19/Coronavirus Tracker</title>
+<style>
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>COVID-19/Coronavirus Tracker</h1>
+<div class="details">
+<span id="author" class="author">Robert Bennett</span><br>
+<span id="email" class="email"><a href="https://github.com/rben01">GitHub Profile</a></span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Contents</div>
+<ul class="sectlevel1">
+<li><a href="#sect-setup">🛠 Setup</a></li>
+<li><a href="#sect-data-sources">💾 Data Sources</a></li>
+<li><a href="#sect-notes">📓 Notes</a></li>
+<li><a href="#sect-graphs">📈 Graphs</a>
+<ul class="sectlevel2">
+<li><a href="#graphs-world-china-row">🌍 World, China, and Rest of World</a>
+<ul class="sectlevel3">
+<li><a href="#world-china-row-cases-deaths">World, China, and Rest of World - Cases and deaths over time</a></li>
+</ul>
+</li>
+<li><a href="#graphs-top-ten-countries-no-china">🗺 Top Ten Countries, Excluding China</a>
+<ul class="sectlevel3">
+<li><a href="#top-ten-countries-no-china-cases-deaths-total">Countries - Cases and deaths over time</a></li>
+<li><a href="#top-ten-countries-no-china-cases-deaths-per-capita">Countries - Cases and deaths per capita over time</a></li>
+<li><a href="#top-ten-countries-no-china-cases-since">Countries - Cases since hitting 100 cases</a></li>
+<li><a href="#top-ten-countries-no-china-deaths-since">Countries - Deaths since hitting 25 deaths</a></li>
+</ul>
+</li>
+<li><a href="#graphs-usa-top-states">🇺🇸 Top Ten USA States</a>
+<ul class="sectlevel3">
+<li><a href="#usa-top-states-cases-deaths-total">USA States - Cases and deaths over time</a></li>
+<li><a href="#usa-top-states-cases-deaths-per-capita">USA States - Cases and deaths per capita over time</a></li>
+<li><a href="#usa-top-states-cases-since">USA States - Cases since hitting 100 cases</a></li>
+<li><a href="#usa-top-states-deaths-since">USA States - Deaths since hitting 25 deaths</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph lead">
+<p>This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sect-setup"><a class="link" href="#sect-setup">🛠 Setup</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Clone the GitHub repo (<a href="https://github.com/rben01/covid19" class="bare">https://github.com/rben01/covid19</a>)</p>
+</div>
+<div class="paragraph">
+<p>Create the conda environment using</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">conda env create -f environment.yml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Activate the environment with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">conda activate covid</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, run the graphing script</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The script has a command line interface; check it out with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py --help</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sect-data-sources"><a class="link" href="#sect-data-sources">💾 Data Sources</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv">Washington Post world historical data</a></p>
+</li>
+<li>
+<p><a href="https://covidtracking.com/api/states/daily.csv">covidtracking.com US states historical data</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population">Wikipedia - List of Countries by Population</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population">Wikipedia - List of US States by Population</a></p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><a href="https://coronadatascraper.com/#home">Corona Data Scraper</a> is not currently used, but it seems decent as well.<br></p>
+</div>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The data used to create these graphs is available <a href="data/data_table.csv">here</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sect-notes"><a class="link" href="#sect-notes">📓 Notes</a></h2>
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistics. Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes. It is with this mindset that this document was written.</p>
+</div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>✅ These graphs only convey accurate information when the data feeding them is good; garbage in, garbage out. In particular, as the number of (true) cases grows and regions lose the ability to test everyone infected, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases.<br>
+Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused. For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.<br>
+This is also not to mention those who died because of coronavirus, but not <em>from</em> it; there are many who would otherwise have received medical care but, due to the burden placed on the world&#8217;s healthcare infrastructure by coronavirus, have not been able to.</p>
+</li>
+<li>
+<p>📅 In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.</p>
+</li>
+<li>
+<p>⏳ Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (or "DT" for short). Lines annotated "n days" show how the number of coronavirus cases would increase within a region if it doubled every n days. Comparing the slope of a region&#8217;s growth line to the slopes of these benchmark lines gives an indication of that region&#8217;s doubling time. These graphs' legends also list the doubling times over different periods of time (e.g., "20d DT" means the average doubling time of a region over the past 20 days").<br>
+To find the daily percent increase for any doubling time T, simply compute 2<sup>1/T</sup>. Below is a list of doubling times and corresponding per-day percent increases.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>1 day: +100% daily</p>
+</li>
+<li>
+<p>2 days: +41% daily</p>
+</li>
+<li>
+<p>3 days: +26% daily</p>
+</li>
+<li>
+<p>4 days: +19% daily</p>
+</li>
+<li>
+<p>5 days: +15% daily</p>
+</li>
+<li>
+<p>6 days: +12% daily</p>
+</li>
+<li>
+<p>1 week: +10% daily</p>
+</li>
+<li>
+<p>2 weeks: +5% daily</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>🔟 In each graph, the "top 10" refers to top 10 by number of cases, even for the graphs of cases per capita. Graphs' legends are, however, sorted according to the relevant measurement (number of cases, cases per capita, or doubling time thereof).<br>
+For example, in a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world (the country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which it&#8217;s obviously not given its population of 33k).</p>
+</li>
+<li>
+<p>🔄 Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change. Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data.</p>
+</li>
+<li>
+<p>📝 Case Fatality Rate (CFR) notes</p>
+<div class="ulist">
+<ul>
+<li>
+<p>CFR = Case fatality rate = deaths / confirmed.</p>
+</li>
+<li>
+<p>This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing. If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won&#8217;t yet have had time to become fatal. If it&#8217;s been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not).<br>
+Of course, the numerator and denominator may themselves be inaccurate to do testing issues. And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).</p>
+</li>
+<li>
+<p>The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the <strong>Confirmed Cases</strong> and <strong>Deaths</strong> lines for a given country — the larger the distance, the lower the CFR. (The computed CFR is roughly 1/2<sup>distance</sup>; again this will be an underestimate.)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sect-graphs"><a class="link" href="#sect-graphs">📈 Graphs</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="graphs-world-china-row"><a class="link" href="#graphs-world-china-row">🌍 World, China, and Rest of World</a></h3>
+<div class="sect3">
+<h4 id="world-china-row-cases-deaths"><a class="link" href="#world-china-row-cases-deaths">World, China, and Rest of World - Cases and deaths over time</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_fixed_date/Stage_All/world.png" alt="World" width="750" height="and Rest of World - Cases and deaths over time">
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graphs-top-ten-countries-no-china"><a class="link" href="#graphs-top-ten-countries-no-china">🗺 Top Ten Countries, Excluding China</a></h3>
+<div class="sect3">
+<h4 id="top-ten-countries-no-china-cases-deaths-total"><a class="link" href="#top-ten-countries-no-china-cases-deaths-total">Countries - Cases and deaths over time</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png" alt="Countries - Cases and deaths over time" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="top-ten-countries-no-china-cases-deaths-per-capita"><a class="link" href="#top-ten-countries-no-china-cases-deaths-per-capita">Countries - Cases and deaths per capita over time</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png" alt="Countries - {cases-per-cap-over time}" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="top-ten-countries-no-china-cases-since"><a class="link" href="#top-ten-countries-no-china-cases-since">Countries - Cases since hitting 100 cases</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png" alt="Countries - Cases since hitting 100 cases}" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="top-ten-countries-no-china-deaths-since"><a class="link" href="#top-ten-countries-no-china-deaths-since">Countries - Deaths since hitting 25 deaths</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png" alt="Countries - Deaths since hitting 25 deaths" width="750">
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graphs-usa-top-states"><a class="link" href="#graphs-usa-top-states">🇺🇸 Top Ten USA States</a></h3>
+<div class="sect3">
+<h4 id="usa-top-states-cases-deaths-total"><a class="link" href="#usa-top-states-cases-deaths-total">USA States - Cases and deaths over time</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_fixed_date/Stage_All/states.png" alt="USA States - Cases and deaths over time" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usa-top-states-cases-deaths-per-capita"><a class="link" href="#usa-top-states-cases-deaths-per-capita">USA States - Cases and deaths per capita over time</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Per_capita/From_fixed_date/Stage_All/states.png" alt="USA States - Cases and deaths per capita over time" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usa-top-states-cases-since"><a class="link" href="#usa-top-states-cases-since">USA States - Cases since hitting 100 cases</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png" alt="USA States - Cases since hitting 100 cases" width="750">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usa-top-states-deaths-since"><a class="link" href="#usa-top-states-deaths-since">USA States - Deaths since hitting 25 deaths</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./figures/Total_cases/From_local_spread_start/Stage_Death/states.png" alt="USA States - Deaths since hitting 25 deaths" width="750">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2020-04-13 11:30:06 -0400
+</div>
+</div>
+</body>
+</html>
