@@ -9,7 +9,7 @@
 :toclevels: 4
 :over-time: over time
 :fig-dir: ./figures
-:stylesheet: ./styles/adoc-maker.css
+:stylesheet: ./styles/clean.css
 :linkcss!:
 :icons: font
 :cases-deaths-count-raw: Cases and deaths
