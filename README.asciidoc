@@ -11,7 +11,7 @@
 :fig-dir: ./figures
 :stylesheet: ./styles/clean.css
 :linkcss!:
-:icons: font
+:icons:
 :cases-deaths-count-raw: Cases and deaths
 :cases-deaths-per-cap-raw: Cases and deaths per capita
 :cases-deaths-count-over-time: Cases and deaths {over-time}
