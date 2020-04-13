@@ -351,6 +351,18 @@ def read_data_table(*, as_text=False) -> Union[pd.DataFrame, str]:
 # cell NaN or an empty string?)
 # Also this is probably faster than DataFrame.equals() because no parsing happens
 def is_new_data(df: pd.DataFrame) -> bool:
+    """Check whether the df is materially different from the data we have saved
+
+    When downloading new data, this function checks whether the new data is materially
+    different from the existing data. If the "new" data was loaded from disk, this
+    function should return False
+
+    :param df: The newly downloaded data
+    :type df: pd.DataFrame
+    :return: True if the data is different from what's saved on disk, False if it's the
+    same
+    :rtype: bool
+    """
     with io.StringIO() as s:
         save_as_data_table(df, s)
         new_data = s.getvalue()
@@ -393,12 +405,12 @@ def main(namespace: argparse.Namespace = None) -> pd.DataFrame:
 
     if not is_new_data(df):
         print("No new data; old data table is up to date")
-        return
+        if not namespace.force_graphs:
+            return
     else:
         print("Got new data")
-
-    if namespace.create_data_table:
-        save_as_data_table(df)
+        if namespace.create_data_table:
+            save_as_data_table(df)
 
     if namespace.no_graphs:
         return
@@ -475,8 +487,14 @@ if __name__ == "__main__":
         action="store_true",
         help="Save data used in graphs to a file",
     )
-    parser.add_argument(
+    graph_group = parser.add_mutually_exclusive_group()
+    graph_group.add_argument(
         "--no-graphs", action="store_true", help="Don't create graphs",
+    )
+    graph_group.add_argument(
+        "--force-graphs",
+        action="store_true",
+        help="Unconditionally create graphs (even when there's no new data)",
     )
     data_group = parser.add_mutually_exclusive_group()
     data_group.add_argument(
