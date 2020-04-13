@@ -23,14 +23,15 @@ ifndef::env-github[]
 :data-table-source: {github-repo}/blob/master/data/data_table.csv
 :fig-dir: ./figures
 endif::[]
+:world: World, China, and Rest of World
+:countries: Countries
+:usa-states: USA States
 :cases-deaths-count-raw: Cases and deaths
-:cases-deaths-per-cap-raw: Cases and deaths per capita
-:cases-deaths-count-over-time: Cases and deaths {over-time}
+:cases-deaths-per-cap: Cases and deaths per capita
+:cases-deaths-count-raw-over-time: Cases and deaths {over-time}
 :cases-deaths-per-cap-over-time: Cases and deaths per capita {over-time}
 :cases-since-100: Cases since hitting 100 cases
 :deaths-since-25: Deaths since hitting 25 deaths
-:countries: Countries
-:usa-states: USA States
 :sep: {sp}-{sp}
 :total-count-dir: Total_cases
 :per-capita-dir: Per_capita
@@ -43,6 +44,16 @@ endif::[]
 :img-countries: countries_wo_china.png
 :img-usa-states: states.png
 :img-opts: width=750
+:title-world-cases-deaths-over-time: {world}{sep}{cases-deaths-count-raw-over-time}
+:title-countries-cases-deaths-count-raw-over-time: {countries}{sep}{cases-deaths-count-raw-over-time}
+:title-countries-cases-deaths-per-capita: {countries}{sep}{cases-deaths-per-cap-over-time}
+:title-countries-cases-since-100: {countries}{sep}{cases-since-100}
+:title-countries-deaths-since-25: {countries}{sep}{deaths-since-25}
+:title-usa-states-cases-deaths-count-raw-over-time: {usa-states}{sep}{cases-deaths-count-raw-over-time}
+:title-usa-states-cases-deaths-per-capita: {usa-states}{sep}{cases-deaths-per-cap-over-time}
+:title-usa-states-cases-since-100: {usa-states}{sep}{cases-since-100}
+:title-usa-states-deaths-since-25: {usa-states}{sep}{deaths-since-25}
+
 
 [pass]
 ++++
@@ -154,56 +165,56 @@ Of course, the numerator and denominator may themselves be inaccurate to do test
 == 📈 Graphs
 
 [[graphs-world-china-row]]
-=== 🌍 World, China, and Rest of World
+=== 🌍 {world}
 
 [[world-china-row-cases-deaths]]
-==== World, China, and Rest of World{sep}{cases-deaths-count-over-time}
+==== {title-world-cases-deaths-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[World, China, and Rest of World{sep}{cases-deaths-count-over-time},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}["{title-world-cases-deaths-over-time}",{img-opts},title="{title-world-cases-deaths-over-time}"]
 
 [[graphs-top-ten-countries-no-china]]
 === 🗺 Top Ten Countries, Excluding China
 
 [[top-ten-countries-no-china-cases-deaths-total]]
-==== {countries}{sep}{cases-deaths-count-over-time}
+==== {title-countries-cases-deaths-count-raw-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-deaths-count-over-time},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}["{title-countries-cases-deaths-count-raw-over-time}",{img-opts},title="{title-countries-cases-deaths-count-raw-over-time}"]
 
 [[top-ten-countries-no-china-cases-deaths-per-capita]]
-==== {countries}{sep}{cases-deaths-per-cap-over-time}
+==== {title-countries-cases-deaths-per-capita}
 
-image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{countries}{sep}{cases-per-cap-over time},{img-opts}]
+image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}["{title-countries-cases-deaths-per-capita}",{img-opts},title="{title-countries-cases-deaths-per-capita}"]
 
 [[top-ten-countries-no-china-cases-since]]
-==== {countries}{sep}{cases-since-100}
+==== {title-countries-cases-since-100}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{countries}{sep}{cases-since-100}},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}["{title-countries-cases-since-100}",{img-opts},title="{title-countries-cases-since-100}"]
 
 [[top-ten-countries-no-china-deaths-since]]
-==== {countries}{sep}{deaths-since-25}
+==== {title-countries-deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}[{countries}{sep}{deaths-since-25},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-countries}["{title-countries-deaths-since-25}",{img-opts},title="{title-countries-deaths-since-25}"]
 
 
 [[graphs-usa-top-states]]
 === 🇺🇸 Top Ten USA States
 
 [[usa-top-states-cases-deaths-total]]
-==== {usa-states}{sep}{cases-deaths-count-over-time}
+==== {title-usa-states-cases-deaths-count-raw-over-time}
 
-image::{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-count-over-time},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}["{title-usa-states-cases-deaths-count-raw-over-time}",{img-opts},title="{title-usa-states-cases-deaths-count-raw-over-time}"]
 
 [[usa-top-states-cases-deaths-per-capita]]
-==== {usa-states}{sep}{cases-deaths-per-cap-over-time}
+==== {title-usa-states-cases-deaths-per-capita}
 
-image::{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{usa-states}{sep}{cases-deaths-per-cap-over-time},{img-opts}]
+image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{title-countries-cases-deaths-per-capita},{img-opts},title="{title-usa-states-cases-deaths-per-capita}"]
 
 [[usa-top-states-cases-since]]
-==== {usa-states}{sep}{cases-since-100}
+==== {title-usa-states-cases-since-100}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{usa-states}{sep}{cases-since-100},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}["{title-countries-cases-since-100}",{img-opts},title="{title-usa-states-cases-since-100}"]
 
 [[usa-top-states-deaths-since]]
-==== {usa-states}{sep}{deaths-since-25}
+==== {title-countries-deaths-since-25}
 
-image::{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{usa-states}{sep}{deaths-since-25},{img-opts}]
+image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}["{title-usa-states-deaths-since-25}",{img-opts},title="{title-usa-states-deaths-since-25}"]
