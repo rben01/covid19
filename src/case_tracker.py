@@ -345,17 +345,17 @@ def read_data_table(*, as_text=False) -> Union[pd.DataFrame, str]:
     return pd.read_csv(DATA_TABLE_PATH)
 
 
-# Two dataframes are equal (up to dtypes) iff the CSVs they'd produce are the same
-# This is easier than comparing actual df values because of the way pandas converts
-# values when reading from csv (it's hard to 100% round trip data, e.g., is a blank
-# cell NaN or an empty string?)
-# Also this is probably faster than DataFrame.equals() because no parsing happens
 def is_new_data(df: pd.DataFrame) -> bool:
     """Check whether the df is materially different from the data we have saved
 
     When downloading new data, this function checks whether the new data is materially
     different from the existing data. If the "new" data was loaded from disk, this
-    function should return False
+    function should return False.
+    Two dataframes are equal (up to dtypes) iff the CSVs they'd produce are the same.
+    This is easier than comparing actual df values because of the way pandas converts
+    values when reading from csv (it's hard to 100% round trip data, e.g., is a blank
+    cell NaN or an empty string?)
+    Also this is probably faster than DataFrame.equals() because no parsing happens.
 
     :param df: The newly downloaded data
     :type df: pd.DataFrame

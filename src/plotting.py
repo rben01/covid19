@@ -19,6 +19,7 @@ from matplotlib.ticker import (
     MultipleLocator,
     NullFormatter,
     ScalarFormatter,
+    StrMethodFormatter,
 )
 
 from constants import (
@@ -670,7 +671,8 @@ def _plot_helper(
         if count is Counting.TOTAL_CASES:
             ax.set_yscale("log", basey=2, nonposy="mask")
             ax.yaxis.set_major_locator(LogLocator(base=2, numticks=1000))
-            ax.yaxis.set_major_formatter(ScalarFormatter())
+            # ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
             ax.yaxis.set_minor_locator(
                 # 5 ticks is one full "cycle": n, 1.25n, 1.5n, 1.75n, 2n
                 # Hence 5-2 minor ticks between each pair of majors (omit endpoints)
