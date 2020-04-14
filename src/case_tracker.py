@@ -1,13 +1,48 @@
 # %%
-import io
 import argparse
-from typing import Union
+import sys
 
-import pandas as pd
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--create-data-table",
+        action="store_true",
+        help="Save data used in graphs to a file",
+    )
+    graph_group = parser.add_mutually_exclusive_group()
+    graph_group.add_argument(
+        "--no-graphs", action="store_true", help="Don't create graphs",
+    )
+    graph_group.add_argument(
+        "--force-graphs",
+        action="store_true",
+        help="Unconditionally create graphs (even when there's no new data)",
+    )
+    data_group = parser.add_mutually_exclusive_group()
+    data_group.add_argument(
+        "--use-web-data",
+        action="store_true",
+        dest="refresh",
+        help="Pull data from web sources",
+    )
+    data_group.add_argument(
+        "--use-local-data",
+        action="store_false",
+        dest="refresh",
+        help="Use locally cached data",
+    )
+
+    if sys.argv[0] == __file__:
+        args = parser.parse_args()
+
+import io  # noqa E402
+from typing import Union  # noqa E402
+
+import pandas as pd  # noqa E402
 from IPython.display import display  # noqa F401
 
-import read_in_data
-from constants import (
+import read_in_data  # noqa E402
+from constants import (  # noqa E402
     CaseInfo,
     CaseTypes,
     Columns,
@@ -17,7 +52,7 @@ from constants import (
     Locations,
     Paths,
 )
-from plotting import plot
+from plotting import plot  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
 
@@ -481,34 +516,4 @@ if False:
 
 # %% Don't run this cell if using ipython
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--create-data-table",
-        action="store_true",
-        help="Save data used in graphs to a file",
-    )
-    graph_group = parser.add_mutually_exclusive_group()
-    graph_group.add_argument(
-        "--no-graphs", action="store_true", help="Don't create graphs",
-    )
-    graph_group.add_argument(
-        "--force-graphs",
-        action="store_true",
-        help="Unconditionally create graphs (even when there's no new data)",
-    )
-    data_group = parser.add_mutually_exclusive_group()
-    data_group.add_argument(
-        "--use-web-data",
-        action="store_true",
-        dest="refresh",
-        help="Pull data from web sources",
-    )
-    data_group.add_argument(
-        "--use-local-data",
-        action="store_false",
-        dest="refresh",
-        help="Use locally cached data",
-    )
-
-    args = parser.parse_args()
     df = main(args)
