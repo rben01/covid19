@@ -1,8 +1,9 @@
 = COVID-19/Coronavirus Tracker
 :author: Robert Bennett
-:github-profile: https://github.com/rben01
+:github-profile: link:https://github.com/rben01
 :github-repo: {github-profile}/covid19
-:email: {github-profile}[GitHub Profile]
+:github-icon-in-link: icon:github[]{nbsp},role="no-underline"
+:email: {github-profile}[{github-icon-in-link}]{github-profile}[rben01]
 :description: Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.
 :keywords: coronavirus, covid, covid-19, pandemic, visualization, graph
 :docinfo: shared

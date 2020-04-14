@@ -30,4 +30,21 @@
     display: block;
     font-size: 20%;
   }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    cursor: auto;
+    text-decoration: underline;
+  }
+
+  a.no-underline:hover {
+    text-decoration: none;
+  }
+
+  a.no-underline:hover+a {
+    text-decoration: underline;
+  }
 </style>
