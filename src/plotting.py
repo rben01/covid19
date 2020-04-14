@@ -18,7 +18,6 @@ from matplotlib.ticker import (
     LogLocator,
     MultipleLocator,
     NullFormatter,
-    ScalarFormatter,
     StrMethodFormatter,
 )
 
