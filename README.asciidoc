@@ -3,7 +3,7 @@
 :github-profile: link:https://github.com/rben01
 :github-repo: {github-profile}/covid19
 :github-icon-in-link: icon:github[]{nbsp},role="no-underline"
-:email: {github-profile}[{github-icon-in-link}]{github-profile}[rben01]
+:email: https://rben01.github.io/[Other Projects,role="underline prominent-link"] {nbsp}/{nbsp} {github-profile}[{github-icon-in-link}]{github-profile}[rben01,role="underline prominent-link"]
 :description: Several graphs showing how coronavirus has spread throughout the world, individual countries, and individual USA states. The "Notes" section provides some background info and caveats for these graphs.
 :keywords: coronavirus, covid, covid-19, pandemic, visualization, graph
 :docinfo: shared
@@ -125,7 +125,7 @@ endif::[]
 [[sect-setup]]
 == {icon-setup} Setup
 
-. Clone the {github-repo}[GitHub repo]
+. Clone the {github-repo}[GitHub repo]:
 +
 [source,bash]
 ----
@@ -133,7 +133,7 @@ git clone https://github.com/rben01/covid19.git
 cd covid19
 ----
 
-. Create the conda environment using
+. Create the conda environment:
 +
 --
 [source,bash]
@@ -142,15 +142,15 @@ conda env create -f environment.yml
 NOTE: If you do not already have `conda` installed, you can install it from https://www.anaconda.com/distribution/[here].
 --
 
-. Activate the environment with
+. Activate the environment:
 [source,bash]
 conda activate covid
 
-. Finally, run the graphing script
+. Finally, run the graphing script:
 [source,bash]
 python src/case_tracker.py
 
-. The script has a command line interface; check it out with
+. The script has a command line interface; check it out:
 [source,bash]
 python src/case_tracker.py --help
 
@@ -165,7 +165,7 @@ python src/case_tracker.py --help
 * https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well.
 
 
-TIP: The data used to create these graphs has been aggregated into a single table available {data-table-source}[here].
+TIP: The above data -- which is what's used in the graphs below -- has been aggregated into a single table available {data-table-source}[here].
 
 [[sect-notes]]
 == {icon-notes} Notes
