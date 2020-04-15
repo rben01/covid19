@@ -35,11 +35,6 @@
     text-decoration: none;
   }
 
-  a.prominent-link:hover {
-    color: #3e6cb1 !important;
-    text-decoration: underline;
-  }
-
   a:hover {
     cursor: auto;
     text-decoration: underline;
@@ -49,7 +44,13 @@
     text-decoration: none;
   }
 
-  a.no-underline:hover+a {
+  a.prominent-link:hover {
+    color: #3e6cb1 !important;
+    text-decoration: underline;
+  }
+
+  a.no-underline:hover+a.prominent-link {
+    color: #3e6cb1 !important;
     text-decoration: underline;
   }
 </style>
