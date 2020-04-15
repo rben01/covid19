@@ -180,7 +180,7 @@ While this document discusses the effects of coronavirus from a statistical stan
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.
 ****
 
-[cols=">.<1,<.<50a",frame="none",grid="none",stripes="none"]
+[cols=">.<1,<.<50a",frame="none",grid="none",stripes="none",options="autowidth.stretch"]
 |===
 
 | {bullet-data-quality}
