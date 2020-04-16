@@ -234,10 +234,10 @@ def _add_doubling_time_lines(
 
     # For ease of computation, everything will be in axes coordinate system
     # Variable names beginning with "ac" refer to axis coords and "dc" to data coords
-    # {ac,dc}_{min,max}_{x,y} refer to the coordinates of the doubling-time lines
+    # {ac,dc}_{x,y}_{min,max} refer to the coordinates of the doubling-time lines
     if x_axis is Columns.XAxis.DAYS_SINCE_OUTBREAK:
         # Create transformation from data coords to axes coords
-        # This composes two transforms, data -> fig, and (axes -> fig)^(-1)
+        # This composes two transforms, data -> fig and (axes -> fig)^(-1)
         dc_to_ac = ax.transData + ax.transAxes.inverted()
 
         dc_x_lower_lim, dc_x_upper_lim = ax.get_xlim()
@@ -245,9 +245,9 @@ def _add_doubling_time_lines(
 
         # Adding stuff causes the axis to resize itself, and we have to stop it
         # from doing so (by setting it back to its original size)
-        # Also need to add back margin
         ax.set_xlim(dc_x_lower_lim, dc_x_upper_lim)
 
+        # Also need to add back margin
         dc_y_upper_lim = dc_to_ac.inverted().transform((0, 1.1))[1]
         ax.set_ylim(dc_y_lower_lim, dc_y_upper_lim)
 
@@ -261,7 +261,7 @@ def _add_doubling_time_lines(
 
         # Getting max x,y bounds is trickier due to needing to use the maximum
         # extent of the graph area
-        # Get top right corner of graph in data coords (to a void the edges of the
+        # Get top right corner of graph in data coords (to avoid the edges of the
         # texts' boxes clipping the axes, we move things in just a hair)
         ac_x_upper_lim = ac_y_upper_lim = 1
 
@@ -347,20 +347,20 @@ def _add_doubling_time_lines(
             # and producing the padding we want
             # If we wanted to do this the "right" way we'd *redo* the calculations above
             # but with ac_x_upper_lim = ac_y_upper_lim = 1 - padding
-            padding = 0.005
+            PADDING = 0.005
             ac_rot_text_width = (
                 (ac_text_width * cos_ac_angle)
                 + (ac_text_height * sin_ac_angle)
-                + padding
+                + PADDING
             )
             ac_rot_text_height = (
                 (ac_text_width * sin_ac_angle)
                 + (ac_text_height * cos_ac_angle)
-                + padding
+                + PADDING
             )
 
             # Perpendicular distance from text to corresponding line
-            ac_dist_from_line = 0.005
+            AC_DIST_FROM_LINE = 0.005
             # Get text box origin relative to line upper endpoint
             EdgeGuide.verify(edge)
             if edge is EdgeGuide.RIGHT:
@@ -375,8 +375,8 @@ def _add_doubling_time_lines(
                 )
                 ac_text_origin_y = (
                     ac_y_min
-                    + ac_dist_from_line / cos_ac_angle
                     + (ac_text_origin_x - ac_x_min) * ac_line_slope
+                    + AC_DIST_FROM_LINE / cos_ac_angle
                 )
 
             # If text box is in very top right of graph, it may use only the right
@@ -390,7 +390,7 @@ def _add_doubling_time_lines(
                 ac_text_origin_y = ac_y_upper_lim - ac_rot_text_height
                 ac_text_origin_x = (
                     ac_x_min
-                    - ac_dist_from_line / sin_ac_angle
+                    - AC_DIST_FROM_LINE / sin_ac_angle
                     + (ac_text_origin_y - ac_y_min) / ac_line_slope
                 )
 
