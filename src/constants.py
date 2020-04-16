@@ -90,6 +90,7 @@ class Paths:
                 )
 
             ROOT = ROOT.parent
+
     FIGURES: Path = ROOT / "docs" / "figures"
     DATA: Path = ROOT / "data"
 
