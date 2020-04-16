@@ -3,10 +3,11 @@ import enum
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, List, Mapping, NewType, NoReturn, Optional, Tuple, Union
+from typing import Any, List, Mapping, NewType, NoReturn, Tuple, Union
 
 import pandas as pd
 from IPython.display import display  # noqa F401
+from typing_extensions import Literal
 
 Atom = NewType("Atom", Any)
 Column = NewType("Column", str)
@@ -111,7 +112,7 @@ class ABCStrictEnum(enum.Enum):
     """
 
     @classmethod
-    def verify(cls, item, *, none_ok: bool = False):
+    def verify(cls, item, *, allow_select: bool = False):
         """Verify that the passed item is a case of this enum
 
         If `item is not None`, then raise if `item` is not a case of this enum, else
@@ -125,7 +126,7 @@ class ABCStrictEnum(enum.Enum):
         None, raise only if `not none_ok`
         """
 
-        if (item is None and none_ok) or (item is not None and item in cls):
+        if (item in Select and allow_select) or (item not in Select and item in cls):
             return
 
         raise StrictEnumError(f"Invalid {cls} case {item}")
@@ -268,6 +269,15 @@ class Counting(ABCStrictEnum):
         return f"{self.name.capitalize()}"
 
 
+@enum.unique
+class Select(ABCStrictEnum):
+    """An enum that represents a choice of cases of other enums
+    """
+
+    DEFAULT: "Select" = enum.auto()
+    ALL: "Select" = enum.auto()
+
+
 class CaseTypes:
     """A namespace containing string constants that describe the different case types
 
@@ -380,7 +390,7 @@ class CaseInfo:
             field.raise_for_unhandled_case()
 
     @classmethod
-    @lru_cache
+    @lru_cache(None)
     # Return df multi-indexed by (Stage, Counting), columns are InfoField
     def _get_case_type_groups_df(cls) -> pd.DataFrame:
         """Get the dataframe containing all (field, stage, count) information
@@ -420,8 +430,8 @@ class CaseInfo:
     def get_info_items_for(
         cls,
         *fields: List[InfoField],
-        stage: Optional[DiseaseStage] = None,
-        count: Optional[Counting] = None,
+        stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+        count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
         squeeze_rows=False,
         squeeze_cols=True,
     ) -> Union[Atom, pd.Series, pd.DataFrame]:
@@ -435,12 +445,12 @@ class CaseInfo:
 
         :param *fields: The fields whose information is to be returned
         :type *fields: InfoField...
-        :param stage: The `DiseaseStage` to return information for, by default None.
-        Defaults to None (return info for all `DiseaseStage` cases).
-        :type stage: Optional[DiseaseStage], optional
-        :param count: The `Counting` to return information for. Defaults to None (return
-            info for all `Counting` cases).
-        :type count: Optional[Counting], optional
+        :param stage: The `DiseaseStage` to return information for.
+        Defaults to Select.ALL (return info for all `DiseaseStage` cases).
+        :type stage: Union[DiseaseStage, Literal[Select.ALL]], optional
+        :param count: The `Counting` to return information for. Defaults to Select.ALL
+        (return info for all `Counting` cases).
+        :type count: Union[Counting, Literal[Select.ALL]], optional
         :param squeeze_rows: By default False. If True, and the result has a single row,
         return the result as a Series instead of a DataFrame. Has no effect if the
         result has >1 row. If the resulting series has length 1 and `squeeze_cols`, then
@@ -468,15 +478,13 @@ class CaseInfo:
             for field in fields:
                 InfoField.verify(field)
 
-        if stage is None:
+        DiseaseStage.verify(stage, allow_select=True)
+        if stage is Select.ALL:
             stage = slice(None)
-        else:
-            DiseaseStage.verify(stage, none_ok=True)
 
-        if count is None:
+        Counting.verify(count, allow_select=True)
+        if count is Select.ALL:
             count = slice(None)
-        else:
-            Counting.verify(count, none_ok=True)
 
         info_df = cls._get_case_type_groups_df().xs(
             (stage, count), level=(DiseaseStage.__name__, Counting.__name__), axis=0,

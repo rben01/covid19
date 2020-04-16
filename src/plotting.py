@@ -2,7 +2,7 @@
 import itertools
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 
@@ -20,6 +20,7 @@ from matplotlib.ticker import (
     NullFormatter,
     StrMethodFormatter,
 )
+from typing_extensions import Literal
 
 from constants import (
     ABCStrictEnum,
@@ -31,6 +32,7 @@ from constants import (
     InfoField,
     Locations,
     Paths,
+    Select,
 )
 
 FROM_FIXED_DATE_DESC = "from_fixed_date"
@@ -56,11 +58,8 @@ class EdgeGuide(ABCStrictEnum):
     """An enum whose cases represent which edge of the graph text is to be aligned with
     """
 
-    RIGHT = "right"
-    TOP = "top"
-
-    RIGHT: "EdgeGuide"
-    TOP: "EdgeGuide"
+    RIGHT: "EdgeGuide" = "right"
+    TOP: "EdgeGuide" = "top"
 
 
 def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
@@ -78,7 +77,7 @@ def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
 def get_current_case_data(
     df: pd.DataFrame,
     *,
-    stage: Optional[DiseaseStage],
+    stage: Union[DiseaseStage, Literal[Select.DEFAULT]],
     count: Counting,
     x_axis: Columns.XAxis,
 ) -> pd.DataFrame:
@@ -99,14 +98,14 @@ def get_current_case_data(
     :rtype: pd.DataFrame
     """
 
-    DiseaseStage.verify(stage, none_ok=True)
+    DiseaseStage.verify(stage, allow_select=True)
     Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
     # Filter in order to compute doubling time
     df = df[df[Columns.CASE_COUNT] > 0]
 
-    if stage is None:
+    if stage is Select.DEFAULT:
         stage = DiseaseStage.CONFIRMED
 
     relevant_case_type = CaseInfo.get_info_item_for(
@@ -531,7 +530,7 @@ def _format_legend(
 def _plot_helper(
     df: pd.DataFrame,
     *,
-    stage: Optional[DiseaseStage],
+    stage: Union[DiseaseStage, Literal[Select.ALL]],
     count: Counting,
     x_axis: Columns.XAxis,
     style: Optional[str] = None,
@@ -547,8 +546,7 @@ def _plot_helper(
     :param x_axis: The x axis column the data will be plotted against
     :type x_axis: Columns.XAxis
     :param stage: The disease stage (one half of the y-value) that will be plotted;
-    None means all stages
-    :type stage: Optional[DiseaseStage]
+    :type stage: Union[DiseaseStage, Literal[Select.ALL]]
     :param count: The counting method (the other half of the y-value) that will be
     plotted
     :type count: Counting
@@ -567,7 +565,7 @@ def _plot_helper(
     :rtype: List[Tuple[plt.Figure, plt.Axes]]
     """
 
-    DiseaseStage.verify(stage, none_ok=True)
+    DiseaseStage.verify(stage, allow_select=True)
     Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
@@ -582,9 +580,14 @@ def _plot_helper(
     fig: plt.Figure
     ax: plt.Axes
 
-    current_case_counts = get_current_case_data(
-        df, stage=stage, count=count, x_axis=x_axis
-    )
+    if stage is Select.ALL:
+        current_case_counts = get_current_case_data(
+            df, stage=Select.DEFAULT, count=count, x_axis=x_axis
+        )
+    else:
+        current_case_counts = get_current_case_data(
+            df, stage=stage, count=count, x_axis=x_axis
+        )
 
     df = df[
         df[Columns.CASE_TYPE].isin(
@@ -626,7 +629,7 @@ def _plot_helper(
         )
 
         default_stage = stage
-        if default_stage is None:
+        if stage is Select.ALL:
             default_stage = DiseaseStage.CONFIRMED
 
         # Configure axes and ticks
@@ -650,7 +653,7 @@ def _plot_helper(
             ).values
             ax.set_xlabel(f"Days Since Reaching {_threshold:.3g} {_axis_name}")
 
-            if stage is not None:  # i.e. if only one DiseaseStage plotted
+            if stage is not Select.ALL:  # i.e. if only one DiseaseStage plotted
                 ax.set_ylim(bottom=_threshold / 4)
 
         else:
@@ -748,7 +751,7 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
 def get_savefile_path_and_location_heading(
     df: pd.DataFrame,
     *,
-    stage: Optional[DiseaseStage],
+    stage: Union[DiseaseStage, Literal[Select.ALL]],
     count: Counting,
     x_axis: Columns.XAxis,
 ) -> Tuple[Path, str]:
@@ -759,8 +762,8 @@ def get_savefile_path_and_location_heading(
     :type df: pd.DataFrame
     :param x_axis: The x axis column to be plotted against
     :type x_axis: Columns.XAxis
-    :param stage: The disease stage to be plotted
-    :type stage: Optional[DiseaseStage]
+    :param stage: The disease stage(s) to be plotted
+    :type stage: Union[DiseaseStage, Literal[Select.ALL]]
     :param count: The count type to be plotted
     :type count: Counting
     :raises ValueError: Certain know dataframes are explicitly handled; if a dataframe
@@ -770,7 +773,7 @@ def get_savefile_path_and_location_heading(
     :rtype: Tuple[Path, str]
     """
 
-    DiseaseStage.verify(stage, none_ok=True)
+    DiseaseStage.verify(stage, allow_select=True)
     Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
@@ -793,7 +796,7 @@ def get_savefile_path_and_location_heading(
     else:
         raise ValueError("DataFrame contents not understood")
 
-    if stage is None:
+    if stage is Select.ALL:
         stage_name = "All"
     else:
         stage_name = stage.pprint()
@@ -849,7 +852,7 @@ def plot(
     df: pd.DataFrame,
     *,
     start_date=None,
-    stage: Optional[DiseaseStage] = None,
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Counting,
     x_axis: Columns.XAxis,
     df_with_china: pd.DataFrame = None,
@@ -865,14 +868,13 @@ def plot(
     :type df: pd.DataFrame
     :param x_axis: The x axis column to plot against
     :type x_axis: Columns.XAxis
-    :param count: The count type to plot
-    :type count: Counting
     :param start_date: A date with which to filter the data; only data after this date
     will be plotted, defaults to None (all data will be plotted)
     :type start_date: [type], optional
-    :param stage: The disease stage to plot, defaults to None (all stages will be
-    plotted)
-    :type stage: DiseaseStage, optional
+    :param stage: The disease stage to plot, defaults to Select.ALL
+    :type stage: Union[DiseaseStage, Literal[Select.ALL]], optional
+    :param count: The count type to plot
+    :type count: Counting
     :param df_with_china: A dataframe to serve as a reference point for creating the
     color mapping; this keeps colors in sync whether or not China is included in the
     plot. Defaults to None, in which case `df` is used to create the color mapping.
@@ -883,7 +885,7 @@ def plot(
     :rtype: List[Tuple[plt.Figure, plt.Axes]]
     """
 
-    DiseaseStage.verify(stage, none_ok=True)
+    DiseaseStage.verify(stage, allow_select=True)
     Counting.verify(count)
     Columns.XAxis.verify(x_axis)
 
