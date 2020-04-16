@@ -77,7 +77,7 @@ class Paths:
 
     # Try to use source filename to get project dir - this works if running from
     # a command line
-    ROOT = Path(sys.argv[0]).parent.parent
+    ROOT: Path = Path(sys.argv[0]).parent.parent
     # If using interactively in ipython, it might not work
     # Path() will be correct, but sys.argv[0] might be some ipython.py (or similar) file
     if not (ROOT / "src" / "case_tracker.py").exists():
@@ -90,14 +90,8 @@ class Paths:
                 )
 
             ROOT = ROOT.parent
-
-    ROOT: Path
-
-    FIGURES = ROOT / "docs" / "figures"
-    DATA = ROOT / "data"
-
-    FIGURES: Path
-    DATA: Path
+    FIGURES: Path = ROOT / "docs" / "figures"
+    DATA: Path = ROOT / "data"
 
 
 class StrictEnumError(Exception):
@@ -161,43 +155,24 @@ class Columns:
     """A namespace for string constants used as column names
     """
 
-    LATITUDE = "Lat"
-    LONGITUDE = "Long"
-    CITY = "City"
-    COUNTY_NOT_COUNTRY = "County"
-    TWO_LETTER_STATE_CODE = "State Code"
-    STATE = "State"
-    COUNTRY = "Country"
-    THREE_LETTER_COUNTRY_CODE = "Country Code"
-    LOCATION_NAME = "Location"
-    POPULATION = "Population"
-    IS_STATE = "Is State"
-    URL = "Url"
-    DATE = "Date"
-    CASE_COUNT = "Cases"
-    CASE_TYPE = "Case Type"
-    OUTBREAK_START_DATE_COL = "Outbreak start date"
-    DAYS_SINCE_OUTBREAK = "Days Since Outbreak"
-    SOURCE = "Source"
-
-    LATITUDE: Column
-    LONGITUDE: Column
-    CITY: Column
-    COUNTY_NOT_COUNTRY: Column
-    TWO_LETTER_STATE_CODE: Column
-    STATE: Column
-    COUNTRY: Column
-    THREE_LETTER_COUNTRY_CODE: Column
-    LOCATION_NAME: Column
-    POPULATION: Column
-    IS_STATE: Column
-    URL: Column
-    DATE: Column
-    CASE_COUNT: Column
-    CASE_TYPE: Column
-    OUTBREAK_START_DATE_COL: Column
-    DAYS_SINCE_OUTBREAK: Column
-    SOURCE: Column
+    LATITUDE: Column = "Lat"
+    LONGITUDE: Column = "Long"
+    CITY: Column = "City"
+    COUNTY_NOT_COUNTRY: Column = "County"
+    TWO_LETTER_STATE_CODE: Column = "State Code"
+    STATE: Column = "State"
+    COUNTRY: Column = "Country"
+    THREE_LETTER_COUNTRY_CODE: Column = "Country Code"
+    LOCATION_NAME: Column = "Location"
+    POPULATION: Column = "Population"
+    IS_STATE: Column = "Is State"
+    URL: Column = "Url"
+    DATE: Column = "Date"
+    CASE_COUNT: Column = "Cases"
+    CASE_TYPE: Column = "Case Type"
+    OUTBREAK_START_DATE_COL: Column = "Outbreak start date"
+    DAYS_SINCE_OUTBREAK: Column = "Days Since Outbreak"
+    SOURCE: Column = "Source"
 
     string_cols = [
         LATITUDE,
@@ -266,11 +241,8 @@ class DiseaseStage(ABCStrictEnum):
     """An enum whose cases represent stages of the disease (confirmed, dead)
     """
 
-    CONFIRMED = enum.auto()
-    DEATH = enum.auto()
-
-    CONFIRMED: "DiseaseStage"
-    DEATH: "DiseaseStage"
+    CONFIRMED: "DiseaseStage" = enum.auto()
+    DEATH: "DiseaseStage" = enum.auto()
 
     def __str__(self) -> str:
         return f"DS.{self.name}"
@@ -285,11 +257,8 @@ class Counting(ABCStrictEnum):
     stage (total cases, per capita) within a given region
     """
 
-    TOTAL_CASES = enum.auto()
-    PER_CAPITA = enum.auto()
-
-    TOTAL_CASES: "Counting"
-    PER_CAPITA: "Counting"
+    TOTAL_CASES: "Counting" = enum.auto()
+    PER_CAPITA: "Counting" = enum.auto()
 
     def __str__(self) -> str:
         return f"C.{self.name}"
@@ -341,13 +310,9 @@ class InfoField(ABCStrictEnum):
     cases for specifying a field to fetch from this data set.
     """
 
-    CASE_TYPE = "CaseType_"
-    THRESHOLD = "Threshold_"
-    DASH_STYLE = "DashStyle_"
-
-    CASE_TYPE: "InfoField"
-    THRESHOLD: "InfoField"
-    DASH_STYLE: "InfoField"
+    CASE_TYPE: "InfoField" = "CaseType_"
+    THRESHOLD: "InfoField" = "Threshold_"
+    DASH_STYLE: "InfoField" = "DashStyle_"
 
     def __str__(self) -> str:
         return f"IF.{self.name}"
@@ -520,6 +485,7 @@ class CaseInfo:
         # axis 1 (but there'll always be an axis 0)
         if squeeze_cols and len(fields) == 1:
             info_df = info_df.iloc(axis=1)[0]
+
         if squeeze_rows and len(info_df) == 1:
             info_df = info_df.iloc(axis=0)[0]
 

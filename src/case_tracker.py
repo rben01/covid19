@@ -1,14 +1,73 @@
 # %%
-# In older versions of Python, merely reading a function definition with a type
-# annotation involving an as-yet-undefined type would actually evaluate the type
-# annotation and throw an error (a NameError iirc). That behavior is insanely dumb, and
-# I can't believe Python manages to behave so immaturely for such an old language, but
-# anyway this line fixes that behavior: it is now legal to annotate functions with types
-# that won't exist until the function is actually called.
-from __future__ import annotations
+# Imported globally so that `main`'s type annotations work
+import argparse
 
-# And now we can avoid importing modules until they're actually needed, whih makes
-# using the cmd line API with `--help` fast again!
+if __name__ == "__main__":
+    import sys
+
+    try:
+        __this_file = __file__
+    except NameError:
+        __this_file = None
+
+    # If we're in ipython, sys.argv[0] will be ipykernel.py or something similar, and
+    # IN_TERMINAL will be False. When running from a terminal it will be True.
+    IN_A_TERMINAL = sys.argv[0] == __this_file
+
+    if IN_A_TERMINAL:
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "--create-data-table",
+            action="store_true",
+            help="Save data used in graphs to a file",
+        )
+        graph_group = parser.add_mutually_exclusive_group()
+        graph_group.add_argument(
+            "--no-graphs", action="store_true", help="Don't create graphs",
+        )
+        graph_group.add_argument(
+            "--force-graphs",
+            action="store_true",
+            help="Unconditionally create graphs (even when there's no new data)",
+        )
+        data_group = parser.add_mutually_exclusive_group()
+        data_group.add_argument(
+            "--use-web-data",
+            action="store_true",
+            dest="refresh",
+            help="Pull data from web sources",
+        )
+        data_group.add_argument(
+            "--use-local-data",
+            action="store_false",
+            dest="refresh",
+            help="Use locally cached data",
+        )
+
+        # If `--help`, this will exit and we can avoid importing everything below
+        args = parser.parse_args()
+
+
+import io  # noqa E402
+from typing import Union  # noqa E402
+
+import pandas as pd  # noqa E402
+from IPython.display import display  # noqa F401
+
+import read_in_data  # noqa E402
+from constants import (  # noqa E402
+    CaseInfo,
+    CaseTypes,
+    Counting,
+    Columns,
+    DiseaseStage,
+    InfoField,
+    Locations,
+    Paths,
+)
+from plotting import plot  # noqa E402
+
+DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
 
 
 def _get_data(*, from_web: bool) -> pd.DataFrame:
@@ -468,71 +527,8 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
     return df
 
 
-if __name__ == "__main__":
-    import sys
-
-    try:
-        __this_file = __file__
-    except NameError:
-        __this_file = None
-
-    # If we're in ipython, sys.argv[0] will be ipykernel.py or something similar, and
-    # the below will be skipped. When running from a terminal it won't be skipped.
-    if sys.argv[0] == __this_file:
-        import argparse
-
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--create-data-table",
-            action="store_true",
-            help="Save data used in graphs to a file",
-        )
-        graph_group = parser.add_mutually_exclusive_group()
-        graph_group.add_argument(
-            "--no-graphs", action="store_true", help="Don't create graphs",
-        )
-        graph_group.add_argument(
-            "--force-graphs",
-            action="store_true",
-            help="Unconditionally create graphs (even when there's no new data)",
-        )
-        data_group = parser.add_mutually_exclusive_group()
-        data_group.add_argument(
-            "--use-web-data",
-            action="store_true",
-            dest="refresh",
-            help="Pull data from web sources",
-        )
-        data_group.add_argument(
-            "--use-local-data",
-            action="store_false",
-            dest="refresh",
-            help="Use locally cached data",
-        )
-
-        # If `--help`, this will exit and we can avoid importing everything below
-        args = parser.parse_args()
-
-        import io
-        import pandas as pd  # noqa E402
-        from IPython.display import display  # noqa F401
-        from typing import Union
-
-        import read_in_data  # noqa E402
-        from constants import (
-            CaseInfo,
-            CaseTypes,
-            Columns,
-            Counting,  # noqa E402
-            DiseaseStage,
-            InfoField,
-            Locations,
-            Paths,
-        )
-        from plotting import plot  # noqa E402
-
-        DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
-        df = main(args)
+if __name__ == "__main__" and IN_A_TERMINAL:
+    df = main(args)
 
 # A little hack -- an ipython cell that will run in an interactive window but not when
 # running this from a terminal

@@ -66,8 +66,6 @@ class EdgeGuide(ABCStrictEnum):
 def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
     """Create the column label for the given doubling time days-ago number
 
-    [extended_summary]
-
     :param day_idx: The iloc[] index giving the time interval (in days) over which to
     compute the doubling time
     :type day_idx: int
@@ -447,11 +445,8 @@ def _format_legend(
     # Add (formatted) current data to legend labels
 
     # Fields labels, comprising the first row of the legend
-    legend_fields = []
-    case_count_str_cols = []
-
-    legend_fields: List[str]
-    case_count_str_cols: List[pd.Series]
+    legend_fields: List[str] = []
+    case_count_str_cols: List[pd.Series] = []
 
     if include_confirmed:
         this_case_type = CaseInfo.get_info_item_for(
