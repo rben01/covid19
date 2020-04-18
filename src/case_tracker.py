@@ -51,7 +51,6 @@ if __name__ == "__main__":
 import io  # noqa E402
 from typing import Union  # noqa E402
 
-import numpy as np
 import pandas as pd  # noqa E402
 from IPython.display import display  # noqa F401
 

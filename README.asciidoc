@@ -19,11 +19,13 @@
 :stylesheet: ./styles/clean.css
 :linkcss!:
 :icons: font
+:data-table-path: data/data_table.csv
+:raw-gh-content-url: link:https://raw.githubusercontent.com/rben01/covid19/master
 // Set up icons for GitHub and non-GitHub rendering
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
-:data-table-source: link:data/data_table.csv
+:data-table-gh-link: link:{data-table-path}
 :fig-dir: ./docs/figures
 :bullet-setup: 🛠
 :bullet-data-source: 💾
@@ -40,7 +42,7 @@ ifdef::env-github[]
 :bullet-cfr-notes: 📝
 endif::[]
 ifndef::env-github[]
-:data-table-source: {github-repo}/blob/master/data/data_table.csv
+:data-table-gh-link: {github-repo}/blob/master/{data-table-path}
 :fig-dir: ./figures
 // :icon-opts: fw
 // :icon-setup: icon:gear[{icon-opts}]
@@ -71,6 +73,7 @@ ifndef::env-github[]
 :bullet-updates: icon:sync-alt[{bullet-opts}]
 :bullet-cfr-notes: icon:heartbeat[{bullet-opts}]
 endif::[]
+// Icons for sections
 :icon-setup: 🛠
 :icon-data-source: 💾
 :icon-notes: 📓
@@ -171,7 +174,9 @@ python src/case_tracker.py --help
 * https://coronadatascraper.com/#home[Corona Data Scraper] is not currently used, but it seems decent as well.
 
 
-TIP: The above data -- which is what's used in the graphs below -- has been aggregated into a single table available {data-table-source}[here].
+TIP: The above data -- which is what's used in the graphs below -- has been aggregated into a single table available {raw-gh-content-url}/{data-table-path}[here].
+Feel free to use it however you like.
+
 
 [[sect-notes]]
 == {icon-notes} Notes
