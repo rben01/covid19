@@ -51,6 +51,7 @@ if __name__ == "__main__":
 import io  # noqa E402
 from typing import Union  # noqa E402
 
+import numpy as np
 import pandas as pd  # noqa E402
 from IPython.display import display  # noqa F401
 
@@ -64,8 +65,10 @@ from constants import (  # noqa E402
     InfoField,
     Locations,
     Paths,
+    Select,
 )
 from plotting import plot  # noqa E402
+from typing_extensions import Literal  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
 
@@ -302,7 +305,11 @@ def get_countries_df(
     return keep_only_n_largest_locations(df, n, count)
 
 
-def get_usa_states_df(df: pd.DataFrame, n: int, count: Counting = None) -> pd.DataFrame:
+def get_usa_states_df(
+    df: pd.DataFrame,
+    n: int,
+    count: Union[Counting, Literal[Select.DEFAULT]] = Select.DEFAULT,
+) -> pd.DataFrame:
     """Get the top n US states from the dataframe
 
     :param df: Dataframe containing data for all locations
@@ -316,7 +323,8 @@ def get_usa_states_df(df: pd.DataFrame, n: int, count: Counting = None) -> pd.Da
     :rtype: pd.DataFrame
     """
 
-    if count is None:
+    Counting.verify(count, allow_select=True)
+    if count is Select.DEFAULT:
         count = Counting.TOTAL_CASES
 
     df = df[(df[Columns.COUNTRY] == Locations.USA) & df[Columns.IS_STATE]]
@@ -338,6 +346,17 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     df = df.copy()
+
+    # Normalize times by labeling all of today's data with its future label, 00:00
+    # tomorrow (as that's the timestamp marking the end of the 24-hour data collection
+    # period). No need to adjust data not from today; it's already been adjusted and is
+    # labeled with the date whose 00:00 marked the end of data collection (i.e., data
+    # generated on Mar 20 is labeled Mar 21).
+    normalized_dates = df[Columns.DATE].dt.normalize()
+    is_at_midnight = df[Columns.DATE] == normalized_dates
+    df.loc[~is_at_midnight, Columns.DATE] = normalized_dates[
+        ~is_at_midnight
+    ] + pd.Timedelta(days=1)
     df[Columns.DATE] = df[Columns.DATE].dt.strftime(r"%Y-%m-%d")
 
     df = df.drop(
@@ -457,6 +476,11 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         setattr(namespace, k, v)
 
     df = get_df(refresh_local_data=namespace.refresh)
+    # display(
+    #     get_usa_states_df(df, 20).sort_values([Columns.LOCATION_NAME, Columns.DATE])[
+    #         [Columns.LOCATION_NAME, Columns.DATE]
+    #     ]
+    # )
 
     if not is_new_data(df):
         print("No new data; old data table is up to date")

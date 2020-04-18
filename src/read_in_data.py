@@ -28,19 +28,35 @@ DATA_COLS = [
 
 
 class SaveFormats(enum.Enum):
-    CSV = ".csv"
-    CSV: "SaveFormats"
+    CSV: "SaveFormats" = ".csv"
 
     # Parquet currently broken (pyarrow bug?), don't know why but csv is fine
     # PARQUET = ".parquet"
 
     @staticmethod
     def _adjust_dates(date_col: pd.Series) -> pd.Series:
+        """Adjust dates to take into account minor timekeeping details
+
+        When we get data, data labeled with <date> represents events from 00:00 to 23:59
+        of that date. For the last date on which we have data, we will have less than
+        24 hours of data, which will skew the scale of the graph at its right edge.
+        Therefore we adjust dates slightly so that what is graphed correctly represents
+        the situation. Events are labeled by the time *ending* their 24-hour data
+        collection period. Data labeled Mar 20 (i.e., collected during 00:00-23:59 on
+        Mar 20) is labeled Mar 21, and data labeled <today> has the current time
+        added to it, representing the time period 00:00-<current time> of <today>.
+
+        :param date_col: The column of dates to adjust
+        :type date_col: pd.Series
+        :return: The dates adjusted as described above
+        :rtype: pd.Series
+        """
         date_col = date_col.copy()
         is_todays_date = date_col.dt.strftime(r"%Y%m%d") == pd.Timestamp.now().strftime(
             r"%Y%m%d"
         )
-        date_col.loc[is_todays_date] = pd.Timestamp.now() - pd.Timedelta("1 day")
+        date_col.loc[is_todays_date] = pd.Timestamp.now()
+        date_col.loc[~is_todays_date] += pd.Timedelta(days=1)
         return date_col
 
     def path_with_fmt_suffix(self, path: Path) -> Path:

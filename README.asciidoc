@@ -124,7 +124,7 @@ endif::[]
 This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
 ifdef::env-github[]
-__Read this page as a standalone webpage https://rben01.github.io/covid19/[here].__
+__Read this page as a standalone webpage https://rben01.github.io/covid19/[here], where it is formatted much more nicely than GitHub's READMEs.__
 endif::[]
 
 
