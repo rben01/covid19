@@ -22,6 +22,7 @@ from plotting_utils import (
     get_current_case_data,
     get_savefile_path_and_location_heading,
     remove_empty_leading_dates,
+    get_color_palette_assignments,
 )
 
 
@@ -88,21 +89,71 @@ def _plot_helper(
         InfoField.CASE_TYPE, InfoField.DASH_STYLE, stage=stage, count=count
     )
 
+    display(config_df)
+
     dashes = {
         CaseTypes.CONFIRMED: "solid",
         CaseTypes.DEATHS: "dash",
     }
-    display(dashes)
 
-    fig = px.line(
-        data_frame=df,
-        log_y=True,
-        x=x_axis.column(),
-        y=Columns.CASE_COUNT,
-        color=Columns.LOCATION_NAME,
-        line_dash=Columns.CASE_TYPE,
-        line_dash_map=dashes,
-    )
+    if color_mapping is not None:
+        line_colors = df[Columns.LOCATION_NAME.map(color_mapping)]
+    else:
+        line_colors = get_color_palette_assignments(df)
+
+    def get_hover_text(row: pd.Series) -> str:
+        date_str = row[x_axis.column()]
+        if x_axis is Columns.XAxis.DATE:
+            date_str = date_str.strftime(r"%b %-d, %Y")
+
+        count_str = row[Columns.CASE_COUNT]
+        if count is Counting.TOTAL_CASES:
+            count_str = int(count_str)
+
+        return "<br />".join(
+            [
+                f"{row[Columns.LOCATION_NAME]} - {date_str}",
+                f"{row[Columns.CASE_TYPE]}: {count_str}",
+            ]
+        )
+
+    fig = go.Figure()
+    for location in current_case_counts[Columns.LOCATION_NAME]:
+        for case_type in config_df[InfoField.CASE_TYPE]:
+            trace_df = df[
+                (df[Columns.LOCATION_NAME] == location)
+                & (df[Columns.CASE_TYPE] == case_type)
+            ]
+            show_legend = "death" not in case_type.lower()
+
+            line_color = line_colors.loc[location].iloc[0]
+
+            hover_text = trace_df.apply(get_hover_text, axis=1,)
+
+            fig.add_scatter(
+                x=trace_df[x_axis.column()],
+                y=trace_df[Columns.CASE_COUNT],
+                mode="lines",
+                legendgroup=location,
+                line_color=line_color,
+                line_dash=dashes[case_type],
+                showlegend=show_legend,
+                name=location,
+                hoverinfo="text",
+                hovertext=hover_text,
+            )
+
+    fig.update_layout(yaxis_type="log", legend_tracegroupgap=1)
+
+    # fig = px.line(
+    #     data_frame=df,
+    #     log_y=True,
+    #     x=x_axis.column(),
+    #     y=Columns.CASE_COUNT,
+    #     color=Columns.LOCATION_NAME,
+    #     line_dash=Columns.CASE_TYPE,
+    #     line_dash_map=dashes,
+    # )
 
     return fig
 
@@ -239,6 +290,10 @@ def plot(
         df, x_axis=x_axis, stage=stage, count=count
     )
 
+
+from case_tracker import get_df, get_usa_states_df
+
+s = get_usa_states_df(get_df(refresh_local_data=False), 10)
 
 _plot_helper(
     s,

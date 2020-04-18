@@ -37,9 +37,9 @@ from plotting_utils import (
     ADTL_DAY_INDICES,
     COLOR,
     START_DATE,
-    ColorPalette,
     LocationColorMapping,
     form_doubling_time_colname,
+    get_color_palette_assignments,
     get_current_case_data,
     get_savefile_path_and_location_heading,
     remove_empty_leading_dates,
@@ -578,43 +578,6 @@ def _plot_helper(
         figs_and_axes.append((fig, ax))
 
     return figs_and_axes
-
-
-def get_color_palette_assignments(
-    df: pd.DataFrame, palette: ColorPalette = None
-) -> LocationColorMapping:
-    """Get the mapping of colors corresponding to the locations in the given dataframe
-
-    When creating multiple plots, we want to use the same color for a given location in
-    each graph (for instance, if the US is blue in one graph it should be blue in every
-    graph in which it appears). To do this, we compute a color mapping from location ->
-    color
-
-    :param df: The dataframe to be plotted; its locations will be mapped to colors
-    :type df: pd.DataFrame
-    :param palette: The color palette to be used, defaults to None (default palette)
-    :type palette: ColorPalette, optional
-    :return: A map of locations (strings) to colors (RGB tuples); currently this map is
-    implemented as a DataFrame
-    :rtype: LocationColorMapping
-    """
-    current_case_data = get_current_case_data(
-        df,
-        stage=DiseaseStage.CONFIRMED,
-        count=Counting.TOTAL_CASES,
-        x_axis=Columns.XAxis.DATE,
-    )
-    if palette is None:
-        palette = sns.color_palette(n_colors=len(current_case_data))
-    else:
-        palette = palette[: len(current_case_data)]
-
-    return pd.DataFrame(
-        {
-            Columns.LOCATION_NAME: current_case_data[Columns.LOCATION_NAME],
-            COLOR: palette,
-        }
-    )
 
 
 def plot(

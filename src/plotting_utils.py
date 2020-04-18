@@ -1,9 +1,12 @@
+# %%
 from pathlib import Path
 from typing import List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from typing_extensions import Literal
+
+import plotly.colors as pcolors
 
 from constants import (
     CaseInfo,
@@ -27,9 +30,9 @@ COLOR = "Color_"
 # Don't include 0 here; it'll be added automatically (hence "additional")
 ADTL_DAY_INDICES = [-20, -10]
 
-SingleColor = Tuple[float, float, float]
+SingleColor = str
 ColorPalette = List[SingleColor]
-LocationColorMapping = pd.DataFrame
+LocationColorMapping = pd.Series
 
 
 def form_doubling_time_colname(day_idx: int) -> Tuple[str, int]:
@@ -164,6 +167,44 @@ def get_current_case_data(
     )
 
     return current_case_counts
+
+
+def get_color_palette_assignments(
+    df: pd.DataFrame, palette: ColorPalette = None
+) -> LocationColorMapping:
+    """Get the mapping of colors corresponding to the locations in the given dataframe
+
+    When creating multiple plots, we want to use the same color for a given location in
+    each graph (for instance, if the US is blue in one graph it should be blue in every
+    graph in which it appears). To do this, we compute a color mapping from location ->
+    color
+
+    :param df: The dataframe to be plotted; its locations will be mapped to colors
+    :type df: pd.DataFrame
+    :param palette: The color palette to be used, defaults to None (default palette)
+    :type palette: ColorPalette, optional
+    :return: A map of locations (strings) to colors (RGB tuples); currently this map is
+    implemented as a DataFrame
+    :rtype: LocationColorMapping
+    """
+
+    current_case_data = get_current_case_data(
+        df,
+        stage=DiseaseStage.CONFIRMED,
+        count=Counting.TOTAL_CASES,
+        x_axis=Columns.XAxis.DATE,
+    )
+    if palette is None:
+        palette = pcolors.qualitative.T10
+    else:
+        palette = palette[: len(current_case_data)]
+
+    return pd.DataFrame(
+        {
+            Columns.LOCATION_NAME: current_case_data[Columns.LOCATION_NAME],
+            COLOR: palette,
+        }
+    ).set_index(Columns.LOCATION_NAME)
 
 
 def get_savefile_path_and_location_heading(
