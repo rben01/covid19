@@ -6,6 +6,7 @@ curr_branch="$(git rev-parse --abbrev-ref HEAD)" &&
 	python src/case_tracker.py --use-web-data --create-data-table &&
 	touch README.asciidoc &&
 	asciidoctor --base-dir docs -o index.html README.asciidoc &&
+	git status &&
 	git add -A . &&
 	git commit -m "Auto update with new data" &&
 	git push &&
