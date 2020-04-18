@@ -7,9 +7,12 @@ dependencies:
   - python=3.8
   - ipython
   - ipykernel
+  - notebook
+  - jupyter
   - pandas
   - matplotlib
   - seaborn
   - requests
   - flake8
   - black
+  - plotly
