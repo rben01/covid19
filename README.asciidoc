@@ -184,7 +184,7 @@ Unfortunately, graphs cannot exhibit the personal and societal impacts of a disa
 |===
 
 | {bullet-data-quality}
-| These graphs only convey accurate information when the data feeding them is good; garbage in, garbage out.
+| These graphs only convey accurate information when the data feeding them is good; https://xkcd.com/2295[garbage in, garbage out].
 In particular, the number of confirmed cases in a given region is reflective of both that region's true number of cases _and_ their testing capabilities.
 A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region's testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
 Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
@@ -196,7 +196,10 @@ For a more in-depth picture of the difficulties of data collection vis-à-vis pa
 --
 
 | {bullet-start-date}
-| In all graphs below, the start date was the earliest date for which there was data available and for which any of the plotted locations had confirmed cases.
+| The dates on the graphs' x-axes represent data collected in the 24-hour time span ending at the start of that date.
+For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
+This choice was made so that data for the current date, which has not yet had a full 24-hour period to be collected, could be faithfully represented on the graphs. +
+Also, in all graphs below, the start date was simply the earliest date for which there was data available with at least one case.
 
 | {bullet-doubling-time}
 | Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (DT).
