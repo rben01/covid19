@@ -283,6 +283,8 @@ def create_data_table(df: pd.DataFrame) -> pd.DataFrame:
             Columns.OUTBREAK_START_DATE_COL,
             Columns.DAYS_SINCE_OUTBREAK,
             Columns.POPULATION,
+            Columns.STAGE,
+            Columns.COUNT_TYPE,
         ]
     )
 
