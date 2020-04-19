@@ -1,126 +1,106 @@
 # %%
-import io
-import itertools
-import json
-from typing import NewType
+from typing import List, Union
 
+import geopandas
+import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import plotly.graph_objs as go
-from IPython.display import display
-from plotly.offline import plot
-from plotly.subplots import make_subplots
+from IPython.display import display  # noqa F401
+from shapely.geometry import Polygon
+from typing_extensions import Literal
+from matplotlib.ticker import NullLocator
 
 from case_tracker import get_df, get_usa_states_df
-from constants import CaseInfo, Columns, Counting, DiseaseStage, InfoField, Paths
+from constants import (
+    CaseInfo,
+    Columns,
+    Counting,
+    DiseaseStage,
+    InfoField,
+    Paths,
+    USA_STATE_CODES,
+    Select,
+)
 
-GeoJSON = NewType("GeoJson", dict)
+
+def get_geo_df() -> geopandas.GeoDataFrame:
+    return geopandas.read_file(
+        Paths.DATA / "Geo" / "cb_2018_us_state_5m" / "cb_2018_us_state_5m.shp"
+    )
 
 
-def get_geojson() -> GeoJSON:
-    with open(Paths.DATA / "usa_states_geo.json") as f:
-        return json.load(f)
+def plot_usa_daybyday_case_diffs(
+    states_df: pd.DataFrame,
+    *,
+    geo_df: geopandas.GeoDataFrame,
+    stage: Union[DiseaseStage, Literal[Select.ALL]],
+    dates: List[pd.Timestamp] = None
+) -> plt.Figure:
 
+    DIFF_COL = "Diff_"
 
-# This method pretty much taken wholesale from here:
-# https://plotly.com/python/map-subplots-and-small-multiples/
-def plot_usa_states_over_time(states_df, geojson: GeoJSON = None) -> go.Figure:
+    DiseaseStage.verify(stage, allow_select=True)
 
-    # Don't change this -- see below
-    # https://stackoverflow.com/q/49106957
-    def get_geo_id(i: int) -> str:
-        if i == 0:
-            return "geo"
-        return f"geo{i+1}"
+    if stage is Select.ALL:
+        stage_list = list(DiseaseStage)
+    else:
+        stage_list = [stage]
 
-    if geojson is None:
-        geojson = get_geojson()
+    stage_list: List[DiseaseStage]
+    del stage
 
-    # fig = make_subplots(rows=2, cols=2, specs=[[{"type": "chloropleth"}] * 2] * 2)
+    case_diffs_df = states_df[
+        (states_df[Columns.COUNT_TYPE] == Counting.PER_CAPITA.name)
+        & (states_df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES))
+        & (~states_df[Columns.TWO_LETTER_STATE_CODE].isin(["AK", "HI"]))
+    ]
+    case_diffs_df[DIFF_COL] = case_diffs_df.groupby([Columns.STATE, Columns.STAGE])[
+        Columns.CASE_COUNT
+    ].diff()
 
-    X = "x"
-    Y = "y"
+    if dates is None:
+        dates: List[pd.Timestamp] = case_diffs_df.loc[
+            case_diffs_df[DIFF_COL].notna(), Columns.DATE
+        ].unique()
 
-    layout = {}
-    data = []
+    vmin = 0
+    vmaxs = case_diffs_df.groupby(Columns.STAGE)[DIFF_COL].max()
 
-    for i, (stage, count) in enumerate(itertools.product(DiseaseStage, Counting)):
+    for date in dates:
 
-        geo_id = get_geo_id(i)
+        fig, axs = plt.subplots(nrows=len(stage_list))
+        if len(stage_list) == 1:
+            axs: List[plt.Axes] = [axs]
 
-        row, col = divmod(i, 2)
-        # Plotly developers: take a good hard look at yourselves in the mirror. What
-        # could have possible led you to 1-index your subplot layouts???????????????????
+        for stage, ax in zip(stage_list, axs):
+            ax: plt.Axes
 
-        trace_df = states_df[
-            states_df[Columns.CASE_TYPE]
-            == CaseInfo.get_info_item_for(InfoField.CASE_TYPE, stage=stage, count=count)
-        ]
-
-        latest = (
-            trace_df.groupby(
-                [Columns.STATE, Columns.STAGE, Columns.COUNT_TYPE], as_index=False
+            stage_date_df = case_diffs_df[
+                (case_diffs_df[Columns.STAGE] == stage.name)
+                & (case_diffs_df[Columns.DATE] == date)
+            ]
+            stage_geo_df: geopandas.GeoDataFrame = geo_df.merge(
+                stage_date_df,
+                how="left",
+                left_on="STUSPS",
+                right_on=Columns.TWO_LETTER_STATE_CODE,
             )
-            .apply(lambda g: g.sort_values(Columns.DATE).tail(1))
-            .reset_index(drop=True)[
-                [
-                    Columns.LOCATION_NAME,
-                    Columns.DATE,
-                    Columns.CASE_COUNT,
-                    Columns.STAGE,
-                    Columns.COUNT_TYPE,
-                    Columns.STATE,
-                    Columns.TWO_LETTER_STATE_CODE,
-                ]
-            ]
-        )
+            # stage_geo_df = geopandas.clip(stage_geo_df, stage_geo_df)
+            # display(stage_geo_df.columns)
+            stage_geo_df.plot(
+                column=DIFF_COL, ax=ax, legend=True, vmin=0, vmax=vmaxs[stage.name],
+            )
 
-        data.append(
-            {
-                "type": "choropleth",
-                "locations": latest[Columns.TWO_LETTER_STATE_CODE],
-                "z": latest[Columns.CASE_COUNT],
-                "locationmode": "USA-states",
-                "geo": geo_id,
-            }
-        )
+            ax.set_title(stage.to_percapita_str())
 
-        layout[geo_id] = {
-            "scope": "usa",
-            "showland": True,
-            "landcolor": "rgb(229, 229, 229)",
-            "showcountries": False,
-            "showsubunits": True,
-            "domain": {X: [], Y: []},
-        }
+            for spine in [ax.xaxis, ax.yaxis]:
+                spine.set_major_locator(NullLocator())
+                spine.set_minor_locator(NullLocator())
 
-    N_ROWS = len(DiseaseStage)
-    N_COLS = len(Counting)
-
-    i = 0
-    for r in reversed(range(N_ROWS)):  # r == y
-        for c in range(N_COLS):  # c == x
-            geo_id = get_geo_id(i)
-            layout[geo_id]["domain"][X] = [
-                float(c) / float(N_COLS),
-                float(c + 1) / float(N_COLS),
-            ]
-            layout[geo_id]["domain"][Y] = [
-                float(r) / float(N_ROWS),
-                float(r + 1) / float(N_ROWS),
-            ]
-
-            i += 1
-
-    choromap = go.Figure(data=data, layout=layout)
-
-    return choromap
+        return
 
 
-geojson = get_geojson()
+geo_df = get_geo_df()
 s = get_usa_states_df(get_df(refresh_local_data=False), 55)
 
-fig = plot_usa_states_over_time(s, geojson)
-# fig.write_html(str(Paths.ROOT / "docs" / "fig.html"))
-plot(fig)
+
+plot_usa_daybyday_case_diffs(s, geo_df=geo_df, stage=Select.ALL)

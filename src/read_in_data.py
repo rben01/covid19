@@ -397,6 +397,8 @@ class SaveFormats(enum.Enum):
 
         df = self.get_df_with_outbreak_start_date_and_days_since(df)
 
+        df[Columns.TWO_LETTER_STATE_CODE] = df[Columns.TWO_LETTER_STATE_CODE].fillna("")
+
         df = df[DATA_COLS]
 
         return df

@@ -16,4 +16,5 @@ dependencies:
   - flake8
   - black
   - cartopy
-  - geopandas
+  - geopandas>=0.7
+  - descartes

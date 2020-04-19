@@ -252,7 +252,13 @@ class DiseaseStage(ABCStrictEnum):
         return f"DS.{self.name}"
 
     def pprint(self) -> str:
-        return f"{self.name.capitalize()}"
+        return self.name.capitalize()
+
+    def to_str(self) -> str:
+        return self.pprint()
+
+    def to_percapita_str(self) -> str:
+        return " ".join([self.to_str(), "Per Cap."])
 
 
 @enum.unique
@@ -289,28 +295,17 @@ class CaseTypes:
     """
 
     # The main ones we use
-    CONFIRMED = "Cases"
-    DEATHS = "Deaths"
-    CONFIRMED_PER_CAPITA = CONFIRMED + " Per Cap."
-    DEATHS_PER_CAPITA = DEATHS + " Per Cap."
+    CONFIRMED: "CaseType" = "Cases"
+    DEATHS: "CaseType" = "Deaths"
+    CONFIRMED_PER_CAPITA: "CaseType" = "Cases Per Cap."
+    DEATHS_PER_CAPITA: "CaseType" = "Deaths Per Cap."
 
     # Not used much, but keep them around
-    TESTED = "Tested"
-    ACTIVE = "Active"
-    RECOVERED = "Recovered"
-    MORTALITY = "CFR"
-    GROWTH_FACTOR = "GrowthFactor"
-
-    # Impart type info
-    CONFIRMED: "CaseType"
-    DEATHS: "CaseType"
-    CONFIRMED_PER_CAPITA: "CaseType"
-    DEATHS_PER_CAPITA: "CaseType"
-    TESTED: "CaseType"
-    ACTIVE: "CaseType"
-    RECOVERED: "CaseType"
-    MORTALITY: "CaseType"
-    GROWTH_FACTOR: "CaseType"
+    TESTED: "CaseType" = "Tested"
+    ACTIVE: "CaseType" = "Active"
+    RECOVERED: "CaseType" = "Recovered"
+    MORTALITY: "CaseType" = "CFR"
+    GROWTH_FACTOR: "CaseType" = "GrowthFactor"
 
 
 @enum.unique
