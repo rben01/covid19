@@ -16,3 +16,4 @@ dependencies:
   - flake8
   - black
   - cartopy
+  - geopandas
