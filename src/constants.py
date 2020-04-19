@@ -172,6 +172,8 @@ class Columns:
     DATE: Column = "Date"
     CASE_COUNT: Column = "Cases"
     CASE_TYPE: Column = "Case Type"
+    STAGE: Column = "DiseaseStage"
+    COUNT_TYPE: Column = "Counting"
     OUTBREAK_START_DATE_COL: Column = "Outbreak start date"
     DAYS_SINCE_OUTBREAK: Column = "Days Since Outbreak"
     SOURCE: Column = "Source"

@@ -86,86 +86,6 @@ def _get_data(*, from_web: bool) -> pd.DataFrame:
     return df
 
 
-def get_df_with_outbreak_start_date_and_days_since(df: pd.DataFrame) -> pd.DataFrame:
-    """Append outbreak start date and days since outbreak columns to the given dataframe
-
-    The start of an outbreak is defined to be the date at which the relevant statistic
-    (number of cases, deaths per capita, etc) crosses a predefined threshold. This
-    start date is computed once for each statistic for each location.
-
-    :param df: The input dataframe containing locations and case counts on specific
-    dates
-    :type df: pd.DataFrame
-    :return: The dataframe with outbreak start date and days since outbreak columns
-    added
-    :rtype: pd.DataFrame
-    """
-
-    outbreak_thresholds = CaseInfo.get_info_items_for(
-        InfoField.THRESHOLD, InfoField.CASE_TYPE
-    )
-
-    # Add threshold column to df
-    df = df.merge(
-        outbreak_thresholds,
-        how="left",
-        left_on=Columns.CASE_TYPE,
-        right_on=InfoField.CASE_TYPE,
-    )
-
-    outbreak_id_cols = [*Columns.location_id_cols, Columns.CASE_TYPE]
-    outbreak_start_dates = (
-        # Filter df for days where case count was at least threshold for given case type
-        df[(df[Columns.CASE_COUNT] >= df[InfoField.THRESHOLD])]
-        # Get min date for each region
-        .groupby(outbreak_id_cols)[Columns.DATE]
-        .min()
-        .rename(Columns.OUTBREAK_START_DATE_COL)
-    )
-
-    df = df.merge(outbreak_start_dates, how="left", on=outbreak_id_cols).drop(
-        columns=[InfoField.THRESHOLD, InfoField.CASE_TYPE]
-    )
-
-    # For each row, get n days since outbreak started
-    df[Columns.DAYS_SINCE_OUTBREAK] = (
-        df[Columns.DATE] - df[Columns.OUTBREAK_START_DATE_COL]
-    ).dt.total_seconds() / 86400
-
-    return df
-
-
-def append_per_capita_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Add rows for per-capita data to the given dataframe
-
-    For each row in the input dataframe (assumed to not yet contain per-capita data),
-    divide the numbers by locations' populations and add the per-capita data to the
-    bottom of the dataframe
-
-    :param df: The input dataframe
-    :type df: pd.DataFrame
-    :return: The input dataframe with per-capita data appended to the bottom
-    :rtype: pd.DataFrame
-    """
-
-    per_capita_df = df.copy()
-    per_capita_df[Columns.CASE_COUNT] /= per_capita_df[Columns.POPULATION]
-    per_capita_df[Columns.CASE_TYPE] = (
-        per_capita_df[Columns.CASE_TYPE]
-        .map(
-            {
-                CaseTypes.CONFIRMED: CaseTypes.CONFIRMED_PER_CAPITA,
-                CaseTypes.DEATHS: CaseTypes.DEATHS_PER_CAPITA,
-            }
-        )
-        .fillna(per_capita_df[Columns.CASE_TYPE])
-    )
-
-    df = pd.concat([df, per_capita_df], axis=0, ignore_index=True)
-
-    return df
-
-
 def clean_up(df: pd.DataFrame) -> pd.DataFrame:
     """Perform any remaining cleaning up of the dataframe
 
@@ -203,8 +123,6 @@ def get_df(*, refresh_local_data: bool) -> pd.DataFrame:
     """
 
     df = _get_data(from_web=refresh_local_data)
-    df = append_per_capita_data(df)
-    df = get_df_with_outbreak_start_date_and_days_since(df)
     df = clean_up(df)
     return df
 

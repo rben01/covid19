@@ -9,8 +9,12 @@ from IPython.display import display  # noqa F401
 
 from constants import (
     USA_STATE_CODES,
+    CaseInfo,
     CaseTypes,
     Columns,
+    Counting,
+    DiseaseStage,
+    InfoField,
     Locations,
     Paths,
     Urls,
@@ -20,10 +24,15 @@ COUNTRY_DATA = Paths.DATA / "WaPo"
 DATA_COLS = [
     Columns.STATE,
     Columns.COUNTRY,
+    Columns.TWO_LETTER_STATE_CODE,
     Columns.DATE,
     Columns.CASE_TYPE,
     Columns.CASE_COUNT,
     Columns.POPULATION,
+    Columns.IS_STATE,
+    Columns.LOCATION_NAME,
+    Columns.STAGE,
+    Columns.COUNT_TYPE,
 ]
 
 
@@ -147,8 +156,6 @@ class SaveFormats(enum.Enum):
             dtype="Int64",
         )
 
-        df = df[DATA_COLS]
-
         return df
 
     def _read_countries_daily(self, *, from_web: bool) -> pd.DataFrame:
@@ -207,7 +214,103 @@ class SaveFormats(enum.Enum):
             population_series.map(int, na_action="ignore").values, dtype="Int64",
         )
 
-        df = df[DATA_COLS]
+        return df
+
+    @staticmethod
+    def append_percapita_stage_count(df: pd.DataFrame) -> pd.DataFrame:
+        """Add rows for per-capita data to the given dataframe
+
+        For each row in the input dataframe (assumed to not yet contain per-capita
+        data), divide the numbers by locations' populations and add the per-capita data
+        to the bottom of the dataframe
+
+        :param df: The input dataframe
+        :type df: pd.DataFrame
+        :return: The input dataframe with per-capita data appended to the bottom
+        :rtype: pd.DataFrame
+        """
+
+        total_cases_df = df.copy()
+        per_capita_df = df.copy()
+
+        total_cases_df[Columns.STAGE] = per_capita_df[Columns.STAGE] = df[
+            Columns.CASE_TYPE
+        ].map(
+            {
+                CaseTypes.CONFIRMED: DiseaseStage.CONFIRMED.name,
+                CaseTypes.DEATHS: DiseaseStage.DEATH.name,
+            }
+        )
+
+        per_capita_df[Columns.CASE_TYPE] = (
+            per_capita_df[Columns.CASE_TYPE]
+            .map(
+                {
+                    CaseTypes.CONFIRMED: CaseTypes.CONFIRMED_PER_CAPITA,
+                    CaseTypes.DEATHS: CaseTypes.DEATHS_PER_CAPITA,
+                }
+            )
+            .fillna(per_capita_df[Columns.CASE_TYPE])
+        )
+        per_capita_df[Columns.CASE_COUNT] /= per_capita_df[Columns.POPULATION]
+
+        total_cases_df[Columns.COUNT_TYPE] = Counting.TOTAL_CASES.name
+        per_capita_df[Columns.COUNT_TYPE] = Counting.PER_CAPITA.name
+
+        return pd.concat(
+            [total_cases_df, per_capita_df], axis=0, ignore_index=True, copy=True
+        )
+
+    @staticmethod
+    def get_df_with_outbreak_start_date_and_days_since(
+        df: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """Append outbreak start date and days since outbreak columns to the given dataframe
+
+        The start of an outbreak is defined to be the date at which the relevant
+        statistic (number of cases, deaths per capita, etc) crosses a predefined
+        threshold. This start date is computed once for each statistic for each
+        location.
+
+        :param df: The input dataframe containing locations and case counts on specific
+        dates
+        :type df: pd.DataFrame
+        :return: The dataframe with outbreak start date and days since outbreak columns
+        added
+        :rtype: pd.DataFrame
+        """
+
+        outbreak_thresholds = CaseInfo.get_info_items_for(
+            InfoField.THRESHOLD, InfoField.CASE_TYPE
+        )
+
+        # Add threshold column to df
+        df = df.merge(
+            outbreak_thresholds,
+            how="left",
+            left_on=Columns.CASE_TYPE,
+            right_on=InfoField.CASE_TYPE,
+        )
+
+        outbreak_id_cols = [*Columns.location_id_cols, Columns.CASE_TYPE]
+        outbreak_start_dates = (
+            # Filter df for days where case count was at least threshold for given case
+            # type
+            df[(df[Columns.CASE_COUNT] >= df[InfoField.THRESHOLD])]
+            # Get min date for each region
+            .groupby(outbreak_id_cols)[Columns.DATE]
+            .min()
+            .rename(Columns.OUTBREAK_START_DATE_COL)
+        )
+
+        df = df.merge(outbreak_start_dates, how="left", on=outbreak_id_cols).drop(
+            columns=[InfoField.THRESHOLD, InfoField.CASE_TYPE]
+        )
+
+        # For each row, get n days since outbreak started
+        df[Columns.DAYS_SINCE_OUTBREAK] = (
+            df[Columns.DATE] - df[Columns.OUTBREAK_START_DATE_COL]
+        ).dt.total_seconds() / 86400
 
         return df
 
@@ -279,12 +382,19 @@ class SaveFormats(enum.Enum):
             axis=0,
             ignore_index=True,
         )
+
+        df = self.append_percapita_stage_count(df)
+
         df[Columns.POPULATION] = pd.array(df[Columns.POPULATION], dtype="Int64")
 
         df[Columns.IS_STATE] = df[Columns.STATE] != ""
         df[Columns.LOCATION_NAME] = df[Columns.STATE].where(
             df[Columns.IS_STATE], df[Columns.COUNTRY]
         )
+
+        df = self.get_df_with_outbreak_start_date_and_days_since(df)
+
+        df = df[DATA_COLS]
 
         return df
 
