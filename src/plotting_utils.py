@@ -4,9 +4,8 @@ from typing import List, Tuple, Union
 
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from typing_extensions import Literal
-
-import plotly.colors as pcolors
 
 from constants import (
     CaseInfo,
@@ -195,7 +194,7 @@ def get_color_palette_assignments(
         x_axis=Columns.XAxis.DATE,
     )
     if palette is None:
-        palette = pcolors.qualitative.T10
+        palette = sns.color_palette(n_colors=len(current_case_data))
     else:
         palette = palette[: len(current_case_data)]
 
@@ -204,7 +203,7 @@ def get_color_palette_assignments(
             Columns.LOCATION_NAME: current_case_data[Columns.LOCATION_NAME],
             COLOR: palette,
         }
-    ).set_index(Columns.LOCATION_NAME)
+    )
 
 
 def get_savefile_path_and_location_heading(

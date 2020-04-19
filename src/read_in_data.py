@@ -33,6 +33,8 @@ DATA_COLS = [
     Columns.LOCATION_NAME,
     Columns.STAGE,
     Columns.COUNT_TYPE,
+    Columns.OUTBREAK_START_DATE_COL,
+    Columns.DAYS_SINCE_OUTBREAK,
 ]
 
 
@@ -252,6 +254,7 @@ class SaveFormats(enum.Enum):
             )
             .fillna(per_capita_df[Columns.CASE_TYPE])
         )
+
         per_capita_df[Columns.CASE_COUNT] /= per_capita_df[Columns.POPULATION]
 
         total_cases_df[Columns.COUNT_TYPE] = Counting.TOTAL_CASES.name
@@ -383,9 +386,9 @@ class SaveFormats(enum.Enum):
             ignore_index=True,
         )
 
-        df = self.append_percapita_stage_count(df)
-
         df[Columns.POPULATION] = pd.array(df[Columns.POPULATION], dtype="Int64")
+
+        df = self.append_percapita_stage_count(df)
 
         df[Columns.IS_STATE] = df[Columns.STATE] != ""
         df[Columns.LOCATION_NAME] = df[Columns.STATE].where(
