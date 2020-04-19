@@ -262,10 +262,8 @@ The country with the most cases per capita in the world — San Marino at the ti
 | The y-axis of the graphs is log scaled.
 On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
 On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2^n^ and 2^n+1^ are located at 1.25×2^n^, 1.5×2^n^, and 1.75×2^n^.
-On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10^n^ and 10^n+1^ are located at 2×10^n^, 3×10^n^, ..., and 9×10^n^.
-
-| {bullet-cfr-notes}
-| The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country -- it's roughly 1/2^distance^.
+On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10^n^ and 10^n+1^ are located at 2×10^n^, 3×10^n^, ..., 8×10^n^, 9×10^n^. +
+The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country -- it's roughly 1/2^distance^.
 
 |===
 
