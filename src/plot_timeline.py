@@ -14,7 +14,7 @@ from IPython.display import display  # noqa F401
 from matplotlib.colors import ListedColormap, LogNorm
 from matplotlib.ticker import NullLocator
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
-from PIL import Image
+from PIL import Image, ImageOps
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
@@ -35,6 +35,13 @@ def get_geo_df() -> geopandas.GeoDataFrame:
 
 def _resize_to_even_dims(img_path: Path):
     image: Image = Image.open(img_path)
+
+    # First, pad bottom to leave room for video player controls
+    # Padding is left, top, right, bottom
+    # https://pillow.readthedocs.io/en/stable/_modules/PIL/ImageOps.html#expand
+    image = ImageOps.expand(image, (0, 0, 0, 250), fill=(255, 255, 255, 255))
+
+    # Now resize by rounding width and height down to nearest even number
     width_px, height_px = image.size
     width_px = (width_px // 2) * 2
     height_px = (height_px // 2) * 2

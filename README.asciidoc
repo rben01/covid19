@@ -362,6 +362,8 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-us
 [[graphs-timeline-video]]
 === {icon-timeline-video} Video Timeline of New Cases Per Day
 
-This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington D.C. States that are white on a given day had no new cases/deaths that day.
+This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington, D.C.
+States that are white on a given day had no new cases/deaths that day.
+The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a fixed number.
 
 video::{timeline-video-dir}/dod_diffs.mp4[poster="{timeline-video-dir}/DayOverDayDiffs/dod_diff_20200419.png",options="loop"]
