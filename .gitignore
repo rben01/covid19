@@ -2,4 +2,3 @@
 .vscode
 *.pyc
 data/WaPo
-twistd.pid
