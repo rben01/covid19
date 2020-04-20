@@ -109,6 +109,7 @@ class SaveFormats(enum.Enum):
             df[col] = pd.to_datetime(df[col])
 
         df[Columns.DATE] = self._adjust_dates(df[Columns.DATE])
+
         df = df.melt(
             id_vars=[Columns.DATE, Columns.TWO_LETTER_STATE_CODE, "dateChecked"],
             value_vars=[

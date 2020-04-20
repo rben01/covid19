@@ -7,11 +7,16 @@ dependencies:
   - python=3.8
   - ipython
   - ipykernel
-  - pandas
-  - lxml
-  - pyarrow
+  - notebook
+  - jupyter
+  - pandas>=1.0
   - matplotlib
   - seaborn
   - requests
+  - geopandas>=0.7
+  - descartes
+  - cmocean
+  - ffmpeg
+  - pillow
   - flake8
   - black
