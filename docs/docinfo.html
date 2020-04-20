@@ -1,6 +1,14 @@
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
 
+<script>
+  function setPlaybackSpeed(player_id, speed) {
+    const vdiv = document.getElementById(player_id)
+    const video = vdiv.getElementsByClassName("content")[0].getElementsByTagName("video")[0]
+    video.playbackRate = speed
+  }
+</script>
+
 <style>
   .admonitionblock td.icon [class^="fa icon-"] {
     font-size: 2.25em;

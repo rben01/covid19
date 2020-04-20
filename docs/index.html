@@ -14,8 +14,12 @@
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 
 @import url("//fonts.googleapis.com/css?family=Noto+Sans:300,600italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700");
-@import url(//asciidoctor.org/stylesheets/asciidoctor.css);
+
 /* Default asciidoc style framework - important */
+/* Copied locally to avoid external request */
+@import url("/docs/styles/asciidoctor.css");
+/* @import url(//asciidoctor.org/stylesheets/asciidoctor.css); */
+
 
 /* CUSTOMISATIONS */
 /* Change the values in root for quick customisation. If you want even more fine grain... venture further. */
@@ -56,6 +60,38 @@ p {
   font-family: "Noto Sans", sans-serif !important
 }
 
+
+#usa-states-playback-speed {
+  padding: 0em 0em .5em 0em;
+  line-height: 2em;
+}
+
+#usa-states-playback-speed-notice {
+  padding-right: 0.5em;
+}
+
+#usa-states-playback-speed-controls {
+  display: inline-block;
+}
+
+.playback-speed-button {
+  margin: 0px .9em 0px 0px;
+}
+
+.playback-speed-button input {
+  margin-right: 3px;
+}
+
+/* @media (max-width: 10000px) {
+  #usa-states-playback-speed-controls {
+    display: block;
+    margin-top: 0.5em;
+    margin-left: 0em;
+    margin-right: 1.2em;
+  }
+} */
+
+
 /* Table styles */
 th {
   font-family: "Noto Sans", sans-serif !important
@@ -77,6 +113,14 @@ video {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
+
+<script>
+  function setPlaybackSpeed(player_id, speed) {
+    const vdiv = document.getElementById(player_id)
+    const video = vdiv.getElementsByClassName("content")[0].getElementsByTagName("video")[0]
+    video.playbackRate = speed
+  }
+</script>
 
 <style>
   .admonitionblock td.icon [class^="fa icon-"] {
@@ -509,7 +553,24 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 States that are white on a given day had no new cases/deaths that day.
 The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a fixed number.</p>
 </div>
-<div class="videoblock">
+<div id="usa-states-playback-speed">
+	<span id="usa-states-playback-speed-notice">Set playback rate: </span>
+	<span id="usa-states-playback-speed-controls">
+		<label class="playback-speed-button">
+			<input type="radio" name="usa-states-playback-speed" id="half-speed"
+				onclick="setPlaybackSpeed('usa-states-timeline-video', 0.5)">0.5x
+		</label>
+		<label class="playback-speed-button">
+			<input type="radio" name="usa-states-playback-speed" id="normal-speed"
+				onclick="setPlaybackSpeed('usa-states-timeline-video', 1.0)" checked>1x
+		</label>
+		<label class="playback-speed-button">
+			<input type="radio" name="usa-states-playback-speed" id="double-speed"
+				onclick="setPlaybackSpeed('usa-states-timeline-video', 2.0)">2x
+		</label>
+	</span>
+</div>
+<div id="usa-states-timeline-video" class="videoblock usa-states-timeline-video-1">
 <div class="content">
 <video src="./figures/Geo/dod_diffs.mp4" poster="./figures/Geo/DayOverDayDiffs/dod_diff_20200419.png" controls loop>
 Your browser does not support the video tag.
@@ -522,7 +583,7 @@ Your browser does not support the video tag.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-20 12:29:22 -0400
+Last updated 2020-04-20 17:10:22 -0400
 </div>
 </div>
 </body>

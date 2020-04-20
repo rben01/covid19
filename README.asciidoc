@@ -366,4 +366,10 @@ This section contains a single video showing the number of new cases and deaths,
 States that are white on a given day had no new cases/deaths that day.
 The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a fixed number.
 
-video::{timeline-video-dir}/dod_diffs.mp4[poster="{timeline-video-dir}/DayOverDayDiffs/dod_diff_20200419.png",options="loop"]
+[pass]
+++++
+include::adtl_html/playback_speed_buttons.html[]
+++++
+
+[[usa-states-timeline-video]]
+video::{timeline-video-dir}/dod_diffs.mp4[role="usa-states-timeline-video-1",poster="{timeline-video-dir}/DayOverDayDiffs/dod_diff_20200419.png",options="loop"]
