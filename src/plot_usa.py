@@ -1,4 +1,5 @@
 # %%
+import functools
 import itertools
 import subprocess
 from pathlib import Path
@@ -18,6 +19,7 @@ from PIL import Image
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
+from plotting_utils import format_float
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 DOD_DIFF_DIR: Path = GEO_FIG_DIR / "DayOverDayDiffs"
@@ -59,8 +61,9 @@ def plot_usa_daybyday_case_diffs(
     DIFF_COL = "Diff_"
     ASPECT_RATIO = 1 / 20
     PAD_FRAC = 0.5
-    N_CBAR_BUCKETS = 9
-    N_CBAR_TICKS = N_CBAR_BUCKETS + 1  # N_CBAR_BUCKETS // 2 + 1
+    N_CBAR_BUCKETS = 16
+    N_BUCKETS_PER_TICK = 2
+    N_CBAR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_PER_TICK + 1
     CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
     DPI = 300
 
@@ -89,11 +92,14 @@ def plot_usa_daybyday_case_diffs(
 
     dates = sorted(pd.Timestamp(date) for date in dates)
 
+    # Get day-by-day case diffs per location, date, stage, count-type
     case_diffs_df = states_df[
         (states_df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES))
         & (~states_df[Columns.TWO_LETTER_STATE_CODE].isin(["AK", "HI"]))
     ].copy()
 
+    # Make sure data exists for every date for every state so that the entire country is
+    # plotted each day; fill missing data with 0 (missing really *is* as good as 0)
     state_date_stage_combos = pd.MultiIndex.from_product(
         [
             case_diffs_df[Columns.TWO_LETTER_STATE_CODE].unique(),
@@ -130,12 +136,12 @@ def plot_usa_daybyday_case_diffs(
 
     fig: plt.Figure = plt.figure(facecolor="white")
 
-    # For encoding to mp4, these both have to be even integers
+    # Don't put too much stock in these, we tweak them later to make sure they're even
     fig_width_px = len(count_list) * 1800
     fig_height_px = len(stage_list) * 1000 + 200
 
-    img_files: List[Path] = []
-
+    # The order doesn't matter, but doing later dates first lets us see interesting
+    # output in Finder earlier, which is good for debugging
     for date in reversed(dates):
         date = pd.Timestamp(date)
         fig.suptitle(date.strftime(r"%b %-d, %Y"))
@@ -145,6 +151,7 @@ def plot_usa_daybyday_case_diffs(
         ):
             ax: plt.Axes = fig.add_subplot(len(stage_list), len(count_list), i)
 
+            # Filter to just this axes: this stage, this count-type, this date
             stage_date_df = case_diffs_df[
                 (case_diffs_df[Columns.STAGE] == stage.name)
                 & (case_diffs_df[Columns.COUNT_TYPE] == count.name)
@@ -158,84 +165,91 @@ def plot_usa_daybyday_case_diffs(
                 left_on="STUSPS",
                 right_on=Columns.TWO_LETTER_STATE_CODE,
             )
-
-            stage_geo_df.plot(column=DIFF_COL, ax=ax, legend=False)
-            stage_geo_df.boundary.plot(ax=ax, linewidth=0.06, edgecolor="k")
-
-            naive_vmax = vmaxs.loc[(stage.name, count.name)]
-            power_of_10 = np.floor(np.log10(naive_vmax))
-            cbar_tick_dist = 2 * 10 ** power_of_10
-
-            vmax = np.ceil(naive_vmax / cbar_tick_dist) * cbar_tick_dist
+            assert len(stage_geo_df) == 49
 
             vmin = vmins[count]
+            vmax = vmaxs.loc[(stage.name, count.name)]
+            # power_of_10 = np.floor(np.log10(naive_vmax))
+            # cbar_tick_dist = 2 * 10 ** power_of_10
 
+            # vmax = np.ceil(naive_vmax / cbar_tick_dist) * cbar_tick_dist
+
+            # Create log-scaled color mapping
+            # https://stackoverflow.com/a/43807666
+            norm = LogNorm(vmin, vmax)
+            scm = plt.cm.ScalarMappable(norm=norm, cmap=CMAP)
+
+            # Actually plot the data. Omit legend, since we'll want to customize it and
+            # it's easier to create a new one than customize the existing one.
+            stage_geo_df.plot(
+                column=DIFF_COL,
+                ax=ax,
+                legend=False,
+                vmin=vmin,
+                vmax=vmax,
+                cmap=CMAP,
+                norm=norm,
+            )
+
+            # Plot state boundaries
+            stage_geo_df.boundary.plot(ax=ax, linewidth=0.06, edgecolor="k")
+
+            # Add colorbar axes to right side of graph
             # https://stackoverflow.com/a/33505522
             divider = make_axes_locatable(ax)
             width = axes_size.AxesY(ax, aspect=ASPECT_RATIO)
             pad = axes_size.Fraction(PAD_FRAC, width)
             cax = divider.append_axes("right", size=width, pad=pad)
-            # cmap = plt.get_cmap('cividis', N_CBAR_BUCKETS)  # bucket colors
 
-            # https://stackoverflow.com/a/43807666
-            norm = LogNorm(vmin, vmax)
-            scm = plt.cm.ScalarMappable(norm=norm, cmap=CMAP)
-
+            # Add colorbar itself
             cbar = fig.colorbar(scm, cax=cax)
             cbar.minorticks_off()
 
+            # Add evenly spaced ticks and their labels
             # Adapted from https://stackoverflow.com/a/50314773
             bucket_size = (vmax / vmin) ** (1 / N_CBAR_BUCKETS)
-            tick_dist = bucket_size
-            # ((vmax / vmin) / bucket_size) ** (1 / (N_CBAR_TICKS - 1))
+            tick_dist = bucket_size ** N_BUCKETS_PER_TICK
 
-            tick_locs = [
-                *(
-                    vmin
-                    # * (bucket_size ** 0.5)
-                    * (tick_dist ** np.arange(0, N_CBAR_TICKS))
-                ),
-            ]
+            # tick_dist = ((vmax / vmin) / bucket_size) ** (1 / (N_CBAR_TICKS - 1))
 
-            cbar.set_ticks(tick_locs)
-            if count is Counting.PER_CAPITA:
-                fmt_str = "{:.2e}"
-            else:
-                fmt_str = "{:.5g}"
-            cbar.set_ticklabels(
-                [fmt_str.format(x) if x != 0 else "0" for x in tick_locs]
+            tick_locs = (
+                vmin
+                * (tick_dist ** np.arange(0, N_CBAR_TICKS))
+                # * (bucket_size ** 0.5)
             )
 
-            # https://stackoverflow.com/a/23091382
-            # "In my case the plot was more complex, to find the correct child I had to
-            # do: for PCM in ax.get_children(): if type(PCM) ==
-            # matplotlib.image.AxesImage: break"
-            for pcm in ax.get_children():
-                if type(pcm) == PatchCollection:
-                    pcm: plt.cm.ScalarMappable
-                    pcm.set_cmap(CMAP)
-                    pcm.set_clim(vmin, vmax)
-                    pcm.set_norm(norm)
-                    break
+            cbar.set_ticks(tick_locs)
 
+            if count is Counting.PER_CAPITA:
+                fmt_func = "{:.3e}".format
+            else:
+                fmt_func = functools.partial(format_float, max_digits=5)
+
+            cbar.set_ticklabels([fmt_func(x) if x != 0 else "0" for x in tick_locs])
+
+            # Set axes titles
             ax_stage_name = {
                 DiseaseStage.CONFIRMED: "Cases",
                 DiseaseStage.DEATH: "Deaths",
             }[stage]
             ax_title_components = ["New Daily", ax_stage_name]
             if count is Counting.PER_CAPITA:
-                ax_title_components.append("Per Cap.")
+                ax_title_components.append("Per Capita")
 
             ax.set_title(" ".join(ax_title_components))
 
+            # Remove axis ticks (I think they're lat/long but we don't need them)
             for spine in [ax.xaxis, ax.yaxis]:
                 spine.set_major_locator(NullLocator())
                 spine.set_minor_locator(NullLocator())
 
+        # Save figure, and then deal with matplotlib weirdness that doesn't exactly
+        # respect the dimensions we set due to bbox_inches='tight'
         save_path = DOD_DIFF_DIR / f"dod_diff_{date.strftime(r'%Y%m%d')}.png"
         fig.set_size_inches(fig_width_px / DPI, fig_height_px / DPI)
         fig.savefig(save_path, dpi=300, bbox_inches="tight")
-        img_files.append(save_path)
+
+        _resize_to_even_dims(save_path)
 
         fig.clf()
 
@@ -243,10 +257,6 @@ def plot_usa_daybyday_case_diffs(
 
         # if date < pd.Timestamp("2020-4-16"):
         #     break
-
-    print("Resizing images")
-    for img_file in img_files:
-        _resize_to_even_dims(img_file)
 
     return case_diffs_df
 
@@ -283,6 +293,8 @@ def make_video(fps: float):
         "libx264",
         "-pix_fmt",
         "yuv420p",
+        "-movflags",
+        "+faststart",
         str(save_path),
     ]
 

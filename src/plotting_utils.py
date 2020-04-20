@@ -295,3 +295,23 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
 
     df = df[df[Columns.DATE] >= start_date]
     return df
+
+
+def format_float(f: float, *, max_digits: int = 5) -> str:
+    if f == 0:
+        return "0"
+
+    int_part, frac_part = divmod(f, 1)
+    # print(int_part, 10 ** max_digits)
+
+    # If it's "mostly" an int, format it as such
+    if int_part >= 10 ** (max_digits - 1):
+        return f"{f:,.{max_digits}g}"
+
+    # Otherwise penalize its decimal digits
+    return f"{f:,.{max_digits-1}g}"
+
+
+if __name__ == "__main__":
+    for x in np.linspace(0.001, 4, 50) ** 10:
+        print(x, format_float(x))

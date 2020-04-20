@@ -47,6 +47,7 @@ endif::[]
 ifndef::env-github[]
 :data-table-gh-link: {github-repo}/blob/master/{data-table-path}
 :fig-dir: ./figures
+:timeline-video-dir: {fig-dir}/Geo
 // :icon-opts: fw
 // :icon-setup: icon:gear[{icon-opts}]
 // :icon-data-source: icon:table[{icon-opts}]
@@ -82,7 +83,9 @@ endif::[]
 :icon-data: 💾
 :icon-sources: ➡️
 :icon-notes: 📓
-:icon-graphs: 📈
+:icon-graphs: 📊
+:icon-line-graphs: 📈
+:icon-timeline-video: 🗓
 :icon-world: 🌍
 :icon-countries: 🗺
 :icon-usa: 🇺🇸
@@ -223,8 +226,14 @@ And the true CFR within a region can itself change over time as treatment qualit
 
 |===
 
+[[sect-graphs]]
+== {icon-graphs} Graphs
+
+[[graphs-line]]
+=== {icon-line-graphs} Line Charts
+
 [[sect-reading-graphs]]
-== {icon-reading-graphs} Reading the Graphs
+==== {icon-reading-graphs} Reading the Line Charts
 
 [{note-table-opts}]
 |===
@@ -267,14 +276,12 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 
 |===
 
-[[sect-graphs]]
-== {icon-graphs} Graphs
 
 [[graphs-world-china-row]]
-=== {icon-world} {world}
+==== {icon-world} {world}
 
 [[world-china-row-cases-deaths]]
-==== {title-world-cases-deaths-over-time}
+===== {title-world-cases-deaths-over-time}
 
 :img-alt: {title-world-cases-deaths-over-time}
 :img-desc: {img-alt}
@@ -282,10 +289,10 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[{img-args}]
 
 [[graphs-top-ten-countries-no-china]]
-=== {icon-countries} Top Ten Countries, Excluding China
+==== {icon-countries} Top Ten Countries, Excluding China
 
 [[top-ten-countries-no-china-cases-deaths-total]]
-==== {title-countries-cases-deaths-raw-count}
+===== {title-countries-cases-deaths-raw-count}
 
 :img-alt: {title-countries-cases-deaths-raw-count}
 :img-desc: {img-alt}
@@ -293,7 +300,7 @@ image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-world}[{
 image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{img-args}]
 
 [[top-ten-countries-no-china-cases-deaths-per-capita]]
-==== {title-countries-cases-deaths-per-capita}
+===== {title-countries-cases-deaths-per-capita}
 
 :img-alt: {title-countries-cases-deaths-per-capita}
 :img-desc: {img-alt}
@@ -301,7 +308,7 @@ image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countrie
 image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries}[{img-args}]
 
 [[top-ten-countries-no-china-cases-since]]
-==== {title-countries-cases-since-100}
+===== {title-countries-cases-since-100}
 
 :img-alt: {title-countries-cases-since-100}
 :img-desc: {img-alt}. {doubling-time-explanation-cases}
@@ -309,7 +316,7 @@ image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-countries
 image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-countries}[{img-args}]
 
 [[top-ten-countries-no-china-deaths-since]]
-==== {title-countries-deaths-since-25}
+===== {title-countries-deaths-since-25}
 
 :img-alt: {title-countries-deaths-since-25}
 :img-desc: {img-alt}. {doubling-time-explanation-deaths}
@@ -318,10 +325,10 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-co
 
 
 [[graphs-usa-top-states]]
-=== {icon-usa} Top Ten USA States
+==== {icon-usa} Top Ten USA States
 
 [[usa-top-states-cases-deaths-total]]
-==== {title-usa-states-cases-deaths-raw-count}
+===== {title-usa-states-cases-deaths-raw-count}
 
 :img-alt: {title-usa-states-cases-deaths-raw-count}
 :img-desc: {img-alt}
@@ -329,7 +336,7 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-co
 image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{img-args}]
 
 [[usa-top-states-cases-deaths-per-capita]]
-==== {title-usa-states-cases-deaths-per-capita}
+===== {title-usa-states-cases-deaths-per-capita}
 
 :img-alt: {title-usa-states-cases-deaths-per-capita}
 :img-desc: {img-alt}
@@ -337,7 +344,7 @@ image:{fig-dir}/{total-count-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-stat
 image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-states}[{img-args}]
 
 [[usa-top-states-cases-since]]
-==== {title-usa-states-cases-since-100}
+===== {title-usa-states-cases-since-100}
 
 :img-alt: {title-usa-states-cases-since-100}
 :img-desc: {img-alt}. {doubling-time-explanation-cases}
@@ -345,9 +352,16 @@ image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-state
 image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{img-args}]
 
 [[usa-top-states-deaths-since]]
-==== {title-countries-deaths-since-25}
+===== {title-countries-deaths-since-25}
 
 :img-alt: {title-usa-states-deaths-since-25}
 :img-desc: {img-alt}. {doubling-time-explanation-deaths}
 :img-args: "{img-alt}",{img-opts},title="{img-desc}"
 image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{img-args}]
+
+[[graphs-timeline-video]]
+=== {icon-timeline-video} Video Timeline of New Cases Per Day
+
+This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington D.C. States that are white on a given day had no new cases/deaths that day.
+
+video::{timeline-video-dir}/dod_diffs.mp4[poster="{timeline-video-dir}/DayOverDayDiffs/dod_diff_20200419.png",options="loop"]

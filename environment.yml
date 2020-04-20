@@ -18,3 +18,4 @@ dependencies:
   - geopandas>=0.7
   - descartes
   - cmocean
+  - ffmpeg
