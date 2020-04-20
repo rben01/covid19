@@ -290,9 +290,11 @@ def make_video(fps: float):
         concat_demux_lines.append(f"file '{f}'")
         concat_demux_lines.append(f"duration {1/fps}")
 
-    # Duplicate last frame so that it's clear when video has ended
-    concat_demux_lines.append(f"file '{img_files[-1]}'")
-    concat_demux_lines.append(f"duration {1/fps}")
+    # Duplicate last frame 2x so that it's clear when video has ended
+    for _ in range(2):
+        concat_demux_lines.append(f"file '{img_files[-1]}'")
+        concat_demux_lines.append(f"duration {1/fps}")
+
     concat_demux_lines.append(f"file '{img_files[-1]}'")
 
     concat_demux_str = "\n".join(concat_demux_lines)
