@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from IPython.display import display  # noqa F401
-from matplotlib import rcParams
 from matplotlib.dates import DateFormatter, DayLocator
 from matplotlib.legend import Legend
 from matplotlib.ticker import (
@@ -44,8 +43,6 @@ from plotting_utils import (
     get_savefile_path_and_location_heading,
     remove_empty_leading_dates,
 )
-
-rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 
 class EdgeGuide(ABCStrictEnum):

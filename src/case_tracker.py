@@ -512,6 +512,9 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
 
 
 if __name__ == "__main__" and IN_A_TERMINAL:
+    import matplotlib
+
+    matplotlib.use("agg")
     df = main(args)
 
 # A little hack -- an ipython cell that will run in an interactive window but not when

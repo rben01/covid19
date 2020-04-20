@@ -5,6 +5,7 @@ from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import rcParams
 from typing_extensions import Literal
 
 from constants import (
@@ -17,6 +18,8 @@ from constants import (
     Locations,
     Select,
 )
+
+rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 FROM_FIXED_DATE_DESC = "from_fixed_date"
 FROM_LOCAL_OUTBREAK_START_DESC = "from_local_spread_start"

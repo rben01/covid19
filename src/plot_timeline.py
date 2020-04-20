@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from IPython.display import display  # noqa F401
-from matplotlib import rcParams
 from matplotlib.colors import ListedColormap, LogNorm
 from matplotlib.ticker import NullLocator
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
@@ -22,7 +21,6 @@ from typing_extensions import Literal
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
 from plotting_utils import format_float
 
-rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 DOD_DIFF_DIR: Path = GEO_FIG_DIR / "DayOverDayDiffs"
@@ -292,6 +290,9 @@ def make_video(fps: float):
         concat_demux_lines.append(f"file '{f}'")
         concat_demux_lines.append(f"duration {1/fps}")
 
+    # Duplicate last frame so that it's clear when video has ended
+    concat_demux_lines.append(f"file '{img_files[-1]}'")
+    concat_demux_lines.append(f"duration {1/fps}")
     concat_demux_lines.append(f"file '{img_files[-1]}'")
 
     concat_demux_str = "\n".join(concat_demux_lines)
