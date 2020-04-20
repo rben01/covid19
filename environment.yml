@@ -9,13 +9,14 @@ dependencies:
   - ipykernel
   - notebook
   - jupyter
-  - pandas
+  - pandas>=1.0
   - matplotlib
   - seaborn
   - requests
-  - flake8
-  - black
   - geopandas>=0.7
   - descartes
   - cmocean
   - ffmpeg
+  - pillow
+  - flake8
+  - black

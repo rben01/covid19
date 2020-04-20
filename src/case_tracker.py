@@ -82,8 +82,8 @@ from constants import (  # noqa E402
     Paths,
     Select,
 )
-from plotting import plot  # noqa E402
-from plot_usa import plot_usa_daybyday_case_diffs, make_video  # noqa E402
+from plot_line_graphs import plot  # noqa E402
+from plot_timeline import plot_usa_daybyday_case_diffs, make_video  # noqa E402
 from typing_extensions import Literal  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
