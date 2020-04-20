@@ -455,7 +455,7 @@ def _do_timeline(df: pd.DataFrame):
     plot_usa_daybyday_case_diffs(
         get_usa_states_df(df), stage=Select.ALL, count=Select.ALL
     )
-    make_video(1.25)
+    make_video(0.9)
 
 
 def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:

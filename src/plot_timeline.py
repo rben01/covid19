@@ -2,6 +2,7 @@
 import functools
 import itertools
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Union
 
@@ -11,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from IPython.display import display  # noqa F401
+from matplotlib import rcParams
 from matplotlib.colors import ListedColormap, LogNorm
 from matplotlib.ticker import NullLocator
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
@@ -19,6 +21,8 @@ from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
 from plotting_utils import format_float
+
+rcParams.update({"font.family": "sans-serif", "font.size": 11})
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 DOD_DIFF_DIR: Path = GEO_FIG_DIR / "DayOverDayDiffs"
@@ -39,7 +43,7 @@ def _resize_to_even_dims(img_path: Path):
     # First, pad bottom to leave room for video player controls
     # Padding is left, top, right, bottom
     # https://pillow.readthedocs.io/en/stable/_modules/PIL/ImageOps.html#expand
-    image = ImageOps.expand(image, (0, 0, 0, 250), fill=(255, 255, 255, 255))
+    image = ImageOps.expand(image, (0, 0, 0, 150), fill=(255, 255, 255, 255))
 
     # Now resize by rounding width and height down to nearest even number
     width_px, height_px = image.size
@@ -72,6 +76,7 @@ def plot_usa_daybyday_case_diffs(
     N_CBAR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_PER_TICK + 1
     CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
     DPI = 300
+    NOW_STR = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
 
     ID_COLS = [
         Columns.TWO_LETTER_STATE_CODE,
@@ -156,6 +161,17 @@ def plot_usa_daybyday_case_diffs(
             itertools.product(stage_list, count_list), start=1
         ):
             ax: plt.Axes = fig.add_subplot(len(stage_list), len(count_list), i)
+
+            # Add timestamp to top right axis
+            if i == 2:
+                ax.text(
+                    1.25,  # Coords are arbitrary magic numbers
+                    1.23,
+                    f"Last updated {NOW_STR}",
+                    horizontalalignment="right",
+                    fontsize="small",
+                    transform=ax.transAxes,
+                )
 
             # Filter to just this axes: this stage, this count-type, this date
             stage_date_df = case_diffs_df[
@@ -312,7 +328,7 @@ def make_video(fps: float):
 
 
 if __name__ == "__main__":
-    make_video(1.25)
+    make_video(0.9)
     # from case_tracker import get_df, get_usa_states_df
 
     # geo_df = get_geo_df()
