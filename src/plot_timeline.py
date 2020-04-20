@@ -269,7 +269,7 @@ def plot_usa_daybyday_case_diffs(
         # respect the dimensions we set due to bbox_inches='tight'
         save_path = DOD_DIFF_DIR / f"dod_diff_{date.strftime(r'%Y%m%d')}.png"
         fig.set_size_inches(fig_width_px / DPI, fig_height_px / DPI)
-        fig.savefig(save_path, dpi=300, bbox_inches="tight")
+        fig.savefig(save_path, dpi=DPI, bbox_inches="tight", facecolor="w")
 
         _resize_to_even_dims(save_path)
 
