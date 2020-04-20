@@ -15,6 +15,6 @@ dependencies:
   - requests
   - flake8
   - black
-  - cartopy
   - geopandas>=0.7
   - descartes
+  - cmocean
