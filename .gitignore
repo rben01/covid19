@@ -3,3 +3,4 @@
 *.pyc
 data/WaPo
 twistd.pid
+docs/figures/Geo/DayOverDayDiffs
