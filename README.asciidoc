@@ -372,4 +372,4 @@ include::adtl_html/playback_speed_buttons.html[]
 ++++
 
 [[usa-states-timeline-video]]
-video::{timeline-video-dir}/dod_diffs.mp4[role="usa-states-timeline-video-1",poster="{timeline-video-dir}/DayOverDayDiffs/dod_diff_20200419.png",options="loop"]
+video::{timeline-video-dir}/dod_diffs.mp4[role="usa-states-timeline-video-1",poster="{timeline-video-dir}/dod_diff_poster.png",options="loop"]

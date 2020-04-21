@@ -83,6 +83,8 @@ def plot_usa_daybyday_case_diffs(
         Columns.COUNT_TYPE,
     ]
 
+    save_fig_kwargs = {"dpi": DPI, "bbox_inches": "tight", "facecolor": "w"}
+
     if count is Select.ALL:
         count_list = list(Counting)
     else:
@@ -149,19 +151,23 @@ def plot_usa_daybyday_case_diffs(
     fig_width_px = len(count_list) * 1800
     fig_height_px = len(stage_list) * 1000 + 200
 
+    max_date = max(dates)
+
     # The order doesn't matter, but doing later dates first lets us see interesting
     # output in Finder earlier, which is good for debugging
     for date in reversed(dates):
         date = pd.Timestamp(date)
         fig.suptitle(date.strftime(r"%b %-d, %Y"))
 
-        for i, (stage, count) in enumerate(
+        for subplot_index, (stage, count) in enumerate(
             itertools.product(stage_list, count_list), start=1
         ):
-            ax: plt.Axes = fig.add_subplot(len(stage_list), len(count_list), i)
+            ax: plt.Axes = fig.add_subplot(
+                len(stage_list), len(count_list), subplot_index
+            )
 
             # Add timestamp to top right axis
-            if i == 2:
+            if subplot_index == 2:
                 ax.text(
                     1.25,  # Coords are arbitrary magic numbers
                     1.23,
@@ -267,9 +273,15 @@ def plot_usa_daybyday_case_diffs(
         # respect the dimensions we set due to bbox_inches='tight'
         save_path = DOD_DIFF_DIR / f"dod_diff_{date.strftime(r'%Y%m%d')}.png"
         fig.set_size_inches(fig_width_px / DPI, fig_height_px / DPI)
-        fig.savefig(save_path, dpi=DPI, bbox_inches="tight", facecolor="w")
+        fig.savefig(save_path, **save_fig_kwargs)
 
         _resize_to_even_dims(save_path)
+
+        if date == max_date:
+            poster_save_path = GEO_FIG_DIR / "dod_diff_poster.png"
+            fig.savefig(poster_save_path, **save_fig_kwargs)
+            _resize_to_even_dims(poster_save_path)
+            del poster_save_path
 
         fig.clf()
 
