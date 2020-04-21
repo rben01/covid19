@@ -2498,16 +2498,16 @@ p {
 }
 
 
-#usa-states-playback-speed {
+#usa-states-timeline-playback-speed {
   padding: 0em 0em .5em 0em;
   line-height: 2em;
 }
 
-#usa-states-playback-speed-notice {
+#usa-states-timeline-playback-speed-notice {
   padding-right: 0.5em;
 }
 
-#usa-states-playback-speed-controls {
+#usa-states-timeline-playback-speed-controls {
   display: inline-block;
 }
 

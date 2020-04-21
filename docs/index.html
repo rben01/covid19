@@ -2511,16 +2511,16 @@ p {
 }
 
 
-#usa-states-playback-speed {
+#usa-states-timeline-playback-speed {
   padding: 0em 0em .5em 0em;
   line-height: 2em;
 }
 
-#usa-states-playback-speed-notice {
+#usa-states-timeline-playback-speed-notice {
   padding-right: 0.5em;
 }
 
-#usa-states-playback-speed-controls {
+#usa-states-timeline-playback-speed-controls {
   display: inline-block;
 }
 
@@ -3003,19 +3003,23 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 States that are white on a given day had no new cases/deaths that day.
 The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a corresponding fixed number.</p>
 </div>
-<div id="usa-states-playback-speed">
-	<span id="usa-states-playback-speed-notice">Playback speed: </span>
-	<span id="usa-states-playback-speed-controls">
+<div id="usa-states-timeline-playback-speed">
+	<!-- onclick function first arg (id) must match what's in the asciidoc -->
+	<span id="usa-states-timeline-playback-speed-notice">Playback speed: </span>
+	<span id="usa-states-timeline-playback-speed-controls">
 		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-playback-speed" id="half-speed"
+			<input type="radio" name="usa-states-timeline-playback-speed"
+				id="usa-states-timeline-playback-speed-controls-half-speed"
 				onclick="setPlaybackSpeed('usa-states-timeline-video', 0.5)">0.5x
 		</label>
 		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-playback-speed" id="normal-speed"
+			<input type="radio" name="usa-states-timeline-playback-speed"
+				id="usa-states-timeline-playback-speed-controls-normal-speed"
 				onclick="setPlaybackSpeed('usa-states-timeline-video', 1.0)" checked>1x
 		</label>
 		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-playback-speed" id="double-speed"
+			<input type="radio" name="usa-states-timeline-playback-speed"
+				id="usa-states-timeline-playback-speed-controls-double-speed"
 				onclick="setPlaybackSpeed('usa-states-timeline-video', 2.0)">2x
 		</label>
 	</span>
