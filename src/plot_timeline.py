@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from IPython.display import display  # noqa F401
-from matplotlib.colors import ListedColormap, LogNorm
-from matplotlib.ticker import NullLocator
+from matplotlib.colors import LogNorm
+from matplotlib.ticker import NullLocator, NullFormatter
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
 from PIL import Image, ImageOps
 from typing_extensions import Literal
@@ -69,10 +69,12 @@ def plot_usa_daybyday_case_diffs(
     DIFF_COL = "Diff_"
     ASPECT_RATIO = 1 / 20
     PAD_FRAC = 0.5
-    N_CBAR_BUCKETS = 16
-    N_BUCKETS_PER_TICK = 2
-    N_CBAR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_PER_TICK + 1
-    CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
+    N_CBAR_BUCKETS = 6  # only used when bucketing colormap into discrete regions
+    N_BUCKETS_BTWN_MAJOR_TICKS = 1
+    N_MINOR_TICKS_BTWN_MAJOR_TICKS = 8  # major_1, minor_1, ..., minor_n, major_2
+    N_CBAR_MAJOR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_BTWN_MAJOR_TICKS + 1
+    CMAP = cmocean.cm.matter
+    # CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
     DPI = 300
     NOW_STR = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
 
@@ -83,7 +85,7 @@ def plot_usa_daybyday_case_diffs(
         Columns.COUNT_TYPE,
     ]
 
-    save_fig_kwargs = {"dpi": DPI, "bbox_inches": "tight", "facecolor": "w"}
+    save_fig_kwargs = {"dpi": "figure", "bbox_inches": "tight", "facecolor": "w"}
 
     if count is Select.ALL:
         count_list = list(Counting)
@@ -145,7 +147,7 @@ def plot_usa_daybyday_case_diffs(
     }
     vmaxs = case_diffs_df.groupby([Columns.STAGE, Columns.COUNT_TYPE])[DIFF_COL].max()
 
-    fig: plt.Figure = plt.figure(facecolor="white")
+    fig: plt.Figure = plt.figure(facecolor="white", dpi=DPI)
 
     # Don't put too much stock in these, we tweak them later to make sure they're even
     fig_width_px = len(count_list) * 1800
@@ -195,10 +197,6 @@ def plot_usa_daybyday_case_diffs(
 
             vmin = vmins[count]
             vmax = vmaxs.loc[(stage.name, count.name)]
-            # power_of_10 = np.floor(np.log10(naive_vmax))
-            # cbar_tick_dist = 2 * 10 ** power_of_10
-
-            # vmax = np.ceil(naive_vmax / cbar_tick_dist) * cbar_tick_dist
 
             # Create log-scaled color mapping
             # https://stackoverflow.com/a/43807666
@@ -229,36 +227,55 @@ def plot_usa_daybyday_case_diffs(
 
             # Add colorbar itself
             cbar = fig.colorbar(scm, cax=cax)
-            cbar.minorticks_off()
 
             # Add evenly spaced ticks and their labels
+            # First major, then minor
             # Adapted from https://stackoverflow.com/a/50314773
             bucket_size = (vmax / vmin) ** (1 / N_CBAR_BUCKETS)
-            tick_dist = bucket_size ** N_BUCKETS_PER_TICK
+            tick_dist = bucket_size ** N_BUCKETS_BTWN_MAJOR_TICKS
 
-            # tick_dist = ((vmax / vmin) / bucket_size) ** (1 / (N_CBAR_TICKS - 1))
-
-            tick_locs = (
+            # Simple log scale math
+            major_tick_locs = (
                 vmin
-                * (tick_dist ** np.arange(0, N_CBAR_TICKS))
-                # * (bucket_size ** 0.5)
+                * (tick_dist ** np.arange(0, N_CBAR_MAJOR_TICKS))
+                # * (bucket_size ** 0.5) # Use this if centering ticks on buckets
             )
 
-            cbar.set_ticks(tick_locs)
+            cbar.set_ticks(major_tick_locs)
 
+            # Get minor locs by linearly interpolating between major ticks
+            minor_tick_locs = []
+            for major_tick_index, this_major_tick in enumerate(major_tick_locs[:-1]):
+                next_major_tick = major_tick_locs[major_tick_index + 1]
+
+                # Get minor ticks as numbers in range [vmin, vmax]
+                minor_tick_locs.extend(
+                    np.linspace(
+                        this_major_tick,
+                        next_major_tick,
+                        N_MINOR_TICKS_BTWN_MAJOR_TICKS + 2,
+                    )[1:-1]
+                )
+
+            cbar.ax.yaxis.set_ticks(minor_tick_locs, minor=True)
+            cbar.ax.yaxis.set_minor_formatter(NullFormatter())
+
+            # Add major tick labels
             if count is Counting.PER_CAPITA:
                 fmt_func = "{:.3e}".format
             else:
                 fmt_func = functools.partial(format_float, max_digits=5)
 
-            cbar.set_ticklabels([fmt_func(x) if x != 0 else "0" for x in tick_locs])
+            cbar.set_ticklabels(
+                [fmt_func(x) if x != 0 else "0" for x in major_tick_locs]
+            )
 
             # Set axes titles
-            ax_stage_name = {
+            ax_stage_name: str = {
                 DiseaseStage.CONFIRMED: "Cases",
                 DiseaseStage.DEATH: "Deaths",
             }[stage]
-            ax_title_components = ["New Daily", ax_stage_name]
+            ax_title_components: List[str] = ["New Daily", ax_stage_name]
             if count is Counting.PER_CAPITA:
                 ax_title_components.append("Per Capita")
 
@@ -271,17 +288,16 @@ def plot_usa_daybyday_case_diffs(
 
         # Save figure, and then deal with matplotlib weirdness that doesn't exactly
         # respect the dimensions we set due to bbox_inches='tight'
-        save_path = DOD_DIFF_DIR / f"dod_diff_{date.strftime(r'%Y%m%d')}.png"
+        save_path: Path = DOD_DIFF_DIR / f"dod_diff_{date.strftime(r'%Y%m%d')}.png"
         fig.set_size_inches(fig_width_px / DPI, fig_height_px / DPI)
         fig.savefig(save_path, **save_fig_kwargs)
 
+        # x264 video encoder requires frames have even width and height
         _resize_to_even_dims(save_path)
 
+        # Save poster (preview frame for video on web)
         if date == max_date:
-            poster_save_path = GEO_FIG_DIR / "dod_diff_poster.png"
-            fig.savefig(poster_save_path, **save_fig_kwargs)
-            _resize_to_even_dims(poster_save_path)
-            del poster_save_path
+            (GEO_FIG_DIR / "dod_diff_poster.png").write_bytes(save_path.read_bytes())
 
         fig.clf()
 
@@ -343,7 +359,8 @@ def make_video(fps: float):
 
 
 if __name__ == "__main__":
-    make_video(0.9)
+    pass
+    # make_video(0.9)
     # from case_tracker import get_df, get_usa_states_df
 
     # geo_df = get_geo_df()

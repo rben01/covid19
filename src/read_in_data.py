@@ -63,9 +63,10 @@ class SaveFormats(enum.Enum):
         :rtype: pd.Series
         """
         date_col = date_col.copy()
-        is_todays_date = date_col.dt.strftime(r"%Y%m%d") == pd.Timestamp.now().strftime(
-            r"%Y%m%d"
-        )
+        is_todays_date = date_col.dt.normalize() == pd.Timestamp.now().normalize()
+        # strftime(r"%Y%m%d") == .strftime(
+        #     r"%Y%m%d"
+        # )
         date_col.loc[is_todays_date] = pd.Timestamp.now()
         date_col.loc[~is_todays_date] += pd.Timedelta(days=1)
         return date_col
