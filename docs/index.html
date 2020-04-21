@@ -2922,7 +2922,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><span class="icon table-bullet"><i class="fa fa-hashtag fa-lg"></i></span></p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>The y-axis of the graphs is log scaled.
+<p><a id="pow-10-ticks"></a>The y-axis of the graphs is log scaled.
 On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
 On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2<sup>n</sup> and 2<sup>n+1</sup> are located at 1.25×2<sup>n</sup>, 1.5×2<sup>n</sup>, and 1.75×2<sup>n</sup>.
 On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10<sup>n</sup> and 10<sup>n+1</sup> are located at 2×10<sup>n</sup>, 3×10<sup>n</sup>, &#8230;&#8203;, 8×10<sup>n</sup>, 9×10<sup>n</sup>.<br>
@@ -2999,9 +2999,9 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 <div class="sect2">
 <h3 id="graphs-timeline-video"><a class="link" href="#graphs-timeline-video">🗓 Video Timeline of New Cases Per Day</a></h3>
 <div class="paragraph">
-<p>This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington, D.C.
+<p>This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
 States that are white on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a corresponding fixed number.</p>
+The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8. (Substitute a=1, b=10 and you&#8217;ll arrive at <a href="#pow-10-ticks">the same minor ticks as above</a>.)</p>
 </div>
 <div id="usa-states-timeline-playback-speed">
 	<!-- onclick function first arg (id) must match what's in the asciidoc -->
@@ -3037,7 +3037,7 @@ Your browser does not support the video tag.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-20 20:19:04 -0400
+Last updated 2020-04-21 01:50:51 -0400
 </div>
 </div>
 </body>

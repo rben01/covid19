@@ -268,7 +268,7 @@ In a graph of countries and their cases per capita, the first country in the leg
 The country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which, given its population of 33k, it is not.
 
 | {bullet-gridlines}
-| The y-axis of the graphs is log scaled.
+| [[pow-10-ticks]]The y-axis of the graphs is log scaled.
 On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
 On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2^n^ and 2^n+1^ are located at 1.25×2^n^, 1.5×2^n^, and 1.75×2^n^.
 On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10^n^ and 10^n+1^ are located at 2×10^n^, 3×10^n^, ..., 8×10^n^, 9×10^n^. +
@@ -362,9 +362,9 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-us
 [[graphs-timeline-video]]
 === {icon-timeline-video} Video Timeline of New Cases Per Day
 
-This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington, D.C.
+This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
 States that are white on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a corresponding fixed number.
+The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8. (Substitute a=1, b=10 and you'll arrive at <<pow-10-ticks,the same minor ticks as above>>.)
 
 [pass]
 ++++
