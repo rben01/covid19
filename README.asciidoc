@@ -364,7 +364,7 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-us
 
 This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental US states and Washington, D.C.
 States that are white on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a fixed number.
+The colorbars are logarithmically scaled, which means moving a fixed distance along the colorbar represents multiplying by a corresponding fixed number.
 
 [pass]
 ++++
