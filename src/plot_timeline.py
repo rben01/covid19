@@ -248,7 +248,9 @@ def plot_usa_daybyday_case_diffs(
             for major_tick_index, this_major_tick in enumerate(major_tick_locs[:-1]):
                 next_major_tick = major_tick_locs[major_tick_index + 1]
 
-                # Get minor ticks as numbers in range [vmin, vmax]
+                # Get minor ticks as numbers in range [this_major_tick, next_major_tick]
+                # and exclude the major ticks themselves (once we've used them to
+                # compute the minor tick locs)
                 minor_tick_locs.extend(
                     np.linspace(
                         this_major_tick,
@@ -262,9 +264,11 @@ def plot_usa_daybyday_case_diffs(
 
             # Add major tick labels
             if count is Counting.PER_CAPITA:
-                fmt_func = "{:.3e}".format
+                fmt_func = "{:.2e}".format
             else:
-                fmt_func = functools.partial(format_float, max_digits=5)
+                fmt_func = functools.partial(
+                    format_float, max_digits=5, decimal_penalty=2
+                )
 
             cbar.set_ticklabels(
                 [fmt_func(x) if x != 0 else "0" for x in major_tick_locs]

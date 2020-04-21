@@ -300,7 +300,7 @@ def remove_empty_leading_dates(df: pd.DataFrame, count: Counting) -> pd.DataFram
     return df
 
 
-def format_float(f: float, *, max_digits: int = 5) -> str:
+def format_float(f: float, *, max_digits: int = 5, decimal_penalty: int = 2) -> str:
     if f == 0:
         return "0"
 
@@ -308,11 +308,11 @@ def format_float(f: float, *, max_digits: int = 5) -> str:
     # print(int_part, 10 ** max_digits)
 
     # If it's "mostly" an int, format it as such
-    if int_part >= 10 ** (max_digits - 1):
+    if int_part >= 10 ** (max_digits - decimal_penalty):
         return f"{f:,.{max_digits}g}"
 
     # Otherwise penalize its decimal digits
-    return f"{f:,.{max_digits-1}g}"
+    return f"{f:,.{max_digits-decimal_penalty}g}"
 
 
 if __name__ == "__main__":
