@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import rcParams
+from PIL import Image, ImageOps
 from typing_extensions import Literal
 
 from constants import (
@@ -313,6 +314,22 @@ def format_float(f: float, *, max_digits: int = 5, decimal_penalty: int = 2) -> 
 
     # Otherwise penalize its decimal digits
     return f"{f:,.{max_digits-decimal_penalty}g}"
+
+
+def resize_to_even_dims(img_path: Path):
+    image: Image = Image.open(img_path)
+
+    # First, pad bottom to leave room for video player controls
+    # Padding is left, top, right, bottom
+    # https://pillow.readthedocs.io/en/stable/_modules/PIL/ImageOps.html#expand
+    image = ImageOps.expand(image, (0, 0, 0, 150), fill=(255, 255, 255, 255))
+
+    # Now resize by rounding width and height down to nearest even number
+    width_px, height_px = image.size
+    width_px = (width_px // 2) * 2
+    height_px = (height_px // 2) * 2
+    image = image.resize((width_px, height_px))
+    image.save(img_path)
 
 
 if __name__ == "__main__":

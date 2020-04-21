@@ -15,11 +15,10 @@ from IPython.display import display  # noqa F401
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import NullLocator, NullFormatter
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
-from PIL import Image, ImageOps
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
-from plotting_utils import format_float
+from plotting_utils import format_float, resize_to_even_dims
 
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
@@ -38,22 +37,6 @@ def get_geo_df() -> geopandas.GeoDataFrame:
     # ).to_crs(
     #     "EPSG:2163"  # Google this magic string
     # )
-
-
-def _resize_to_even_dims(img_path: Path):
-    image: Image = Image.open(img_path)
-
-    # First, pad bottom to leave room for video player controls
-    # Padding is left, top, right, bottom
-    # https://pillow.readthedocs.io/en/stable/_modules/PIL/ImageOps.html#expand
-    image = ImageOps.expand(image, (0, 0, 0, 150), fill=(255, 255, 255, 255))
-
-    # Now resize by rounding width and height down to nearest even number
-    width_px, height_px = image.size
-    width_px = (width_px // 2) * 2
-    height_px = (height_px // 2) * 2
-    image = image.resize((width_px, height_px))
-    image.save(img_path)
 
 
 def plot_usa_daybyday_case_diffs(
@@ -313,7 +296,7 @@ def plot_usa_daybyday_case_diffs(
         fig.savefig(save_path, **save_fig_kwargs)
 
         # x264 video encoder requires frames have even width and height
-        _resize_to_even_dims(save_path)
+        resize_to_even_dims(save_path)
 
         # Save poster (preview frame for video on web)
         if date == max_date:
