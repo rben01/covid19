@@ -29,10 +29,15 @@ DOD_DIFF_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_geo_df() -> geopandas.GeoDataFrame:
     return geopandas.read_file(
-        Paths.DATA / "Geo" / "cb_2018_us_state_5m" / "cb_2018_us_state_5m.shp"
+        Paths.DATA / "Geo" / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
     ).to_crs(
-        "EPSG:2163"
-    )  # Google this magic string
+        "EPSG:2163"  # Google this magic string
+    )
+    # return geopandas.read_file(
+    #     Paths.DATA / "Geo" / "cb_2018_us_state_5m" / "cb_2018_us_state_5m.shp"
+    # ).to_crs(
+    #     "EPSG:2163"  # Google this magic string
+    # )
 
 
 def _resize_to_even_dims(img_path: Path):
@@ -158,8 +163,19 @@ def plot_usa_daybyday_case_diffs(
     # The order doesn't matter, but doing later dates first lets us see interesting
     # output in Finder earlier, which is good for debugging
     for date in reversed(dates):
-        date = pd.Timestamp(date)
-        fig.suptitle(date.strftime(r"%b %-d, %Y"))
+        date: pd.Timestamp = pd.Timestamp(date)
+        # Data is associated with the right endpoint of the data collection period,
+        # e.g., data collected *on* March 20 is labeled March 21 -- this is done so that
+        # data collected today (on the day the code is run) has a meaningful date
+        # associated with it (today's current time)
+        # Anyway, here we undo that and display data on the date it was collected
+        # in order to show a meaningful title on the graph
+        if date == date.normalize():
+            collection_date = date - pd.Timedelta(days=1)
+        else:
+            collection_date = date.normalize()
+
+        fig.suptitle(collection_date.strftime(r"%b %-d, %Y"))
 
         for subplot_index, (stage, count) in enumerate(
             itertools.product(stage_list, count_list), start=1
