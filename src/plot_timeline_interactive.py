@@ -479,14 +479,17 @@ def make_usa_daybyday_interactive_timeline(
             {_PBI_TIMER_ELAPSED_TIME_MS} = 0
             if (dateSlider.value < maxDate) {{
                 dateSlider.value += 86400000;
-                dateSlider.change.emit();
-            }} else {{
+            }}
+
+            if (dateSlider.value >= maxDate) {{
                 console.log('reached end')
                 clearInterval({_PBI_TIMER});
                 {_PBI_IS_ACTIVE} = false;
                 playPauseButton.active = false;
                 playPauseButton.change.emit();
             }}
+
+            dateSlider.change.emit();
         }}
     """
 
