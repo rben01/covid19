@@ -405,11 +405,13 @@ def make_usa_daybyday_interactive_timeline(
             major_tick_in=13,
             major_tick_line_color="white",
             major_tick_line_width=1,
+            minor_tick_out=0,
             minor_tick_in=5,
             minor_tick_line_color="white",
             minor_tick_line_width=1,
             location=(0, 0),
             border_line_color=None,
+            bar_line_color=None,
             orientation="vertical",
         )
 
@@ -512,6 +514,8 @@ def make_usa_daybyday_interactive_timeline(
     update_on_date_change_callback = CustomJS(
         args={"source": bokeh_data_source},
         code=f"""
+
+        {_SETUP_WINDOW_PLAYBACK_INFO}
 
         const sliderValue = cb_obj.value;
         const sliderDate = new Date(sliderValue)
