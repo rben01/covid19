@@ -679,6 +679,8 @@ def make_usa_daybyday_interactive_timeline(
 
         if ({_PBI_IS_ACTIVE}) {{
             {_DO_START_TIMER}
+        }} else {{
+            {_PBI_TIMER_ELAPSED_TIME_MS} = 0
         }}
 
         console.log({_PLAYBACK_INFO})
