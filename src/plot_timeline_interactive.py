@@ -446,7 +446,7 @@ def make_usa_daybyday_interactive_timeline(
     _TIMER_START_DATE = "'startDate'"
     _TIMER_ELAPSED_TIME_MS = "'elapsedTime'"
     _SPEEDS_KEY = "'SPEEDS'"
-    _PLAYBACK_INFO = "window._playbackInfo"
+    _PLAYBACK_INFO = "playbackInfo"
 
     _PBI_TIMER = f"{_PLAYBACK_INFO}[{_TIMER_KEY}]"
     _PBI_IS_ACTIVE = f"{_PLAYBACK_INFO}[{_IS_ACTIVE_KEY}]"
@@ -458,8 +458,8 @@ def make_usa_daybyday_interactive_timeline(
     _PBI_CURR_INTERVAL = f"{_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]"
 
     _SETUP_WINDOW_PLAYBACK_INFO = f"""
-        if (typeof({_PLAYBACK_INFO}) === 'undefined') {{
-            {_PLAYBACK_INFO} = {{
+        if (typeof(window._playbackInfo) === 'undefined') {{
+            window._playbackInfo = {{
                 {_TIMER_KEY}: null,
                 {_IS_ACTIVE_KEY}: false,
                 {_SELECTED_INDEX_KEY}: 1,
@@ -469,6 +469,8 @@ def make_usa_daybyday_interactive_timeline(
                 {_SPEEDS_KEY}: [0.5, 1.0, 2.0]
             }};
         }}
+
+        var {_PLAYBACK_INFO} = window._playbackInfo
     """
 
     _DEFFUN_INCR_DATE = f"""
@@ -490,9 +492,17 @@ def make_usa_daybyday_interactive_timeline(
 
     _DO_START_TIMER = f"""
         {_PBI_TIMER_START_DATE} = new Date();
+
+        const initialInterval = (
+            {_PBI_TIMER_ELAPSED_TIME_MS} === 0 ?
+            0 :
+            Math.max({_PBI_CURR_INTERVAL} - {_PBI_TIMER_ELAPSED_TIME_MS}, 0)
+        );
+
+
         {_PBI_TIMER} = setTimeout(
             startLoopTimer,
-            Math.max({_PBI_CURR_INTERVAL} - {_PBI_TIMER_ELAPSED_TIME_MS}, 0)
+            initialInterval
         );
 
         function startLoopTimer() {{
@@ -586,12 +596,16 @@ def make_usa_daybyday_interactive_timeline(
         if (dateSlider.value >= maxDate) {{
             if (playPauseButton.active) {{
                 dateSlider.value = minDate;
-                dateSlider.change.emit()
+                dateSlider.change.emit();
+
+                // Hack to get timer to wait after date slider wraps; any nonzero number
+                // works but the smaller the better
+                {_PBI_TIMER_ELAPSED_TIME_MS} = 1;
             }}
         }}
 
         const active = cb_obj.active;
-        {_PBI_IS_ACTIVE} = active
+        {_PBI_IS_ACTIVE} = active;
 
         if (active) {{
             playPauseButton.label = 'Play/pause (playing)'
@@ -600,9 +614,6 @@ def make_usa_daybyday_interactive_timeline(
             playPauseButton.label = 'Play/pause (paused)'
             {_DO_STOP_TIMER}
         }}
-
-        console.log({_PBI_TIMER})
-
 
         """,
     )
