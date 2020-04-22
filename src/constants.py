@@ -92,8 +92,10 @@ class Paths:
 
             ROOT = ROOT.parent
 
+    ROOT_PARENT: Path = ROOT.parent
     DATA: Path = ROOT / "data"
-    FIGURES: Path = ROOT / "docs" / "figures"
+    DOCS: Path = ROOT / "docs"
+    FIGURES: Path = DOCS / "figures"
 
 
 class StrictEnumError(Exception):

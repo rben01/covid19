@@ -12,7 +12,7 @@ dependencies:
   - pandas>=1.0
   - matplotlib
   - seaborn
-  - bokeh
+  - bokeh=2.0.1
   - requests
   - geopandas>=0.7
   - descartes

@@ -84,6 +84,9 @@ from constants import (  # noqa E402
 )
 from plot_line_graphs import plot  # noqa E402
 from plot_timeline import plot_usa_daybyday_case_diffs, make_video  # noqa E402
+from plot_timeline_interactive import (
+    make_usa_daybyday_interactive_timeline,
+)  # noqa E402
 from typing_extensions import Literal  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
@@ -452,10 +455,11 @@ def _do_static_plots(df: pd.DataFrame):
 
 
 def _do_timeline(df: pd.DataFrame):
-    plot_usa_daybyday_case_diffs(
-        get_usa_states_df(df), stage=Select.ALL, count=Select.ALL
-    )
-    make_video(0.9)
+    usa_states_df = get_usa_states_df(df)
+    # plot_usa_daybyday_case_diffs(usa_states_df, stage=Select.ALL, count=Select.ALL)
+    # make_video(0.9)
+
+    make_usa_daybyday_interactive_timeline(usa_states_df)
 
 
 def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:

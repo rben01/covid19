@@ -1,6 +1,5 @@
 # %%
 import itertools
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, NewType, Tuple, Union
 
@@ -10,8 +9,8 @@ import geopandas
 import numpy as np
 import pandas as pd
 from bokeh.colors import RGB
-from bokeh.io import output_file, output_notebook, show
-from bokeh.layouts import gridplot, layout
+from bokeh.embed import autoload_static
+from bokeh.io import output_file
 from bokeh.layouts import column as layout_column
 from bokeh.layouts import row as layout_row
 from bokeh.models import (
@@ -27,6 +26,7 @@ from bokeh.models import (
 )
 from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
 from bokeh.models.tickers import FixedTicker
+from bokeh.resources import CDN
 from IPython.display import display  # noqa F401
 from shapely.geometry import mapping as shapely_mapping
 from typing_extensions import Literal
@@ -115,22 +115,18 @@ def get_geo_df() -> geopandas.GeoDataFrame:
     return geo_df
 
 
-def plot_usa_daybyday_case_diffs(
+def make_usa_daybyday_interactive_timeline(
     states_df: pd.DataFrame,
     *,
     geo_df: geopandas.GeoDataFrame = None,
-    stage: Union[DiseaseStage, Literal[Select.ALL]],
-    count: Union[Counting, Literal[Select.ALL]],
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+    count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
 ) -> pd.DataFrame:
-
-    from case_tracker import get_df, get_usa_states_df
-
-    states_df = get_usa_states_df(get_df(refresh_local_data=False), None)
 
     Counting.verify(count, allow_select=True)
     DiseaseStage.verify(stage, allow_select=True)
 
-    output_file("plot.html", mode="inline")
+    output_file("timeline.html", mode="cdn")
 
     STRING_DATE_COL = "String_Date_"
     FAKE_DATE_COL = "Fake_Date_"
@@ -143,7 +139,7 @@ def plot_usa_daybyday_case_diffs(
     N_CBAR_MAJOR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_BTWN_MAJOR_TICKS + 1
     CMAP = cmocean.cm.matter
     # CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
-    NOW_STR = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
+    # NOW_STR = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
     DATE_FMT = r"%Y-%m-%d"
 
     ID_COLS = [
@@ -251,8 +247,6 @@ def plot_usa_daybyday_case_diffs(
         selected_data_df[DIFF_COL] > 0, selected_data_df[DIFF_COL], "NaN"
     )
 
-    display(selected_data_df)
-
     bokeh_data_source = ColumnDataSource(selected_data_df)
 
     filters = [
@@ -323,8 +317,6 @@ def plot_usa_daybyday_case_diffs(
             high=vmax,
             nan_color="#f2f2f2",
         )
-
-        print(color_mapper)
 
         # Set axes titles
         fig_stage_name: str = {
@@ -425,7 +417,7 @@ def plot_usa_daybyday_case_diffs(
     # 2x2 grid (for now)
     plot_layout = np.reshape(figures, (len(stage_list), len(count_list))).tolist()
     for i, g in enumerate(plot_layout):
-        plot_layout[i] = layout_row(g, sizing_mode="scale_height")
+        plot_layout[i] = layout_row(g, sizing_mode="scale_both")
 
     update_on_date_change_callback = CustomJS(
         args={"source": bokeh_data_source},
@@ -469,7 +461,7 @@ def plot_usa_daybyday_case_diffs(
     date_slider = DateSlider(
         start=min_slider_date,
         end=max_date,
-        value=min_slider_date,
+        value=max_date,
         step=1,
         sizing_mode="stretch_width",
         width_policy="fit",
@@ -613,15 +605,23 @@ def plot_usa_daybyday_case_diffs(
             height_policy="min",
         )
     )
-    print(plot_layout)
     plot_layout = layout_column(plot_layout, sizing_mode="scale_both")
 
-    show(plot_layout)
     # grid = gridplot(figures, ncols=len(count_list), sizing_mode="stretch_both")
 
     # show(grid)
-    return selected_data_df
+
+    js_path = "load_bokeh.js"
+    js_code, tag_code = autoload_static(plot_layout, CDN, js_path)
+
+    with open(Paths.DOCS / js_path, "w") as s, open(Paths.DOCS / "div.html", "w") as d:
+        s.write(js_code)
+        d.write(tag_code)
+
+    return (js_code, tag_code)
 
 
 if __name__ == "__main__":
-    df = plot_usa_daybyday_case_diffs(None, stage=Select.ALL, count=Select.ALL)
+    df = make_usa_daybyday_interactive_timeline(
+        None, stage=Select.ALL, count=Select.ALL
+    )

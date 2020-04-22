@@ -2564,6 +2564,14 @@ video {
 <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
 <link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
 
+<script src="load_bokeh.js"></script>
+
+<!--
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"
+  integrity="sha384-JpP8FXbgAZLkfur7LiK3j9AGBhHNIvF742meBJrjO2ShJDhCG2I1uVvW+0DUtrmc"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"
+  integrity="sha384-xZlADit0Q04ISQEdKg2k3L4W9AwQBAuDs9nJL9fM/WwzL1tEU9VPNezOFX0nLEAz"></script> -->
+
 <script>
   function setPlaybackSpeed(player_id, speed) {
     const vdiv = document.getElementById(player_id)
@@ -2675,7 +2683,7 @@ video {
 </li>
 </ul>
 </li>
-<li><a href="#graphs-timeline-video">🗓 Video Timeline of New Cases Per Day</a></li>
+<li><a href="#graphs-timeline-video">🗓 Interactive Timeline of New Cases Per Day</a></li>
 </ul>
 </li>
 </ul>
@@ -2997,47 +3005,38 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 </div>
 </div>
 <div class="sect2">
-<h3 id="graphs-timeline-video"><a class="link" href="#graphs-timeline-video">🗓 Video Timeline of New Cases Per Day</a></h3>
+<h3 id="graphs-timeline-video"><a class="link" href="#graphs-timeline-video">🗓 Interactive Timeline of New Cases Per Day</a></h3>
 <div class="paragraph">
-<p>This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
-States that are white on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8. (Substitute a=1, b=10 and you&#8217;ll arrive at <a href="#pow-10-ticks">the same minor ticks as above</a>.)</p>
+<p>This section contains an interactive plot showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
+States that are light gray on a given day had no new cases/deaths that day.
+The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8. (Substitute a=1, b=10 and you&#8217;ll arrive at <a href="#pow-10-ticks">the same minor ticks as above</a>.)<br>
+The date slider can be dragged to pick a specific date.
+In addition, the play/pause button will step through date by date until it reaches the end.
+The "playback speed" buttons are self explanatory.</p>
 </div>
-<div id="usa-states-timeline-playback-speed">
-	<!-- onclick function first arg (id) must match what's in the asciidoc -->
-	<span id="usa-states-timeline-playback-speed-notice">Playback speed: </span>
-	<span id="usa-states-timeline-playback-speed-controls">
-		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-timeline-playback-speed"
-				id="usa-states-timeline-playback-speed-controls-half-speed"
-				onclick="setPlaybackSpeed('usa-states-timeline-video', 0.5)">0.5x
-		</label>
-		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-timeline-playback-speed"
-				id="usa-states-timeline-playback-speed-controls-normal-speed"
-				onclick="setPlaybackSpeed('usa-states-timeline-video', 1.0)" checked>1x
-		</label>
-		<label class="playback-speed-button">
-			<input type="radio" name="usa-states-timeline-playback-speed"
-				id="usa-states-timeline-playback-speed-controls-double-speed"
-				onclick="setPlaybackSpeed('usa-states-timeline-video', 2.0)">2x
-		</label>
-	</span>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If your device or browser isn&#8217;t well suited for interactivity, a static video showing the timeline is available <a href="./figures/Geo/dod_diffs.mp4">here</a>. If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device.<br>
+If you think your device is big enough and nothing is loading below, try refreshing the page.</p>
 </div>
-<div id="usa-states-timeline-video" class="videoblock usa-states-timeline-video-1">
-<div class="content">
-<video src="./figures/Geo/dod_diffs.mp4" poster="./figures/Geo/dod_diff_poster.png" controls loop>
-Your browser does not support the video tag.
-</video>
+</td>
+</tr>
+</table>
 </div>
-</div>
+<script src="load_bokeh.js" id="578dbd3b-8900-426d-af25-e045b9f7820d"></script>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-21 01:50:51 -0400
+Last updated 2020-04-22 03:04:14 -0400
 </div>
 </div>
 </body>

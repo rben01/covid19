@@ -360,16 +360,23 @@ image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{im
 image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-death-dir}/{img-usa-states}[{img-args}]
 
 [[graphs-timeline-video]]
-=== {icon-timeline-video} Video Timeline of New Cases Per Day
+=== {icon-timeline-video} Interactive Timeline of New Cases Per Day
 
-This section contains a single video showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
-States that are white on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8. (Substitute a=1, b=10 and you'll arrive at <<pow-10-ticks,the same minor ticks as above>>.)
+This section contains an interactive plot showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
+States that are light gray on a given day had no new cases/deaths that day.
+The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8. (Substitute a=1, b=10 and you'll arrive at <<pow-10-ticks,the same minor ticks as above>>.) +
+The date slider can be dragged to pick a specific date.
+In addition, the play/pause button will step through date by date until it reaches the end.
+The "playback speed" buttons are self explanatory.
+
+[TIP]
+--
+If your device or browser isn't well suited for interactivity, a static video showing the timeline is available link:{timeline-video-dir}/dod_diffs.mp4[here]. If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device. +
+If you think your device is big enough and nothing is loading below, try refreshing the page.
+--
+
 
 [pass]
 ++++
-include::adtl_html/playback_speed_buttons.html[]
+include::div.html[]
 ++++
-
-[[usa-states-timeline-video]]
-video::{timeline-video-dir}/dod_diffs.mp4[role="usa-states-timeline-video-1",poster="{timeline-video-dir}/dod_diff_poster.png",options="loop"]
