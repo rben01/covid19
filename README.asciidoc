@@ -249,7 +249,7 @@ If you think your device is big enough and nothing is loading below, try refresh
 
 [pass]
 ++++
-include::div.html[]
+include::usa_states_interactive_div.html[]
 ++++
 
 [[graphs-line]]

@@ -621,7 +621,9 @@ def make_usa_daybyday_interactive_timeline(
     js_path = "load_bokeh.js"
     js_code, tag_code = autoload_static(plot_layout, CDN, js_path)
 
-    with open(Paths.DOCS / js_path, "w") as s, open(Paths.DOCS / "div.html", "w") as d:
+    with open(Paths.DOCS / js_path, "w") as s, open(
+        Paths.DOCS / "usa_states_interactive_div.html", "w"
+    ) as d:
         s.write(js_code)
         d.write(tag_code)
 
