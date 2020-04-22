@@ -21,14 +21,13 @@ from bokeh.models import (
     CustomJS,
     DateSlider,
     GroupFilter,
+    HoverTool,
     LogColorMapper,
     RadioButtonGroup,
+    SaveTool,
     Toggle,
 )
-from bokeh.models.formatters import (
-    NumeralTickFormatter,
-    PrintfTickFormatter,
-)
+from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
 from bokeh.models.tickers import FixedTicker
 from bokeh.resources import CDN
 from IPython.display import display  # noqa F401
@@ -308,6 +307,7 @@ def make_usa_daybyday_interactive_timeline(
     # in order to show a meaningful title on the graph
 
     figures = []
+
     for subplot_index, (stage, count) in enumerate(
         itertools.product(stage_list, count_list)
     ):
@@ -365,19 +365,27 @@ def make_usa_daybyday_interactive_timeline(
 
         fig_title = " ".join(fig_title_components)
 
-        # Create figure object.
-        p = bplotting.figure(
-            title=fig_title,
-            title_location="above",
-            tools="save",
-            toolbar_location=None,
+        hover_tool = HoverTool(
             tooltips=[
                 ("Date", f"@{{{FAKE_DATE_COL}}}"),
                 ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
                 ("Count", f"@{{{DIFF_COL}}}"),
             ],
+            toggleable=False,
+        )
+
+        # Create figure object.
+        p = bplotting.figure(
+            title=fig_title,
+            title_location="above",
+            tools=[SaveTool(), hover_tool],
+            toolbar_location=None,
             aspect_ratio=1.5,
             output_backend="webgl",
+            lod_factor=100,
+            lod_interval=1000,
+            lod_threshold=1,
+            lod_timeout=500,
         )
 
         p.xgrid.grid_line_color = None
@@ -586,8 +594,8 @@ def make_usa_daybyday_interactive_timeline(
             }}
 
             source.change.emit();
-        }}
 
+        }}
 
         """,
     )
