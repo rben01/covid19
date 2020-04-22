@@ -2892,7 +2892,7 @@ If you think your device is big enough and nothing is loading below, try refresh
 </tr>
 </table>
 </div>
-<script src="load_bokeh.js" id="578dbd3b-8900-426d-af25-e045b9f7820d"></script>
+<script src="load_bokeh.js" id="5450032b-6133-40f8-9f3d-182587a53cb9"></script>
 </div>
 <div class="sect2">
 <h3 id="graphs-line"><a class="link" href="#graphs-line">📈 Line Charts</a></h3>
@@ -2907,9 +2907,10 @@ If you think your device is big enough and nothing is loading below, try refresh
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><span class="icon table-bullet"><i class="fa fa-calendar-day fa-lg"></i></span></p></td>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>The dates on the graphs' x-axes represent data collected in the 24-hour time span ending at the start of that date.
+<p>The dates on the graphs' x-axes represent data collected in the time span from the most recent occurrence midnight to the given date.
 For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
-This choice was made so that data for the current date, which has not yet had a full 24-hour period to be collected, could be faithfully represented on the graphs.<br>
+On the last day, there will be less than 24 hours of collected data, so the vertical line over <code>today</code> at <code>current time</code> represents the data collected from midnight (this morning) to now.
+By labeling data with the right endpoint of the data collection period, data can be represented faithfully regardless of whether or not it represents a full 24 hour data collection period (i.e., whether it is from today or from earlier).<br>
 Also, in all graphs below, the start date was simply the earliest date for which there was at least one region with at least one case.</p>
 </div></div></td>
 </tr>
@@ -3042,7 +3043,7 @@ The nature of log-scale graphs is that the CFR can be observed from the vertical
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-22 03:16:49 -0400
+Last updated 2020-04-22 10:21:57 -0400
 </div>
 </div>
 </body>

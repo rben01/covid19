@@ -8,17 +8,20 @@ from typing import List, Union
 
 import cmocean
 import geopandas
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from IPython.display import display  # noqa F401
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import NullLocator, NullFormatter
+from matplotlib.ticker import NullFormatter, NullLocator
 from mpl_toolkits.axes_grid1 import axes_size, make_axes_locatable
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
 from plotting_utils import format_float, resize_to_even_dims
+
+matplotlib.use("agg")
 
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"

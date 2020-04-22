@@ -21,7 +21,7 @@ from bokeh.models import (
     DateSlider,
     GroupFilter,
     LogColorMapper,
-    RadioGroup,
+    RadioButtonGroup,
     Toggle,
 )
 from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
@@ -164,6 +164,13 @@ def make_usa_daybyday_interactive_timeline(
 
     count_list: List[Counting]
     stage_list: List[DiseaseStage]
+
+    # Unadjust dates (see SaveFormats._adjust_dates)
+    states_df = states_df.copy()
+    normalized_dates = states_df[Columns.DATE].dt.normalize()
+    is_at_midnight = states_df[Columns.DATE] == normalized_dates
+    states_df.loc[is_at_midnight, Columns.DATE] -= pd.Timedelta(days=1)
+    states_df.loc[~is_at_midnight, Columns.DATE] = normalized_dates[~is_at_midnight]
 
     min_date, max_date = states_df[Columns.DATE].agg(["min", "max"])
     dates: List[pd.Timestamp] = pd.date_range(start=min_date, end=max_date, freq="D")
@@ -335,8 +342,8 @@ def make_usa_daybyday_interactive_timeline(
             title_location="above",
             toolbar_location=None,
             tooltips=[
-                ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
                 ("Date", f"@{{{FAKE_DATE_COL}}}"),
+                ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
                 ("Count", f"@{{{DIFF_COL}}}"),
             ],
             tools="save",
@@ -586,7 +593,7 @@ def make_usa_daybyday_interactive_timeline(
     """,
     )
 
-    playback_speed_radio = RadioGroup(
+    playback_speed_radio = RadioButtonGroup(
         labels=["0.5x speed", "1x speed", "2x speed"],
         active=1,
         sizing_mode="stretch_width",

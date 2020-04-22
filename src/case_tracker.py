@@ -46,6 +46,21 @@ if __name__ == "__main__":
             ),
         )
 
+        interactive_group = parser.add_mutually_exclusive_group()
+        interactive_group.add_argument(
+            "--no-interactive",
+            action="store_true",
+            help="Don't create the interactive USA timeline",
+        )
+        interactive_group.add_argument(
+            "--force-interactive",
+            action="store_true",
+            help=(
+                "Unconditionally create the USA interactive timeline "
+                + "(even when there's no new data)"
+            ),
+        )
+
         data_group = parser.add_mutually_exclusive_group()
         data_group.add_argument(
             "--use-web-data",
@@ -64,7 +79,6 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
 
-import io  # noqa E402
 from typing import Union  # noqa E402
 
 import pandas as pd  # noqa E402
@@ -82,11 +96,6 @@ from constants import (  # noqa E402
     Paths,
     Select,
 )
-from plot_line_graphs import plot  # noqa E402
-from plot_timeline import plot_usa_daybyday_case_diffs, make_video  # noqa E402
-from plot_timeline_interactive import (
-    make_usa_daybyday_interactive_timeline,
-)  # noqa E402
 from typing_extensions import Literal  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
@@ -380,6 +389,8 @@ def is_new_data(df: pd.DataFrame) -> bool:
     same
     :rtype: bool
     """
+    import io
+
     with io.StringIO() as s:
         save_as_data_table(df, s)
         new_data = s.getvalue()
@@ -399,6 +410,8 @@ def is_new_data(df: pd.DataFrame) -> bool:
 
 
 def _do_static_plots(df: pd.DataFrame):
+    from plot_line_graphs import plot
+
     world_df = get_world_df(df)
     usa_states_df = get_usa_states_df(df, 10)
     countries_with_china_df = get_countries_df(df, 10, include_china=True)
@@ -455,11 +468,18 @@ def _do_static_plots(df: pd.DataFrame):
 
 
 def _do_timeline(df: pd.DataFrame):
-    usa_states_df = get_usa_states_df(df)
-    plot_usa_daybyday_case_diffs(usa_states_df, stage=Select.ALL, count=Select.ALL)
+    from plot_timeline import plot_usa_daybyday_case_diffs, make_video
+
+    plot_usa_daybyday_case_diffs(
+        get_usa_states_df(df), stage=Select.ALL, count=Select.ALL
+    )
     make_video(0.9)
 
-    make_usa_daybyday_interactive_timeline(usa_states_df)
+
+def _do_interactive(df: pd.DataFrame):
+    from plot_timeline_interactive import make_usa_daybyday_interactive_timeline
+
+    make_usa_daybyday_interactive_timeline(get_usa_states_df(df))
 
 
 def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
@@ -487,6 +507,8 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         namespace.force_graphs = False
         namespace.no_timeline = False
         namespace.force_timeline = False
+        namespace.no_interactive = False
+        namespace.force_interactive = False
 
     for k, v in kwargs.items():
         setattr(namespace, k, v)
@@ -501,6 +523,9 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
 
         if namespace.force_timeline:
             _do_timeline(df)
+
+        if namespace.force_interactive:
+            _do_interactive(df)
     else:
         print("Got new data")
         if namespace.create_data_table:
@@ -512,13 +537,13 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         if not namespace.no_timeline:
             _do_timeline(df)
 
+        if not namespace.no_interactive:
+            _do_interactive(df)
+
     return df
 
 
 if __name__ == "__main__" and IN_A_TERMINAL:
-    import matplotlib
-
-    matplotlib.use("agg")
     df = main(args)
 
 # A little hack -- an ipython cell that will run in an interactive window but not when
