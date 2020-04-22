@@ -456,8 +456,8 @@ def _do_static_plots(df: pd.DataFrame):
 
 def _do_timeline(df: pd.DataFrame):
     usa_states_df = get_usa_states_df(df)
-    # plot_usa_daybyday_case_diffs(usa_states_df, stage=Select.ALL, count=Select.ALL)
-    # make_video(0.9)
+    plot_usa_daybyday_case_diffs(usa_states_df, stage=Select.ALL, count=Select.ALL)
+    make_video(0.9)
 
     make_usa_daybyday_interactive_timeline(usa_states_df)
 
