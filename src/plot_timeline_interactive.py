@@ -12,6 +12,7 @@ from bokeh.colors import RGB
 from bokeh.embed import autoload_static
 from bokeh.io import output_file
 from bokeh.layouts import column as layout_column
+from bokeh.layouts import gridplot
 from bokeh.layouts import row as layout_row
 from bokeh.models import (
     CDSView,
@@ -340,15 +341,17 @@ def make_usa_daybyday_interactive_timeline(
         p = bplotting.figure(
             title=fig_title,
             title_location="above",
+            tools="save",
             toolbar_location=None,
             tooltips=[
                 ("Date", f"@{{{FAKE_DATE_COL}}}"),
                 ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
                 ("Count", f"@{{{DIFF_COL}}}"),
             ],
-            tools="save",
             aspect_ratio=1.5,
+            output_backend="webgl",
         )
+
         p.xgrid.grid_line_color = None
         p.ygrid.grid_line_color = None
         # Add patch renderer to figure.
@@ -422,58 +425,17 @@ def make_usa_daybyday_interactive_timeline(
         figures.append(p)
 
     # 2x2 grid (for now)
-    plot_layout = np.reshape(figures, (len(stage_list), len(count_list))).tolist()
-    for i, g in enumerate(plot_layout):
-        plot_layout[i] = layout_row(g, sizing_mode="scale_both")
+    plot_layout = [
+        gridplot(
+            figures,
+            ncols=len(count_list),
+            toolbar_location="above",
+            sizing_mode="scale_both",
+        )
+    ]
 
-    update_on_date_change_callback = CustomJS(
-        args={"source": bokeh_data_source},
-        code=f"""
-
-        const sliderValue = cb_obj.value;
-        const sliderDate = new Date(sliderValue)
-        // Ugh, actually requiring the date to be YYYY-MM-DD
-        const dateStr = sliderDate.toISOString().split('T')[0]
-
-        const data = source.data;
-
-        if (typeof(data[dateStr]) !== 'undefined') {{
-            data['{DIFF_COL}'] = data[dateStr]
-
-            const diffCol = data['{DIFF_COL}'];
-            const diffColorCol = data['{DIFF_COLOR_COL}'];
-            const fakeDateCol = data['{FAKE_DATE_COL}']
-
-            for (var i = 0; i < data['{DIFF_COL}'].length; i++) {{
-                const diff = diffCol[i]
-                if (diff == 0) {{
-                    diffColorCol[i] = 'NaN';
-                }} else {{
-                    diffColorCol[i] = diff;
-                }}
-
-                fakeDateCol[i] = dateStr;
-            }}
-
-            source.change.emit();
-        }}
-
-
-        """,
-    )
-
-    # Taking day-over-day diffs means the min slider day is one more than the min data
-    # date
-    min_slider_date = min_date + pd.Timedelta(days=1)
-    date_slider = DateSlider(
-        start=min_slider_date,
-        end=max_date,
-        value=max_date,
-        step=1,
-        sizing_mode="stretch_width",
-        width_policy="fit",
-    )
-    date_slider.js_on_change("value", update_on_date_change_callback)
+    # for i, g in enumerate(plot_layout):
+    #     plot_layout[i] = layout_row(g, sizing_mode="scale_both")
 
     _TIMER_KEY = "'timer'"
     _IS_ACTIVE_KEY = "'isActive'"
@@ -507,7 +469,7 @@ def make_usa_daybyday_interactive_timeline(
         }}
     """
 
-    _DEFFUN_UPDATE_DATE = f"""
+    _DEFFUN_INCR_DATE = f"""
         function updateDate() {{
             {_PBI_TIMER_START_DATE} = new Date();
             {_PBI_TIMER_ELAPSED_TIME_MS} = 0
@@ -547,6 +509,57 @@ def make_usa_daybyday_interactive_timeline(
         clearInterval({_PBI_TIMER});
     """
 
+    update_on_date_change_callback = CustomJS(
+        args={"source": bokeh_data_source},
+        code=f"""
+
+        const sliderValue = cb_obj.value;
+        const sliderDate = new Date(sliderValue)
+        // Ugh, actually requiring the date to be YYYY-MM-DD
+        const dateStr = sliderDate.toISOString().split('T')[0]
+
+        const data = source.data;
+
+        {_PBI_TIMER_ELAPSED_TIME_MS} = 0
+
+        if (typeof(data[dateStr]) !== 'undefined') {{
+            data['{DIFF_COL}'] = data[dateStr]
+
+            const diffCol = data['{DIFF_COL}'];
+            const diffColorCol = data['{DIFF_COLOR_COL}'];
+            const fakeDateCol = data['{FAKE_DATE_COL}']
+
+            for (var i = 0; i < data['{DIFF_COL}'].length; i++) {{
+                const diff = diffCol[i]
+                if (diff == 0) {{
+                    diffColorCol[i] = 'NaN';
+                }} else {{
+                    diffColorCol[i] = diff;
+                }}
+
+                fakeDateCol[i] = dateStr;
+            }}
+
+            source.change.emit();
+        }}
+
+
+        """,
+    )
+
+    # Taking day-over-day diffs means the min slider day is one more than the min data
+    # date
+    min_slider_date = min_date + pd.Timedelta(days=1)
+    date_slider = DateSlider(
+        start=min_slider_date,
+        end=max_date,
+        value=max_date,
+        step=1,
+        sizing_mode="stretch_width",
+        width_policy="fit",
+    )
+    date_slider.js_on_change("value", update_on_date_change_callback)
+
     play_pause_button = Toggle(
         label="Play/pause (paused)",
         button_type="success",
@@ -564,7 +577,7 @@ def make_usa_daybyday_interactive_timeline(
         code=f"""
 
         {_SETUP_WINDOW_PLAYBACK_INFO}
-        {_DEFFUN_UPDATE_DATE}
+        {_DEFFUN_INCR_DATE}
 
         if (dateSlider.value >= maxDate) {{
             if (playPauseButton.active) {{
@@ -601,7 +614,7 @@ def make_usa_daybyday_interactive_timeline(
         code=f"""
 
         {_SETUP_WINDOW_PLAYBACK_INFO}
-        {_DEFFUN_UPDATE_DATE}
+        {_DEFFUN_INCR_DATE}
 
         if ({_PBI_TIMER} !== null) {{
             {_DO_STOP_TIMER}
