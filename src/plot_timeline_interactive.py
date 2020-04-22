@@ -25,7 +25,10 @@ from bokeh.models import (
     RadioButtonGroup,
     Toggle,
 )
-from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
+from bokeh.models.formatters import (
+    NumeralTickFormatter,
+    PrintfTickFormatter,
+)
 from bokeh.models.tickers import FixedTicker
 from bokeh.resources import CDN
 from IPython.display import display  # noqa F401
@@ -213,11 +216,9 @@ def make_usa_daybyday_interactive_timeline(
 
     # case_diffs_df.loc[case_diffs_df[DIFF_COL] == 0, DIFF_COL] = "NaN"
 
-    full_data_df: geopandas.GeoDataFrame = geo_df.merge(
+    selected_data_df: pd.DataFrame = geo_df.merge(
         case_diffs_df, how="inner", on=Columns.TWO_LETTER_STATE_CODE,
-    )
-
-    selected_data_df: pd.DataFrame = full_data_df[
+    )[
         [
             Columns.TWO_LETTER_STATE_CODE,
             Columns.DATE,
@@ -227,6 +228,39 @@ def make_usa_daybyday_interactive_timeline(
             DIFF_COL,
         ]
     ]
+
+    dates = case_diffs_df[Columns.DATE].unique()
+    del case_diffs_df
+
+    values_mins_maxs = (
+        selected_data_df[selected_data_df[DIFF_COL] > 0]
+        .groupby([Columns.STAGE, Columns.COUNT_TYPE])[DIFF_COL]
+        .agg(["min", "max"])
+    )
+
+    vmins: pd.Series = values_mins_maxs["min"]
+    vmaxs: pd.Series = values_mins_maxs["max"]
+
+    pow10s_series: pd.Series = vmaxs.map(lambda x: int(10 ** (-np.floor(np.log10(x)))))
+
+    vmins: dict = vmins.to_dict()
+    vmaxs: dict = vmaxs.to_dict()
+
+    for stage in DiseaseStage:
+        _value_key = (stage.name, Counting.PER_CAPITA.name)
+        _max_pow10 = pow10s_series.loc[(slice(None), Counting.PER_CAPITA.name)].max()
+        vmins[_value_key] *= _max_pow10
+        vmaxs[_value_key] *= _max_pow10
+        pow10s_series[_value_key] = _max_pow10
+
+    percap_pow10s: pd.Series = selected_data_df.apply(
+        lambda row: pow10s_series[(row[Columns.STAGE], row[Columns.COUNT_TYPE])],
+        axis=1,
+    )
+
+    _per_cap_rows = selected_data_df[Columns.COUNT_TYPE] == Counting.PER_CAPITA.name
+
+    selected_data_df.loc[_per_cap_rows, DIFF_COL] *= percap_pow10s.loc[_per_cap_rows]
 
     # selected_data_df[Columns.DATE] = selected_data_df[Columns.DATE].dt.strftime(
     #     r"%Y-%m-%d"
@@ -251,6 +285,7 @@ def make_usa_daybyday_interactive_timeline(
 
     selected_data_df[DIFF_COL] = selected_data_df[max_date_str]
     selected_data_df[FAKE_DATE_COL] = max_date_str
+
     selected_data_df[DIFF_COLOR_COL] = np.where(
         selected_data_df[DIFF_COL] > 0, selected_data_df[DIFF_COL], "NaN"
     )
@@ -264,16 +299,6 @@ def make_usa_daybyday_interactive_timeline(
         ]
         for stage, count in itertools.product(stage_list, count_list)
     ]
-
-    dates = case_diffs_df[Columns.DATE].unique()
-
-    vmins = {
-        Counting.TOTAL_CASES: 1,
-        Counting.PER_CAPITA: case_diffs_df.loc[
-            case_diffs_df[DIFF_COL].replace("NaN", 0) > 0, DIFF_COL
-        ].min(),
-    }
-    vmaxs = case_diffs_df.groupby([Columns.STAGE, Columns.COUNT_TYPE])[DIFF_COL].max()
 
     # Data is associated with the right endpoint of the data collection period,
     # e.g., data collected *on* March 20 is labeled March 21 -- this is done so that
@@ -304,12 +329,24 @@ def make_usa_daybyday_interactive_timeline(
 
         view = CDSView(source=bokeh_data_source, filters=filters[subplot_index])
 
-        vmin = vmins[count]
-        vmax = vmaxs.loc[(stage.name, count.name)]
+        vmin = vmins[(stage.name, count.name)]
+        vmax = vmaxs[(stage.name, count.name)]
+
+        # Set axes titles
+        fig_stage_name: str = {
+            DiseaseStage.CONFIRMED: "Cases",
+            DiseaseStage.DEATH: "Deaths",
+        }[stage]
+        fig_title_components: List[str] = ["New Daily", fig_stage_name]
 
         if count is Counting.PER_CAPITA:
-            formatter = PrintfTickFormatter(format=r"%.2e")
+            formatter = PrintfTickFormatter(
+                format=r"%2.3f"
+            )  # BasicTickFormatter()  # NumeralTickFormatter(format="0.00[00]")
+            # NumeralTickFormatter(format="0.0")
             label_standoff = 12
+            _per_cap_denom = pow10s_series[(stage.name, count.name)]
+            fig_title_components.append(f"Per {_per_cap_denom:,d} people")
         else:
             formatter = NumeralTickFormatter(format="0.0a")
             label_standoff = 8
@@ -325,15 +362,6 @@ def make_usa_daybyday_interactive_timeline(
             high=vmax,
             nan_color="#f2f2f2",
         )
-
-        # Set axes titles
-        fig_stage_name: str = {
-            DiseaseStage.CONFIRMED: "Cases",
-            DiseaseStage.DEATH: "Deaths",
-        }[stage]
-        fig_title_components: List[str] = ["New Daily", fig_stage_name]
-        if count is Counting.PER_CAPITA:
-            fig_title_components.append("Per Capita")
 
         fig_title = " ".join(fig_title_components)
 

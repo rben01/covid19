@@ -242,6 +242,7 @@ The "playback speed" buttons are self explanatory.
 
 [NOTE]
 --
+The interactive timeline takes quite a while to load.
 If your device or browser isn't well suited for interactivity, a static video showing the timeline is available link:{timeline-video-dir}/dod_diffs.mp4[here]. +
 If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device.
 If you think your device is big enough and nothing is loading below, try refreshing the page.
