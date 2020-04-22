@@ -1,5 +1,4 @@
 # %%
-import functools
 import itertools
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,14 +10,11 @@ import geopandas
 import numpy as np
 import pandas as pd
 from bokeh.colors import RGB
-from bokeh.io import curdoc, output_file, output_notebook, show
-from bokeh.layouts import Spacer
-from bokeh.layouts import column as layout_column
+from bokeh.io import output_file, output_notebook, show
 from bokeh.layouts import gridplot, layout
+from bokeh.layouts import column as layout_column
 from bokeh.layouts import row as layout_row
 from bokeh.models import (
-    BooleanFilter,
-    Button,
     CDSView,
     ColorBar,
     ColumnDataSource,
@@ -29,19 +25,13 @@ from bokeh.models import (
     RadioGroup,
     Toggle,
 )
-from bokeh.models.formatters import (
-    BasicTickFormatter,
-    LogTickFormatter,
-    NumeralTickFormatter,
-    PrintfTickFormatter,
-)
-from bokeh.models.tickers import FixedTicker, LogTicker
+from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
+from bokeh.models.tickers import FixedTicker
 from IPython.display import display  # noqa F401
 from shapely.geometry import mapping as shapely_mapping
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
-from plotting_utils import format_float
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 DOD_DIFF_DIR: Path = GEO_FIG_DIR / "DayOverDayDiffs"
@@ -147,15 +137,12 @@ def plot_usa_daybyday_case_diffs(
     DIFF_COL = "Diff_"
     DIFF_COLOR_COL = "Diff_Color_"
 
-    ASPECT_RATIO = 1 / 20
-    PAD_FRAC = 0.5
     N_CBAR_BUCKETS = 6  # only used when bucketing colormap into discrete regions
     N_BUCKETS_BTWN_MAJOR_TICKS = 1
     N_MINOR_TICKS_BTWN_MAJOR_TICKS = 8  # major_1, minor_1, ..., minor_n, major_2
     N_CBAR_MAJOR_TICKS = N_CBAR_BUCKETS // N_BUCKETS_BTWN_MAJOR_TICKS + 1
     CMAP = cmocean.cm.matter
     # CMAP = ListedColormap(cmocean.cm.matter(np.linspace(0, 1, N_CBAR_BUCKETS)))
-    DPI = 300
     NOW_STR = datetime.now(timezone.utc).strftime(r"%b %-d, %Y at %H:%M UTC")
     DATE_FMT = r"%Y-%m-%d"
 
@@ -168,8 +155,6 @@ def plot_usa_daybyday_case_diffs(
 
     if geo_df is None:
         geo_df = get_geo_df()
-
-    save_fig_kwargs = {"dpi": "figure", "bbox_inches": "tight", "facecolor": "w"}
 
     if count is Select.ALL:
         count_list = list(Counting)
@@ -288,10 +273,6 @@ def plot_usa_daybyday_case_diffs(
     }
     vmaxs = case_diffs_df.groupby([Columns.STAGE, Columns.COUNT_TYPE])[DIFF_COL].max()
 
-    # Don't put too much stock in these, we tweak them later to make sure they're even
-    fig_width_px = len(count_list) * 1800
-    fig_height_px = len(stage_list) * 1000 + 200
-
     # Data is associated with the right endpoint of the data collection period,
     # e.g., data collected *on* March 20 is labeled March 21 -- this is done so that
     # data collected today (on the day the code is run) has a meaningful date
@@ -367,6 +348,8 @@ def plot_usa_daybyday_case_diffs(
                 ("Count", f"@{{{DIFF_COL}}}"),
             ],
             tools="save",
+            aspect_ratio=1.5,
+            sizing_mode="scale_both",
         )
         p.xgrid.grid_line_color = None
         p.ygrid.grid_line_color = None
@@ -440,7 +423,10 @@ def plot_usa_daybyday_case_diffs(
 
         figures.append(p)
 
-    plot_grid = np.reshape(figures, (len(stage_list), len(count_list))).tolist()
+    # 2x2 grid (for now)
+    plot_layout = np.reshape(figures, (len(stage_list), len(count_list))).tolist()
+    for i, g in enumerate(plot_layout):
+        plot_layout[i] = layout_row(g, sizing_mode="scale_both")
 
     update_on_date_change_callback = CustomJS(
         args={"source": bokeh_data_source},
@@ -486,9 +472,7 @@ def plot_usa_daybyday_case_diffs(
         end=max_date,
         value=min_slider_date,
         step=1,
-        height_policy="min",
-        width_policy="max",
-        # sizing_mode="stretch_width",
+        sizing_mode="stretch_width",
     )
     date_slider.js_on_change("value", update_on_date_change_callback)
 
@@ -535,7 +519,6 @@ def plot_usa_daybyday_case_diffs(
         label="Play/pause (paused)",
         button_type="success",
         active=False,
-        height_policy="min",
         sizing_mode="stretch_width",
     )
 
@@ -614,23 +597,15 @@ def plot_usa_daybyday_case_diffs(
     playback_speed_radio = RadioGroup(
         labels=["0.5x speed", "1x speed", "2x speed"],
         active=1,
-        width=200,
-        orientation="horizontal",
+        sizing_mode="stretch_width",
     )
     playback_speed_radio.js_on_click(change_playback_speed_callback)
 
-    plot_grid.append(date_slider)
-    plot_grid.append(
-        layout_row(
-            [play_pause_button, playback_speed_radio],
-            sizing_mode="stretch_width",
-            height_policy="min",
-        ),
-    )
+    plot_layout.append(date_slider)
+    plot_layout.append([play_pause_button, playback_speed_radio])
+    plot_layout = layout(plot_layout, sizing_mode="scale_both")
 
-    print(plot_grid)
-
-    show(layout(plot_grid, sizing_mode="stretch_both"))
+    show(plot_layout)
     # grid = gridplot(figures, ncols=len(count_list), sizing_mode="stretch_both")
 
     # show(grid)
