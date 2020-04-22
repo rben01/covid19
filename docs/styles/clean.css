@@ -2171,7 +2171,7 @@ a span.icon>.fa {
 
 .admonitionblock td.icon .icon-warning::before {
   content: "\f071";
-  color: #bf6900
+  color: #f8b90a
 }
 
 .admonitionblock td.icon .icon-caution::before {

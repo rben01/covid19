@@ -240,7 +240,7 @@ The date slider can be dragged to view a specific date.
 In addition, the play/pause button will step through date by date until it reaches the end.
 The "playback speed" buttons are self explanatory.
 
-[TIP]
+[NOTE]
 --
 If your device or browser isn't well suited for interactivity, a static video showing the timeline is available link:{timeline-video-dir}/dod_diffs.mp4[here]. If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device. +
 If you think your device is big enough and nothing is loading below, try refreshing the page.
