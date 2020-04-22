@@ -229,8 +229,6 @@ And the true CFR within a region can itself change over time as treatment qualit
 [[sect-graphs]]
 == {icon-graphs} Graphs
 
-[[graphs-line]]
-=== {icon-line-graphs} Line Charts
 
 [[graphs-timeline-video]]
 === {icon-timeline-video} Interactive Timeline of New Cases Per Day
@@ -253,6 +251,9 @@ If you think your device is big enough and nothing is loading below, try refresh
 ++++
 include::div.html[]
 ++++
+
+[[graphs-line]]
+=== {icon-line-graphs} Line Charts
 
 [[sect-reading-graphs]]
 ==== {icon-reading-graphs} Reading the Line Charts
