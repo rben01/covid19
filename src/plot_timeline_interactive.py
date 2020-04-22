@@ -429,8 +429,8 @@ def make_usa_daybyday_interactive_timeline(
         gridplot(
             figures,
             ncols=len(count_list),
-            toolbar_location="above",
             sizing_mode="scale_both",
+            toolbar_location=None,
         )
     ]
 
