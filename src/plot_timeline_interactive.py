@@ -349,7 +349,6 @@ def plot_usa_daybyday_case_diffs(
             ],
             tools="save",
             aspect_ratio=1.5,
-            sizing_mode="scale_both",
         )
         p.xgrid.grid_line_color = None
         p.ygrid.grid_line_color = None
@@ -426,7 +425,7 @@ def plot_usa_daybyday_case_diffs(
     # 2x2 grid (for now)
     plot_layout = np.reshape(figures, (len(stage_list), len(count_list))).tolist()
     for i, g in enumerate(plot_layout):
-        plot_layout[i] = layout_row(g, sizing_mode="scale_both")
+        plot_layout[i] = layout_row(g, sizing_mode="scale_height")
 
     update_on_date_change_callback = CustomJS(
         args={"source": bokeh_data_source},
@@ -473,6 +472,7 @@ def plot_usa_daybyday_case_diffs(
         value=min_slider_date,
         step=1,
         sizing_mode="stretch_width",
+        width_policy="fit",
     )
     date_slider.js_on_change("value", update_on_date_change_callback)
 
@@ -601,9 +601,20 @@ def plot_usa_daybyday_case_diffs(
     )
     playback_speed_radio.js_on_click(change_playback_speed_callback)
 
-    plot_layout.append(date_slider)
-    plot_layout.append([play_pause_button, playback_speed_radio])
-    plot_layout = layout(plot_layout, sizing_mode="scale_both")
+    plot_layout.append(
+        layout_column(
+            [
+                date_slider,
+                layout_row(
+                    [play_pause_button, playback_speed_radio], height_policy="min",
+                ),
+            ],
+            width_policy="fit",
+            height_policy="min",
+        )
+    )
+    print(plot_layout)
+    plot_layout = layout_column(plot_layout, sizing_mode="scale_both")
 
     show(plot_layout)
     # grid = gridplot(figures, ncols=len(count_list), sizing_mode="stretch_both")
