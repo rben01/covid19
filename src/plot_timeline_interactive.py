@@ -479,14 +479,19 @@ def make_usa_daybyday_interactive_timeline(
     _IS_ACTIVE_KEY = "'isActive'"
     _SELECTED_INDEX_KEY = "'selectedIndex'"
     _BASE_INTERVAL_KEY = "'BASE_INTERVAL'"
+    _TIMER_START_DATE = "'startDate'"
+    _TIMER_ELAPSED_TIME_MS = "'elapsedTime'"
     _SPEEDS_KEY = "'SPEEDS'"
     _PLAYBACK_INFO = "window._playbackInfo"
 
     _PBI_TIMER = f"{_PLAYBACK_INFO}[{_TIMER_KEY}]"
     _PBI_IS_ACTIVE = f"{_PLAYBACK_INFO}[{_IS_ACTIVE_KEY}]"
     _PBI_SELECTED_INDEX = f"{_PLAYBACK_INFO}[{_SELECTED_INDEX_KEY}]"
+    _PBI_TIMER_START_DATE = f"{_PLAYBACK_INFO}[{_TIMER_START_DATE}]"
+    _PBI_TIMER_ELAPSED_TIME_MS = f"{_PLAYBACK_INFO}[{_TIMER_ELAPSED_TIME_MS}]"
     _PBI_BASE_INTERVAL = f"{_PLAYBACK_INFO}[{_BASE_INTERVAL_KEY}]"
     _PBI_SPEEDS = f"{_PLAYBACK_INFO}[{_SPEEDS_KEY}]"
+    _PBI_CURR_INTERVAL = f"{_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]"
 
     _SETUP_WINDOW_PLAYBACK_INFO = f"""
         if (typeof({_PLAYBACK_INFO}) === 'undefined') {{
@@ -494,14 +499,18 @@ def make_usa_daybyday_interactive_timeline(
                 {_TIMER_KEY}: null,
                 {_IS_ACTIVE_KEY}: false,
                 {_SELECTED_INDEX_KEY}: 1,
+                {_TIMER_START_DATE}: null,
+                {_TIMER_ELAPSED_TIME_MS}: 0,
                 {_BASE_INTERVAL_KEY}: 1000,
                 {_SPEEDS_KEY}: [0.5, 1.0, 2.0]
             }};
         }}
     """
 
-    _UPDATE_DATE_FUNC = f"""
+    _DEFFUN_UPDATE_DATE = f"""
         function updateDate() {{
+            {_PBI_TIMER_START_DATE} = new Date();
+            {_PBI_TIMER_ELAPSED_TIME_MS} = 0
             if (dateSlider.value < maxDate) {{
                 dateSlider.value += 86400000;
                 dateSlider.change.emit();
@@ -514,6 +523,30 @@ def make_usa_daybyday_interactive_timeline(
             }}
         }}
     """
+
+    _DO_START_TIMER = f"""
+        {_PBI_TIMER_START_DATE} = new Date();
+        {_PBI_TIMER} = setTimeout(
+            startLoopTimer,
+            Math.max({_PBI_CURR_INTERVAL} - {_PBI_TIMER_ELAPSED_TIME_MS}, 0)
+        );
+
+        function startLoopTimer() {{
+            updateDate();
+            if ({_PBI_IS_ACTIVE}) {{
+                {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL})
+            }}
+        }}
+    """
+
+    _DO_STOP_TIMER = f"""
+        const now = new Date();
+        {_PBI_TIMER_ELAPSED_TIME_MS} += (
+            now.getTime() - {_PBI_TIMER_START_DATE}.getTime()
+        );
+        clearInterval({_PBI_TIMER});
+    """
+
     play_pause_button = Toggle(
         label="Play/pause (paused)",
         button_type="success",
@@ -531,7 +564,7 @@ def make_usa_daybyday_interactive_timeline(
         code=f"""
 
         {_SETUP_WINDOW_PLAYBACK_INFO}
-        {_UPDATE_DATE_FUNC}
+        {_DEFFUN_UPDATE_DATE}
 
         if (dateSlider.value >= maxDate) {{
             if (playPauseButton.active) {{
@@ -544,15 +577,11 @@ def make_usa_daybyday_interactive_timeline(
         {_PBI_IS_ACTIVE} = active
 
         if (active) {{
-            const interval = (
-                {_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]
-            );
-            console.log(interval)
             playPauseButton.label = 'Play/pause (playing)'
-            {_PBI_TIMER} = setInterval(updateDate, interval);
+            {_DO_START_TIMER}
         }} else {{
-            clearInterval({_PBI_TIMER});
             playPauseButton.label = 'Play/pause (paused)'
+            {_DO_STOP_TIMER}
         }}
 
         console.log({_PBI_TIMER})
@@ -572,20 +601,17 @@ def make_usa_daybyday_interactive_timeline(
         code=f"""
 
         {_SETUP_WINDOW_PLAYBACK_INFO}
-        {_UPDATE_DATE_FUNC}
+        {_DEFFUN_UPDATE_DATE}
 
         if ({_PBI_TIMER} !== null) {{
-            clearInterval({_PBI_TIMER});
+            {_DO_STOP_TIMER}
         }}
 
         const selectedIndex = cb_obj.active;
         {_PBI_SELECTED_INDEX} = selectedIndex;
-        const interval = (
-            {_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[selectedIndex]
-        );
 
         if ({_PBI_IS_ACTIVE}) {{
-            {_PBI_TIMER} = setInterval(updateDate, interval)
+            {_DO_START_TIMER}
         }}
 
         console.log({_PLAYBACK_INFO})
