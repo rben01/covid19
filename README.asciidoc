@@ -235,8 +235,8 @@ And the true CFR within a region can itself change over time as treatment qualit
 
 This section contains an interactive plot showing the number of new cases and deaths, total and per capita, in the 48 continental U.S. states and Washington, D.C.
 States that are light gray on a given day had no new cases/deaths that day.
-The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8. (Substitute a=1, b=10 and you'll arrive at <<pow-10-ticks,the same minor ticks as above>>.) +
-The date slider can be dragged to pick a specific date.
+The colorbars are logarithmically scaled; each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8. +
+The date slider can be dragged to view a specific date.
 In addition, the play/pause button will step through date by date until it reaches the end.
 The "playback speed" buttons are self explanatory.
 
