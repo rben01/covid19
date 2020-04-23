@@ -238,7 +238,7 @@ And the true CFR within a region can itself change over time as treatment qualit
 
 
 [[graphs-timeline-interactive]]
-=== {icon-interactive-timeline} Interactive Timeline of New Cases Per Day
+=== {icon-interactive-timeline} Interactive U.S. Tracker
 
 This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
 The first grid-plot shows these numbers cummulatively since coronavirus was first confirmed in the U.S.
