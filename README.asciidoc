@@ -255,7 +255,9 @@ If you think your device is big enough and nothing is loading below, try refresh
 
 [pass]
 ++++
-include::usa_states_interactive_div.html[]
+include::usa_states_total_interactive_div_tag.html[]
+<div style="height: 100px;"></div>
+include::usa_states_diff_interactive_div_tag.html[]
 ++++
 
 [[graphs-line]]
