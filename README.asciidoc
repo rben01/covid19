@@ -235,7 +235,7 @@ And the true CFR within a region can itself change over time as treatment qualit
 == {icon-graphs} Graphs
 
 
-[[graphs-timeline-video]]
+[[graphs-timeline-interactive]]
 === {icon-timeline-video} Interactive Timeline of New Cases Per Day
 
 This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
@@ -263,7 +263,7 @@ If your device is small you may not see anything below; try rotating your device
 If you think your device is big enough and nothing is loading below, try refreshing the page.
 --
 
-
+[[timeline-interactive-usa-states-cummulative]]
 ==== Cummulative
 [pass]
 ++++
@@ -271,6 +271,7 @@ include::usa_states_total_interactive_div_tag.html[]
 <div style="height: 1em;"></div>
 ++++
 
+[[timeline-interactive-usa-states-dod-diff]]
 ==== Increase per Day
 [pass]
 ++++
