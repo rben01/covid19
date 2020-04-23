@@ -477,9 +477,15 @@ def _do_timeline(df: pd.DataFrame):
 
 
 def _do_interactive(df: pd.DataFrame):
-    from plot_timeline_interactive import make_usa_daybyday_interactive_timeline
+    from plot_timeline_interactive import (
+        make_usa_daybyday_diff_interactive_timeline,
+        make_usa_daybyday_total_interactive_timeline,
+    )
 
-    make_usa_daybyday_interactive_timeline(get_usa_states_df(df))
+    make_usa_daybyday_diff_interactive_timeline(get_usa_states_df(df))
+    make_usa_daybyday_total_interactive_timeline(get_usa_states_df(df))
+
+    print("Created interactive")
 
 
 def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:

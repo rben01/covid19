@@ -264,10 +264,16 @@ If you think your device is big enough and nothing is loading below, try refresh
 --
 
 
+==== Cummulative
 [pass]
 ++++
 include::usa_states_total_interactive_div_tag.html[]
-<div style="height: 4em;"></div>
+<div style="height: 1em;"></div>
+++++
+
+==== Increase per Day
+[pass]
+++++
 include::usa_states_diff_interactive_div_tag.html[]
 ++++
 
