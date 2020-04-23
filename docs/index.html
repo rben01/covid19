@@ -2638,10 +2638,6 @@ video {
     text-decoration: underline;
   }
 
-  .bk-tooltip {
-    font-size: 2em;
-  }
-
   @media (max-width: 4in) {
     .bk-root {
       display: none;
@@ -2668,10 +2664,20 @@ video {
 </li>
 <li><a href="#sect-graphs">📊 Graphs</a>
 <ul class="sectlevel2">
-<li><a href="#graphs-timeline-interactive">⏯ Interactive U.S. Tracker</a>
+<li><a href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a>
 <ul class="sectlevel3">
+<li><a href="#timeline-interactive-world">🌍 World</a>
+<ul class="sectlevel4">
+<li><a href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></li>
+<li><a href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></li>
+</ul>
+</li>
+<li><a href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a>
+<ul class="sectlevel4">
 <li><a href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></li>
 <li><a href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#graphs-line">📈 Line Charts</a>
@@ -2873,9 +2879,10 @@ And the true CFR within a region can itself change over time as treatment qualit
 <h2 id="sect-graphs"><a class="link" href="#sect-graphs">📊 Graphs</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="graphs-timeline-interactive"><a class="link" href="#graphs-timeline-interactive">⏯ Interactive U.S. Tracker</a></h3>
+<h3 id="graphs-timeline-interactive-us"><a class="link" href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></h3>
 <div class="paragraph">
-<p>This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
+<p>This section contains four interactive 2x2 grid-plots: two for the U.S. and two for the world&#8217;s countries.
+Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
 The first grid-plot shows these numbers cumulatively since coronavirus was first confirmed in the U.S.
 The second one shows how these numbers increased each day.
 For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6).<br>
@@ -2885,8 +2892,8 @@ Each pair of major ticks has eight minor ticks between them (ten including the m
 Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.
 Also, note that because the per-capita numbers in the two grid-plots have such different magnitudes, they have different denominators (10,000 vs 100,000).<br>
 In a given grid-plot, the date slider can be dragged to view a specific date.
-In addition, the play/pause button will step through date by date until it reaches the end.
-The "playback speed" buttons are self explanatory.</p>
+Hovering your cursor over a state will show its data for the selected date.
+In addition, the play/pause button will step through date by date until it reaches the end.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2906,13 +2913,30 @@ If you think your device is big enough and nothing is loading below, try refresh
 </table>
 </div>
 <div class="sect3">
-<h4 id="timeline-interactive-usa-states-cummulative"><a class="link" href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></h4>
-<script src="usa_states_total_interactive_autoload.js" id="bb1f4481-ea25-4891-bfb1-3200cd6b7950"></script>
+<h4 id="timeline-interactive-world"><a class="link" href="#timeline-interactive-world">🌍 World</a></h4>
+<div class="sect4">
+<h5 id="timeline-interactive-world-cummulative"><a class="link" href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></h5>
+<script src="countries_total_interactive_autoload.js" id="c3efc4b3-1cc5-4174-bd1f-5d93d67cccae"></script>
 <div style="height: 1em;"></div>
 </div>
+<div class="sect4">
+<h5 id="timeline-interactive-world-dod-diff"><a class="link" href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></h5>
+<script src="countries_diff_interactive_autoload.js" id="d558eedc-e0bd-46b5-bb9f-698b9b0ba57a"></script>
+<div style="height: 1em;"></div>
+</div>
+</div>
 <div class="sect3">
-<h4 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h4>
-<script src="usa_states_diff_interactive_autoload.js" id="b72cbbb6-4f18-48c1-84db-5f1a833f7a48"></script>
+<h4 id="timeline-interactive-usa-states"><a class="link" href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a></h4>
+<div class="sect4">
+<h5 id="timeline-interactive-usa-states-cummulative"><a class="link" href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></h5>
+<script src="usa_states_total_interactive_autoload.js" id="7eeff823-e2ce-4751-b75b-9a29c3d6d5c0"></script>
+<div style="height: 1em;"></div>
+</div>
+<div class="sect4">
+<h5 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h5>
+<script src="usa_states_diff_interactive_autoload.js" id="f30f233b-7b5c-4f6b-abaf-3937b689adc8"></script>
+<div style="height: 1em;"></div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -3050,7 +3074,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-23 12:28:52 -0400
+Last updated 2020-04-23 16:28:21 -0400
 </div>
 </div>
 </body>

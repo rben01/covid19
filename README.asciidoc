@@ -233,11 +233,11 @@ And the true CFR within a region can itself change over time as treatment qualit
 [[sect-graphs]]
 == {icon-graphs} Graphs
 
+[[graphs-timeline-interactive-us]]
+=== {icon-interactive-timeline} Interactive Trackers
 
-[[graphs-timeline-interactive]]
-=== {icon-interactive-timeline} Interactive U.S. Tracker
-
-This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
+This section contains four interactive 2x2 grid-plots: two for the U.S. and two for the world's countries.
+Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
 The first grid-plot shows these numbers cumulatively since coronavirus was first confirmed in the U.S.
 The second one shows how these numbers increased each day.
 For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6). +
@@ -247,8 +247,8 @@ Each pair of major ticks has eight minor ticks between them (ten including the m
 Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant.
 Also, note that because the per-capita numbers in the two grid-plots have such different magnitudes, they have different denominators (10,000 vs 100,000). +
 In a given grid-plot, the date slider can be dragged to view a specific date.
+Hovering your cursor over a state will show its data for the selected date.
 In addition, the play/pause button will step through date by date until it reaches the end.
-The "playback speed" buttons are self explanatory.
 
 [NOTE]
 --
@@ -258,8 +258,30 @@ If your device is small you may not see anything below; try rotating your device
 If you think your device is big enough and nothing is loading below, try refreshing the page.
 --
 
+[[timeline-interactive-world]]
+==== {icon-world} World
+
+[[timeline-interactive-world-cummulative]]
+===== {icon-interactive-cumulative} Cumulative
+[pass]
+++++
+include::countries_total_interactive_div_tag.html[]
+<div style="height: 1em;"></div>
+++++
+
+[[timeline-interactive-world-dod-diff]]
+===== {icon-interactive-day-diff} Increase per Day
+[pass]
+++++
+include::countries_diff_interactive_div_tag.html[]
+<div style="height: 1em;"></div>
+++++
+
+[[timeline-interactive-usa-states]]
+==== {icon-usa} U.S. States
+
 [[timeline-interactive-usa-states-cummulative]]
-==== {icon-interactive-cumulative} Cumulative
+===== {icon-interactive-cumulative} Cumulative
 [pass]
 ++++
 include::usa_states_total_interactive_div_tag.html[]
@@ -267,10 +289,11 @@ include::usa_states_total_interactive_div_tag.html[]
 ++++
 
 [[timeline-interactive-usa-states-dod-diff]]
-==== {icon-interactive-day-diff} Increase per Day
+===== {icon-interactive-day-diff} Increase per Day
 [pass]
 ++++
 include::usa_states_diff_interactive_div_tag.html[]
+<div style="height: 1em;"></div>
 ++++
 
 [[graphs-line]]

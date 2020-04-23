@@ -1,7 +1,7 @@
 # %%
 import itertools
 from pathlib import Path
-from typing import Callable, List, NewType, Tuple, Union
+from typing import Callable, List, Tuple, Union
 
 import bokeh.plotting as bplotting
 import cmocean
@@ -14,6 +14,7 @@ from bokeh.layouts import column as layout_column
 from bokeh.layouts import gridplot
 from bokeh.layouts import row as layout_row
 from bokeh.models import (
+    BoxZoomTool,
     CDSView,
     ColorBar,
     ColumnDataSource,
@@ -22,8 +23,11 @@ from bokeh.models import (
     GroupFilter,
     HoverTool,
     LogColorMapper,
+    PanTool,
     RadioButtonGroup,
-    SaveTool,
+    ZoomInTool,
+    ZoomOutTool,
+    ResetTool,
     Toggle,
 )
 from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
@@ -41,31 +45,18 @@ DOD_DIFF_DIR.mkdir(parents=True, exist_ok=True)
 
 Polygon = List[Tuple[float, float]]
 MultiPolygon = List[Tuple[Polygon]]
-DateString = NewType("DateString", str)
-BokehColor = NewType("BokehColor", str)
-InfoForAutoload = NewType("InfoForAutoload", Tuple[str, str])
+DateString = str
+BokehColor = str
+InfoForAutoload = Tuple[str, str]
 
 LAT_COL = "Lat_"
 LONG_COL = "Long_"
+REGION_NAME_COL = "Region_Name_"
 
 
-def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
-    """Get geometry and lat/lon coords for each US state
+def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
 
-    Bokeh's polygon plotting requires polygon vertices to be 1-D lists of floats with
-    nan separating the connected regions; here we take the geopandas geometry and
-    convert it into the desired lat/lon coords
-
-    :return: GeoDataFrame containing, for each US state: 2-letter state code, geometry
-    (boundary), and lists of lat/lon coords in bokeh-compatible format
-    :rtype: geopandas.GeoDataFrame
-    """
-
-    geo_df: geopandas.GeoDataFrame = geopandas.read_file(
-        Paths.DATA / "Geo" / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
-    ).to_crs(
-        "EPSG:2163"  # US National Atlas Equal Area (Google it)
-    )
+    geo_df = geo_df.copy()
 
     # geopandas gives us geometry as (Multi)Polygons
     # bokeh expects two lists, lat and long, each of which is a 1-D list of floats with
@@ -115,12 +106,43 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
     geo_df[LONG_COL] = longs
     geo_df[LAT_COL] = lats
 
-    geo_df = geo_df.rename(columns={"STUSPS": Columns.TWO_LETTER_STATE_CODE})
-
     return geo_df
 
 
-def make_daybyday_interactive_timeline(
+def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
+    """Get geometry and lat/lon coords for each US state
+
+    Bokeh's polygon plotting requires polygon vertices to be 1-D lists of floats with
+    nan separating the connected regions; here we take the geopandas geometry and
+    convert it into the desired lat/lon coords
+
+    :return: GeoDataFrame containing, for each US state: 2-letter state code, geometry
+    (boundary), and lists of lat/lon coords in bokeh-compatible format
+    :rtype: geopandas.GeoDataFrame
+    """
+
+    geo_df: geopandas.GeoDataFrame = geopandas.read_file(
+        Paths.DATA / "Geo" / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
+    ).to_crs(
+        "EPSG:2163"  # US National Atlas Equal Area (Google it)
+    ).rename(
+        columns={"STUSPS": REGION_NAME_COL}, errors="raise"
+    )
+
+    return get_longs_lats(geo_df)
+
+
+def get_countries_geo_df() -> geopandas.GeoDataFrame:
+    geo_df: geopandas.GeoDataFrame = geopandas.read_file(
+        Paths.DATA / "Geo" / "Countries_WGS84" / "Countries_WGS84.shp"
+    ).to_crs("EPSG:3857").rename(
+        columns={"CNTRY_NAME": REGION_NAME_COL}, errors="raise"
+    )
+
+    return get_longs_lats(geo_df)
+
+
+def __make_daybyday_interactive_timeline(
     df: pd.DataFrame,
     *,
     geo_df: geopandas.GeoDataFrame,
@@ -130,6 +152,7 @@ def make_daybyday_interactive_timeline(
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
     out_file_basename: str,
     subplot_title_prefix,
+    plot_aspect_ratio: float,
     cmap=None,
     n_cbar_buckets: int = None,
     n_buckets_btwn_major_ticks: int = None,
@@ -145,7 +168,7 @@ def make_daybyday_interactive_timeline(
 
     DATE_FMT = r"%Y-%m-%d"
     ID_COLS = [
-        Columns.TWO_LETTER_STATE_CODE,
+        REGION_NAME_COL,
         Columns.DATE,
         Columns.STAGE,
         Columns.COUNT_TYPE,
@@ -190,10 +213,7 @@ def make_daybyday_interactive_timeline(
     count_list: List[Counting]
     stage_list: List[DiseaseStage]
 
-    df = df[
-        (df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES))
-        & (~df[Columns.TWO_LETTER_STATE_CODE].isin(["AK", "HI"]))
-    ].copy()
+    df = df.copy()
 
     # Unadjust dates (see SaveFormats._adjust_dates)
     normalized_dates = df[Columns.DATE].dt.normalize()
@@ -212,7 +232,7 @@ def make_daybyday_interactive_timeline(
     # enums will be replaced by their name (this is kind of important)
     id_cols_product: pd.MultiIndex = pd.MultiIndex.from_product(
         [
-            df[Columns.TWO_LETTER_STATE_CODE].unique(),
+            df[REGION_NAME_COL].unique(),
             dates,
             [s.name for s in DiseaseStage],
             [c.name for c in Counting],
@@ -232,9 +252,9 @@ def make_daybyday_interactive_timeline(
     if transform_df_func is not None:
         df = transform_df_func(df)
 
-    df = geo_df.merge(df, how="inner", on=Columns.TWO_LETTER_STATE_CODE,)[
+    df = geo_df.merge(df, how="inner", on=REGION_NAME_COL,)[
         [
-            Columns.TWO_LETTER_STATE_CODE,
+            REGION_NAME_COL,
             Columns.DATE,
             STRING_DATE_COL,
             Columns.STAGE,
@@ -254,7 +274,18 @@ def make_daybyday_interactive_timeline(
     vmins: pd.Series = values_mins_maxs["min"]
     vmaxs: pd.Series = values_mins_maxs["max"]
 
-    pow10s_series: pd.Series = vmaxs.map(lambda x: int(10 ** (-np.floor(np.log10(x)))))
+    # pow10s_series: pd.Series = vmaxs.map(lambda x: int(10 ** (-np.floor(np.log10(x)))))
+
+    # _pow_10s_series_dict = {}
+    # for stage in DiseaseStage:
+    #     _pow_10s_series_dict.update(
+    #         {
+    #             (stage.name, Counting.TOTAL_CASES.name): 100000,
+    #             (stage.name, Counting.PER_CAPITA.name): 10000,
+    #         }
+    #     )
+
+    # pow10s_series = pd.Series(_pow_10s_series_dict)
 
     vmins: dict = vmins.to_dict()
     vmaxs: dict = vmaxs.to_dict()
@@ -280,16 +311,16 @@ def make_daybyday_interactive_timeline(
     # avoid that
     df = (
         df.pivot_table(
-            index=[Columns.TWO_LETTER_STATE_CODE, Columns.STAGE, Columns.COUNT_TYPE],
+            index=[REGION_NAME_COL, Columns.STAGE, Columns.COUNT_TYPE],
             columns=STRING_DATE_COL,
             values=value_col,
             aggfunc="first",
         )
         .reset_index()
         .merge(
-            geo_df[[Columns.TWO_LETTER_STATE_CODE, LONG_COL, LAT_COL]],
+            geo_df[[REGION_NAME_COL, LONG_COL, LAT_COL]],
             how="inner",
-            on=Columns.TWO_LETTER_STATE_CODE,
+            on=REGION_NAME_COL,
         )
     )
 
@@ -373,7 +404,7 @@ def make_daybyday_interactive_timeline(
         hover_tool = HoverTool(
             tooltips=[
                 ("Date", f"@{{{FAKE_DATE_COL}}}"),
-                ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
+                ("State", f"@{{{REGION_NAME_COL}}}"),
                 ("Count", f"@{{{value_col}}}{tooltip_fmt}"),
             ],
             toggleable=False,
@@ -383,14 +414,21 @@ def make_daybyday_interactive_timeline(
         p = bplotting.figure(
             title=fig_title,
             title_location="above",
-            tools=[SaveTool(), hover_tool],
-            toolbar_location=None,
-            aspect_ratio=1.5,
+            tools=[
+                hover_tool,
+                PanTool(),
+                BoxZoomTool(match_aspect=True),
+                ZoomInTool(),
+                ZoomOutTool(),
+                ResetTool(),
+            ],
+            toolbar_location="above",
+            aspect_ratio=plot_aspect_ratio,
             output_backend="webgl",
-            lod_factor=100,
-            lod_interval=1000,
+            lod_factor=75,
+            lod_interval=100,
             lod_threshold=1,
-            lod_timeout=500,
+            lod_timeout=100,
         )
 
         p.xgrid.grid_line_color = None
@@ -467,13 +505,20 @@ def make_daybyday_interactive_timeline(
 
         figures.append(p)
 
+    # Make all figs pan and zoom together
+    figs_iter = iter(np.ravel(figures))
+    anchor_fig = next(figs_iter)
+    for fig in figs_iter:
+        fig.x_range = anchor_fig.x_range
+        fig.y_range = anchor_fig.y_range
+
     # 2x2 grid (for now)
     plot_layout = [
         gridplot(
             figures,
             ncols=len(count_list),
             sizing_mode="scale_both",
-            toolbar_location=None,
+            toolbar_location="above",
         )
     ]
 
@@ -741,6 +786,81 @@ def make_daybyday_interactive_timeline(
     return (js_code, tag_code)
 
 
+def _make_daybyday_total_interactive_timeline(
+    df: pd.DataFrame,
+    *,
+    geo_df: geopandas.GeoDataFrame,
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+    count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    out_file_basename: str,
+    plot_aspect_ratio: float,
+) -> InfoForAutoload:
+
+    return __make_daybyday_interactive_timeline(
+        df,
+        geo_df=geo_df,
+        value_col=Columns.CASE_COUNT,
+        stage=stage,
+        count=count,
+        out_file_basename=f"{out_file_basename}_total_interactive",
+        subplot_title_prefix="Total",
+        plot_aspect_ratio=plot_aspect_ratio,
+    )
+
+
+def _make_daybyday_diff_interactive_timeline(
+    df: pd.DataFrame,
+    *,
+    geo_df: geopandas.GeoDataFrame,
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+    count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    out_file_basename: str,
+    plot_aspect_ratio: float,
+) -> InfoForAutoload:
+
+    DIFF_COL = "Diff_"
+
+    def get_case_diffs(df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        df[DIFF_COL] = df.groupby([REGION_NAME_COL, Columns.STAGE, Columns.COUNT_TYPE])[
+            Columns.CASE_COUNT
+        ].diff()
+
+        df = df[df[DIFF_COL].notna()]
+        return df
+
+    return __make_daybyday_interactive_timeline(
+        df,
+        geo_df=geo_df,
+        value_col=DIFF_COL,
+        transform_df_func=get_case_diffs,
+        stage=stage,
+        count=count,
+        out_file_basename=f"{out_file_basename}_diff_interactive",
+        subplot_title_prefix="New Daily",
+        plot_aspect_ratio=plot_aspect_ratio,
+    )
+
+
+def __assign_region_name_col(df: pd.DataFrame, region_name_col: str) -> pd.DataFrame:
+    return df.rename(columns={region_name_col: REGION_NAME_COL})
+
+
+def _prepare_usa_states_df(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()[
+        (df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES))
+        & (~df[Columns.TWO_LETTER_STATE_CODE].isin(["AK", "HI"]))
+    ]
+
+    df = __assign_region_name_col(df, Columns.TWO_LETTER_STATE_CODE)
+
+    return df
+
+
+def _prepare_countries_df(df: pd.DataFrame) -> pd.DataFrame:
+    return __assign_region_name_col(df, Columns.COUNTRY)
+
+
 def make_usa_daybyday_total_interactive_timeline(
     states_df: pd.DataFrame,
     *,
@@ -749,17 +869,18 @@ def make_usa_daybyday_total_interactive_timeline(
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
 ) -> Tuple:
 
+    states_df = _prepare_usa_states_df(states_df)
+
     if usa_states_geo_df is None:
         usa_states_geo_df = get_usa_states_geo_df()
 
-    return make_daybyday_interactive_timeline(
+    return _make_daybyday_total_interactive_timeline(
         states_df,
         geo_df=usa_states_geo_df,
-        value_col=Columns.CASE_COUNT,
         stage=stage,
         count=count,
-        out_file_basename="usa_states_total_interactive",
-        subplot_title_prefix="Total",
+        out_file_basename="usa_states",
+        plot_aspect_ratio=1.5,
     )
 
 
@@ -769,41 +890,81 @@ def make_usa_daybyday_diff_interactive_timeline(
     usa_states_geo_df: geopandas.GeoDataFrame = None,
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
-) -> Tuple:
+) -> InfoForAutoload:
 
-    DIFF_COL = "Diff_"
+    states_df = _prepare_usa_states_df(states_df)
 
     if usa_states_geo_df is None:
+
         usa_states_geo_df = get_usa_states_geo_df()
 
-    def get_case_diffs(df: pd.DataFrame) -> pd.DataFrame:
-        df = df.copy()
-        df[DIFF_COL] = df.groupby(
-            [Columns.TWO_LETTER_STATE_CODE, Columns.STAGE, Columns.COUNT_TYPE]
-        )[Columns.CASE_COUNT].diff()
-
-        df = df[df[DIFF_COL].notna()]
-        return df
-
-    return make_daybyday_interactive_timeline(
+    return _make_daybyday_diff_interactive_timeline(
         states_df,
         geo_df=usa_states_geo_df,
-        value_col=DIFF_COL,
-        transform_df_func=get_case_diffs,
         stage=stage,
         count=count,
-        out_file_basename="usa_states_diff_interactive",
-        subplot_title_prefix="New Daily",
+        out_file_basename="usa_states",
+        plot_aspect_ratio=1.5,
+    )
+
+
+def make_countries_daybyday_total_interactive_timeline(
+    countries_df: pd.DataFrame,
+    *,
+    countries_geo_df: geopandas.GeoDataFrame = None,
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+    count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+) -> InfoForAutoload:
+
+    countries_df = _prepare_countries_df(countries_df)
+
+    if countries_geo_df is None:
+        countries_geo_df = get_countries_geo_df()
+
+    return _make_daybyday_total_interactive_timeline(
+        countries_df,
+        geo_df=countries_geo_df,
+        stage=stage,
+        count=count,
+        out_file_basename="countries",
+        plot_aspect_ratio=2,
+    )
+
+
+def make_countries_daybyday_diff_interactive_timeline(
+    countries_df: pd.DataFrame,
+    *,
+    countries_geo_df: geopandas.GeoDataFrame = None,
+    stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
+    count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+) -> InfoForAutoload:
+
+    countries_df = _prepare_countries_df(countries_df)
+
+    if countries_geo_df is None:
+        countries_geo_df = get_countries_geo_df()
+
+    return _make_daybyday_diff_interactive_timeline(
+        countries_df,
+        geo_df=countries_geo_df,
+        stage=stage,
+        count=count,
+        out_file_basename="countries",
+        plot_aspect_ratio=2,
     )
 
 
 if __name__ == "__main__":
-    from case_tracker import get_df, get_usa_states_df
+    display(get_countries_geo_df())
+    # from case_tracker import get_df, get_usa_states_df
 
-    usa_df = get_usa_states_df(get_df(refresh_local_data=False))
-    make_usa_daybyday_total_interactive_timeline(
-        usa_df, stage=Select.ALL, count=Select.ALL
-    )
-    make_usa_daybyday_diff_interactive_timeline(
-        usa_df, stage=Select.ALL, count=Select.ALL
-    )
+    # usa_df = get_usa_states_df(get_df(refresh_local_data=False))
+    # make_usa_daybyday_total_interactive_timeline(
+    #     usa_df, stage=Select.ALL, count=Select.ALL
+    # )
+    # make_usa_daybyday_diff_interactive_timeline(
+    #     usa_df, stage=Select.ALL, count=Select.ALL
+    # )
+
+
+# %%

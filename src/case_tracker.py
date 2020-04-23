@@ -220,7 +220,11 @@ def get_world_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_countries_df(
-    df: pd.DataFrame, n: int = None, count: Counting = None, *, include_china: bool
+    df: pd.DataFrame,
+    n: int = None,
+    count: Union[Counting, Literal[Select.DEFAULT]] = Select.DEFAULT,
+    *,
+    include_china: bool
 ) -> pd.DataFrame:
     """Get the top n countries in the world, optionally dropping China from the list
 
@@ -238,7 +242,8 @@ def get_countries_df(
     :rtype: pd.DataFrame
     """
 
-    if count is None:
+    Counting.verify(count, allow_select=True)
+    if count is Select.DEFAULT:
         count = Counting.TOTAL_CASES
 
     exclude_locations = set([Locations.WORLD, Locations.WORLD_MINUS_CHINA])
@@ -480,10 +485,19 @@ def _do_interactive(df: pd.DataFrame):
     from plot_timeline_interactive import (
         make_usa_daybyday_diff_interactive_timeline,
         make_usa_daybyday_total_interactive_timeline,
+        make_countries_daybyday_diff_interactive_timeline,
+        make_countries_daybyday_total_interactive_timeline,
     )
 
     make_usa_daybyday_diff_interactive_timeline(get_usa_states_df(df))
     make_usa_daybyday_total_interactive_timeline(get_usa_states_df(df))
+
+    make_countries_daybyday_diff_interactive_timeline(
+        get_countries_df(df, include_china=True)
+    )
+    make_countries_daybyday_total_interactive_timeline(
+        get_countries_df(df, include_china=True)
+    )
 
     print("Created interactive")
 
