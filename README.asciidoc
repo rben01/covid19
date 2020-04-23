@@ -250,10 +250,6 @@ In a given grid-plot, the date slider can be dragged to view a specific date.
 In addition, the play/pause button will step through date by date until it reaches the end.
 The "playback speed" buttons are self explanatory.
 
-****
-There is a known issue where if you leave your mouse cursor stationary over a state while the animation plays, the hover tooltip's values will not update. To work around this, you can jiggle your mouse while the animation plays. I am working on fixing this issue.
-****
-
 [NOTE]
 --
 The interactive timeline takes quite a while to load.

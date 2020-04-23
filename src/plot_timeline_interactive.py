@@ -513,6 +513,9 @@ def make_daybyday_interactive_timeline(
     """
 
     _DEFFUN_INCR_DATE = f"""
+        let prev_val = null;
+        source.inspect.connect(v => prev_val = v);
+
         function updateDate() {{
             {_PBI_TIMER_START_DATE} = new Date();
             {_PBI_TIMER_ELAPSED_TIME_MS} = 0
@@ -530,6 +533,10 @@ def make_daybyday_interactive_timeline(
             }}
 
             dateSlider.change.emit();
+
+            if (prev_val !== null) {{
+                source.inspect.emit(prev_val);
+            }}
         }}
     """
 
@@ -542,17 +549,18 @@ def make_daybyday_interactive_timeline(
             Math.max({_PBI_CURR_INTERVAL} - {_PBI_TIMER_ELAPSED_TIME_MS}, 0)
         );
 
-
         {_PBI_TIMER} = setTimeout(
             startLoopTimer,
             initialInterval
         );
+
 
         function startLoopTimer() {{
             updateDate();
             if ({_PBI_IS_ACTIVE}) {{
                 {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL})
             }}
+
         }}
     """
 
@@ -626,6 +634,7 @@ def make_daybyday_interactive_timeline(
 
     animate_playback_callback = CustomJS(
         args={
+            "source": bokeh_data_source,
             "dateSlider": date_slider,
             "playPauseButton": play_pause_button,
             "maxDate": max_date,
@@ -665,6 +674,7 @@ def make_daybyday_interactive_timeline(
 
     change_playback_speed_callback = CustomJS(
         args={
+            "source": bokeh_data_source,
             "dateSlider": date_slider,
             "playPauseButton": play_pause_button,
             "maxDate": max_date,
