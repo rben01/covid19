@@ -358,9 +358,11 @@ def make_daybyday_interactive_timeline(
             fig_title_components.append(f"Per {_per_cap_denom:,d} people")
             formatter = PrintfTickFormatter(format=r"%2.3f")
             label_standoff = 12
+            tooltip_fmt = "{0.000}"
         else:
             formatter = NumeralTickFormatter(format="0.0a")
             label_standoff = 10
+            tooltip_fmt = "{0}"
 
         color_mapper = LogColorMapper(
             color_list, low=vmin, high=vmax, nan_color="#f2f2f2",
@@ -372,7 +374,7 @@ def make_daybyday_interactive_timeline(
             tooltips=[
                 ("Date", f"@{{{FAKE_DATE_COL}}}"),
                 ("State", f"@{{{Columns.TWO_LETTER_STATE_CODE}}}"),
-                ("Count", f"@{{{value_col}}}"),
+                ("Count", f"@{{{value_col}}}{tooltip_fmt}"),
             ],
             toggleable=False,
         )
