@@ -85,7 +85,9 @@ endif::[]
 :icon-notes: 📓
 :icon-graphs: 📊
 :icon-line-graphs: 📈
-:icon-timeline-video: 🗓
+:icon-interactive-timeline: ⏯
+:icon-interactive-cummulative: ↗️
+:icon-interactive-day-diff: ↪️
 :icon-world: 🌍
 :icon-countries: 🗺
 :icon-usa: 🇺🇸
@@ -236,7 +238,7 @@ And the true CFR within a region can itself change over time as treatment qualit
 
 
 [[graphs-timeline-interactive]]
-=== {icon-timeline-video} Interactive Timeline of New Cases Per Day
+=== {icon-interactive-timeline} Interactive Timeline of New Cases Per Day
 
 This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
 The first grid-plot shows these numbers cummulatively since coronavirus was first confirmed in the U.S.
@@ -264,7 +266,7 @@ If you think your device is big enough and nothing is loading below, try refresh
 --
 
 [[timeline-interactive-usa-states-cummulative]]
-==== Cummulative
+==== {icon-interactive-cummulative} Cummulative
 [pass]
 ++++
 include::usa_states_total_interactive_div_tag.html[]
@@ -272,7 +274,7 @@ include::usa_states_total_interactive_div_tag.html[]
 ++++
 
 [[timeline-interactive-usa-states-dod-diff]]
-==== Increase per Day
+==== {icon-interactive-day-diff} Increase per Day
 [pass]
 ++++
 include::usa_states_diff_interactive_div_tag.html[]
