@@ -47,7 +47,6 @@ endif::[]
 ifndef::env-github[]
 :data-table-gh-link: {github-repo}/blob/master/{data-table-path}
 :fig-dir: ./figures
-:timeline-video-dir: {fig-dir}/Geo
 // :icon-opts: fw
 // :icon-setup: icon:gear[{icon-opts}]
 // :icon-data-source: icon:table[{icon-opts}]
@@ -62,7 +61,7 @@ ifndef::env-github[]
 // :icon-top-ten: icon:sort-amount-up[{icon-opts}]
 // :icon-updates: icon:sync-alt[{icon-opts}]
 // :icon-cfr-notes: icon:notes-medical[{icon-opts}]
-:bullet-opts: lg,role="table-bullet"
+:bullet-opts: fw
 :bullet-setup: icon:gear[{bullet-opts}]
 :bullet-data-source: icon:table[{bullet-opts}]
 :bullet-notes: icon:sticky-note[{bullet-opts}]
@@ -71,22 +70,23 @@ ifndef::env-github[]
 :bullet-countries: icon:globe-americas[{bullet-opts}]
 :bullet-usa: icon:flag-usa[{bullet-opts}]
 :bullet-data-quality: icon:check-circle[{bullet-opts}]
-:bullet-start-date: icon:calendar-day[{bullet-opts}]
+:bullet-start-date: icon:calendar-alt[{bullet-opts}]
 :bullet-doubling-time: icon:stopwatch[{bullet-opts}]
 :bullet-top-ten: icon:sort-amount-down[{bullet-opts}]
 :bullet-updates: icon:sync-alt[{bullet-opts}]
 :bullet-cfr-notes: icon:heartbeat[{bullet-opts}]
 :bullet-gridlines: icon:hashtag[{bullet-opts}]
 endif::[]
+:timeline-video-dir: {fig-dir}/Geo
 // Icons for sections
 :icon-setup: 🛠
 :icon-data: 💾
-:icon-sources: ➡️
+:icon-sources: 🚰
 :icon-notes: 📓
 :icon-graphs: 📊
 :icon-line-graphs: 📈
 :icon-interactive-timeline: ⏯
-:icon-interactive-cummulative: ↗️
+:icon-interactive-cumulative: ↗️
 :icon-interactive-day-diff: ↪️
 :icon-world: 🌍
 :icon-countries: 🗺
@@ -194,44 +194,41 @@ In addition, while not in use, https://coronadatascraper.com/#home[Corona Data S
 
 
 TIP: The above data -- which is what's used in the graphs below -- has been aggregated into a single table available {raw-gh-content-url}/{data-table-path}[here].
-Feel free to use it however you like.
+Refer to <<date-explanation-note,the note below>> for the interpretation of the dates in this table.
 
 [[data-notes]]
 === {icon-notes} Notes
 
-[{note-table-opts}]
-|===
-
-| {bullet-data-quality}
-| These graphs only convey accurate information when the data feeding them is good; https://xkcd.com/2295[garbage in, garbage out].
+{bullet-data-quality} Data Quality::
+These graphs only convey accurate information when the data feeding them is good; https://xkcd.com/2295[garbage in, garbage out].
 In particular, the number of confirmed cases in a given region is reflective of both that region's true number of cases _and_ their testing capabilities.
 A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region's testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
 Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
 For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.
-This is also not to mention those who died because of coronavirus, but not _from_ it; there are many who would otherwise have received medical care but, due to the burden placed on the world's healthcare infrastructure by coronavirus, have not been able to. +
-Finally, the per-capita numbers assume a constant population within a region.
-This assumption is problematic; for instance, early on, many New Yorkers left the state for elsewhere in the U.S.
-If a state's true population decreases significantly, then its per-capita numbers will be artificually deflated.
-Correspondingly, if a state's true population increases, then its per-capita numbers will be artificually inflated.
-
+This is also not to mention those who died because of coronavirus, but not _from_ it; there are many who would otherwise have received medical care but, due to the burden placed on the world's healthcare infrastructure by coronavirus or reluctance to go to a hospital because of the risk of catching coronavirus, have not been able to.
++
 [example]
 --
 For a more in-depth picture of the difficulties of data collection vis-à-vis pandemic modeling, see FiveThirtyEight's https://fivethirtyeight.com/features/a-comic-strip-tour-of-the-wild-world-of-pandemic-modeling/[A Comic Strip Tour Of The Wild World Of Pandemic Modeling]
 --
 
-| {bullet-updates}
-| Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
-Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data.
+{bullet-updates} Data Updates::
+Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
+Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data. +
+On assumption these graphs make is that the population within a region is constant over time -- any changes in a region's population are ignored when computing per-capita numbers.
+This assumption is problematic.
+For instance, early on, many New Yorkers left the state for elsewhere in the U.S.
+If a region's true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
+Correspondingly, if a region's true population increases (people immigrate), then its per-capita numbers will be artificially inflated.
 
-| {bullet-cfr-notes}
-| Case fatality rate = CFR = ^deaths^/~confirmed{sp}cases~. +
-This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases relative to existing confirmed cases (the slopes of the lines in the below log-scaled plots) is increasing.
+
+{bullet-cfr-notes} Case Fatality Rate (CFR)::
+CFR = ^deaths^/~confirmed{sp}cases~.
+This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases is increasing relative to existing confirmed cases (the slopes of the lines in the below plots).
 If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won't yet have had time to become fatal.
 If it's been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not). +
 Of course, the numerator and denominator may be inaccurate to do testing issues.
-And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened). +
-
-|===
+And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
 
 [[sect-graphs]]
 == {icon-graphs} Graphs
@@ -241,7 +238,7 @@ And the true CFR within a region can itself change over time as treatment qualit
 === {icon-interactive-timeline} Interactive U.S. Tracker
 
 This section contains two interactive 2x2 grid-plots. Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
-The first grid-plot shows these numbers cummulatively since coronavirus was first confirmed in the U.S.
+The first grid-plot shows these numbers cumulatively since coronavirus was first confirmed in the U.S.
 The second one shows how these numbers increased each day.
 For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6). +
 States that are light gray on a given day had no cases/deaths that day.
@@ -266,7 +263,7 @@ If you think your device is big enough and nothing is loading below, try refresh
 --
 
 [[timeline-interactive-usa-states-cummulative]]
-==== {icon-interactive-cummulative} Cummulative
+==== {icon-interactive-cumulative} Cumulative
 [pass]
 ++++
 include::usa_states_total_interactive_div_tag.html[]
@@ -286,24 +283,26 @@ include::usa_states_diff_interactive_div_tag.html[]
 [[sect-reading-graphs]]
 ==== {icon-reading-graphs} Reading the Line Charts
 
-[{note-table-opts}]
-|===
-
-| {bullet-start-date}
-| The dates on the graphs' x-axes represent data collected in the time span from the most recent occurrence midnight to the given date.
+[[date-explanation-note]]{bullet-start-date} Interpreting the Dates on the X-Axis::
+The dates on the graphs' x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
 For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
 On the last day, there will be less than 24 hours of collected data, so the vertical line over `today` at `current time` represents the data collected from midnight (this morning) to now.
-By labeling data with the right endpoint of the data collection period, data can be represented faithfully regardless of whether or not it represents a full 24 hour data collection period (i.e., whether it is from today or from earlier). +
-Also, in all graphs below, the start date was simply the earliest date for which there was at least one region with at least one case.
 
-| {bullet-doubling-time}
-| Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (DT).
+{bullet-gridlines} Interpreting the Log-Scaled Y-Axis::
+The y-axis of the graphs is log scaled.
+On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
+On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2^n^ and 2^n+1^ are located at 1.25×2^n^, 1.5×2^n^, and 1.75×2^n^.
+On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10^n^ and 10^n+1^ are located at 2×10^n^, 3×10^n^, ..., 8×10^n^, 9×10^n^. +
+The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country -- it's roughly 1/2^distance^.
+
+{bullet-doubling-time} Doubling Time::
+Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (DT).
 Lines annotated "`n days`" show how the number of coronavirus cases would increase within a region if it doubled every n days.
 Comparing the slope of a region's growth line to the slopes of these benchmark lines gives an indication of that region's doubling time.
 These graphs`' legends also list the doubling times over different periods of time, e.g., "`20d DT`" means the average doubling time of a region over the past 20 days. +
 To find the daily percent increase for any doubling time T, simply compute 2^1/T^. Below is a list of doubling times and corresponding per-day percent increases.
-
-[role="compact"]
++
+[circle,role="compact"]
 * 1 day: +100% daily
 * 2 days: +41% daily
 * 3 days: +26% daily
@@ -313,20 +312,11 @@ To find the daily percent increase for any doubling time T, simply compute 2^1/T
 * 1 week: +10% daily
 * 2 weeks: +5% daily
 
-| {bullet-top-ten}
-| In each graph, the "`top 10`" refers to top 10 by number of cases, even for the graphs of cases per capita.
+{bullet-top-ten} Ranking and Sorting::
+In each graph, the "`top 10`" refers to top 10 by total number of cases/deaths, even for the per-capita graphs.
 Graphs`' legends are, however, sorted according to the relevant measurement (number of cases, cases per capita, or doubling time thereof).
 In a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world.
 The country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which, given its population of 33k, it is not.
-
-| {bullet-gridlines}
-| [[pow-10-ticks]]The y-axis of the graphs is log scaled.
-On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
-On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2^n^ and 2^n+1^ are located at 1.25×2^n^, 1.5×2^n^, and 1.75×2^n^.
-On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10^n^ and 10^n+1^ are located at 2×10^n^, 3×10^n^, ..., 8×10^n^, 9×10^n^. +
-The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the *Confirmed Cases* and *Deaths* lines for a given country -- it's roughly 1/2^distance^.
-
-|===
 
 
 [[graphs-world-china-row]]
