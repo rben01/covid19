@@ -526,6 +526,7 @@ def make_daybyday_interactive_timeline(
                 {_PBI_IS_ACTIVE} = false;
                 playPauseButton.active = false;
                 playPauseButton.change.emit();
+                playPauseButton.label = 'Restart';
             }}
 
             dateSlider.change.emit();
