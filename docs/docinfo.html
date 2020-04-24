@@ -75,8 +75,22 @@
     text-decoration: underline;
   }
 
-  @media (max-width: 4in) {
+  @media screen and (max-width: 4in) {
     .bk-root {
+      display: none;
+    }
+
+    .insufficient-width-warning {
+      display: inherit;
+    }
+  }
+
+  @media screen and (min-width: 4.0000000001in) {
+    .bk-root {
+      display: inherit;
+    }
+
+    .insufficient-width-warning {
       display: none;
     }
   }

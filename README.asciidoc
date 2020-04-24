@@ -17,7 +17,7 @@
 :toclevels: 4
 :hide-uri-scheme:
 :stylesheet: ./styles/clean.css
-:linkcss!:
+:!linkcss:
 :icons: font
 :data-table-path: data/data_table.csv
 :raw-gh-content-url: link:https://raw.githubusercontent.com/rben01/covid19/master
@@ -77,7 +77,7 @@ ifndef::env-github[]
 :bullet-cfr-notes: icon:heartbeat[{bullet-opts}]
 :bullet-gridlines: icon:hashtag[{bullet-opts}]
 endif::[]
-:timeline-video-dir: {fig-dir}/Geo
+:timeline-video-dir: {fig-dir}/Geo/BokehInteractiveStatic
 // Icons for sections
 :icon-setup: 🛠
 :icon-data: 💾
@@ -133,6 +133,7 @@ endif::[]
 :title-usa-states-deaths-since-25: {usa-states}{sep}{deaths-since-25}
 :doubling-time-explanation-cases: The thin dotted lines are annoted with a time period and show how the number of cases would grow if it doubled periodically with that period.
 :doubling-time-explanation-deaths: The thin dotted lines are annoted with a time period and show how the number of deaths would grow if it doubled periodically with that period.
+:insufficient-width-warning: Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.
 
 ifdef::env-github[]
 __Read this page as a standalone webpage https://rben01.github.io/covid19/[here], where it is formatted much more nicely than GitHub's READMEs.__
@@ -254,6 +255,8 @@ In addition, the play/pause button will step through date by date until it reach
 The interactive timelines take quite a while to load.
 If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
 If you think your device is big enough and nothing is loading below, try refreshing the page.
+You can also view these timelines as non-interactive videos here: +
+link:{timeline-video-dir}/countries_total_interactive.mp4[1. World/Cumulative], link:{timeline-video-dir}/countries_diff_interactive.mp4[2. World/Daily Differences], link:{timeline-video-dir}/usa_states_total_interactive.mp4[3. USA/Cumulative], link:{timeline-video-dir}/usa_states_diff_interactive.mp4[4. USA/Daily Differences].
 --
 
 [[timeline-interactive-world]]
@@ -261,6 +264,10 @@ If you think your device is big enough and nothing is loading below, try refresh
 
 [[timeline-interactive-world-cummulative]]
 ===== {icon-interactive-cumulative} Cumulative
+[IMPORTANT,role="insufficient-width-warning"]
+--
+{insufficient-width-warning}
+--
 [pass]
 ++++
 include::countries_total_interactive_div_tag.html[]
@@ -269,6 +276,10 @@ include::countries_total_interactive_div_tag.html[]
 
 [[timeline-interactive-world-dod-diff]]
 ===== {icon-interactive-day-diff} Increase per Day
+[IMPORTANT,role="insufficient-width-warning"]
+--
+{insufficient-width-warning}
+--
 [pass]
 ++++
 include::countries_diff_interactive_div_tag.html[]
@@ -280,6 +291,10 @@ include::countries_diff_interactive_div_tag.html[]
 
 [[timeline-interactive-usa-states-cummulative]]
 ===== {icon-interactive-cumulative} Cumulative
+[IMPORTANT,role="insufficient-width-warning"]
+--
+{insufficient-width-warning}
+--
 [pass]
 ++++
 include::usa_states_total_interactive_div_tag.html[]
@@ -288,6 +303,10 @@ include::usa_states_total_interactive_div_tag.html[]
 
 [[timeline-interactive-usa-states-dod-diff]]
 ===== {icon-interactive-day-diff} Increase per Day
+[IMPORTANT,role="insufficient-width-warning"]
+--
+{insufficient-width-warning}
+--
 [pass]
 ++++
 include::usa_states_diff_interactive_div_tag.html[]

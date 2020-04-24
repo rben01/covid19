@@ -2638,8 +2638,22 @@ video {
     text-decoration: underline;
   }
 
-  @media (max-width: 4in) {
+  @media screen and (max-width: 4in) {
     .bk-root {
+      display: none;
+    }
+
+    .insufficient-width-warning {
+      display: inherit;
+    }
+  }
+
+  @media screen and (min-width: 4.0000000001in) {
+    .bk-root {
+      display: inherit;
+    }
+
+    .insufficient-width-warning {
       display: none;
     }
   }
@@ -2905,7 +2919,9 @@ In addition, the play/pause button will step through date by date until it reach
 <div class="paragraph">
 <p>The interactive timelines take quite a while to load.
 If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
-If you think your device is big enough and nothing is loading below, try refreshing the page.</p>
+If you think your device is big enough and nothing is loading below, try refreshing the page.
+You can also view these timelines as non-interactive videos here:<br>
+<a href="./figures/Geo/BokehInteractiveStatic/countries_total_interactive.mp4">1. World/Cumulative</a>, <a href="./figures/Geo/BokehInteractiveStatic/countries_diff_interactive.mp4">2. World/Daily Differences</a>, <a href="./figures/Geo/BokehInteractiveStatic/usa_states_total_interactive.mp4">3. USA/Cumulative</a>, <a href="./figures/Geo/BokehInteractiveStatic/usa_states_diff_interactive.mp4">4. USA/Daily Differences</a>.</p>
 </div>
 </td>
 </tr>
@@ -2915,12 +2931,40 @@ If you think your device is big enough and nothing is loading below, try refresh
 <h4 id="timeline-interactive-world"><a class="link" href="#timeline-interactive-world">🌍 World</a></h4>
 <div class="sect4">
 <h5 id="timeline-interactive-world-cummulative"><a class="link" href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></h5>
-<script src="countries_total_interactive_autoload.js" id="1764d576-6cc5-4e6a-ab44-c21a0a0e965f"></script>
+<div class="admonitionblock important insufficient-width-warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<script src="countries_total_interactive_autoload.js" id="0e7ae5b6-123d-47c0-aa52-f6baaec881ef"></script>
 <div style="height: 1em;"></div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-world-dod-diff"><a class="link" href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></h5>
-<script src="countries_diff_interactive_autoload.js" id="ab1466dc-22a8-4758-a07d-24ac9e746b67"></script>
+<div class="admonitionblock important insufficient-width-warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<script src="countries_diff_interactive_autoload.js" id="e3afa393-fb7c-437d-bc82-64229c43945f"></script>
 <div style="height: 1em;"></div>
 </div>
 </div>
@@ -2928,12 +2972,40 @@ If you think your device is big enough and nothing is loading below, try refresh
 <h4 id="timeline-interactive-usa-states"><a class="link" href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a></h4>
 <div class="sect4">
 <h5 id="timeline-interactive-usa-states-cummulative"><a class="link" href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></h5>
-<script src="usa_states_total_interactive_autoload.js" id="930a47c0-19bd-4c68-ab8e-8d4205853607"></script>
+<div class="admonitionblock important insufficient-width-warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<script src="usa_states_total_interactive_autoload.js" id="bd55aadb-4035-4ee6-ba08-07fc93e4e81c"></script>
 <div style="height: 1em;"></div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h5>
-<script src="usa_states_diff_interactive_autoload.js" id="b16880d5-6437-4715-ac9f-52a559f7329f"></script>
+<div class="admonitionblock important insufficient-width-warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<script src="usa_states_diff_interactive_autoload.js" id="9e442df9-db7b-4d4a-895f-e6297727583e"></script>
 <div style="height: 1em;"></div>
 </div>
 </div>
@@ -3073,7 +3145,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-23 21:46:38 -0400
+Last updated 2020-04-24 12:58:35 -0400
 </div>
 </div>
 </body>

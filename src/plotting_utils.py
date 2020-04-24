@@ -316,13 +316,20 @@ def format_float(f: float, *, max_digits: int = 5, decimal_penalty: int = 2) -> 
     return f"{f:,.{max_digits-decimal_penalty}g}"
 
 
-def resize_to_even_dims(img_path: Path):
+def resize_to_even_dims(img_path: Path, pad_bottom=150):
     image: Image = Image.open(img_path)
 
     # First, pad bottom to leave room for video player controls
     # Padding is left, top, right, bottom
     # https://pillow.readthedocs.io/en/stable/_modules/PIL/ImageOps.html#expand
-    image = ImageOps.expand(image, (0, 0, 0, 150), fill=(255, 255, 255, 255))
+    if isinstance(pad_bottom, int):
+        pass
+    elif isinstance(pad_bottom, float):
+        pad_bottom = int(image.height * pad_bottom)
+    else:
+        raise ValueError(f"`pad_bottom` must be int or float; got {pad_bottom}")
+
+    image = ImageOps.expand(image, (0, 0, 0, pad_bottom), fill=(255, 255, 255, 255))
 
     # Now resize by rounding width and height down to nearest even number
     width_px, height_px = image.size

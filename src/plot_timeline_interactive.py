@@ -2,6 +2,7 @@
 import enum
 import functools
 import itertools
+import subprocess
 import uuid
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
@@ -13,6 +14,7 @@ import numpy as np
 import pandas as pd
 from bokeh.colors import RGB
 from bokeh.embed import autoload_static
+from bokeh.io import export_png
 from bokeh.layouts import column as layout_column
 from bokeh.layouts import gridplot
 from bokeh.layouts import row as layout_row
@@ -30,6 +32,7 @@ from bokeh.models import (
     RadioButtonGroup,
     Range1d,
     ResetTool,
+    Title,
     Toggle,
     ZoomInTool,
     ZoomOutTool,
@@ -42,10 +45,11 @@ from shapely.geometry import mapping as shapely_mapping
 from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
+from plotting_utils import resize_to_even_dims
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
-DOD_DIFF_DIR: Path = GEO_FIG_DIR / "DayOverDayDiffs"
-DOD_DIFF_DIR.mkdir(parents=True, exist_ok=True)
+PNG_SAVE_ROOT_DIR: Path = GEO_FIG_DIR / "BokehInteractiveStatic"
+PNG_SAVE_ROOT_DIR.mkdir(parents=True, exist_ok=True)
 
 Polygon = List[Tuple[float, float]]
 MultiPolygon = List[Tuple[Polygon]]
@@ -219,6 +223,7 @@ def __make_daybyday_interactive_timeline(
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
     min_interval: float,
+    should_make_video=True,
 ) -> InfoForAutoload:
 
     Counting.verify(count, allow_select=True)
@@ -325,7 +330,7 @@ def __make_daybyday_interactive_timeline(
         ]
     ]
 
-    dates = df[Columns.DATE].unique()
+    dates = [pd.Timestamp(d) for d in df[Columns.DATE].unique()]
 
     values_mins_maxs = (
         df[df[value_col] > 0]
@@ -605,14 +610,13 @@ def __make_daybyday_interactive_timeline(
         fig.y_range = anchor_fig.y_range
 
     # 2x2 grid (for now)
-    plot_layout = [
-        gridplot(
-            figures,
-            ncols=len(count_list),
-            sizing_mode="scale_both",
-            toolbar_location="above",
-        )
-    ]
+    gp = gridplot(
+        figures,
+        ncols=len(count_list),
+        sizing_mode="scale_both",
+        toolbar_location="above",
+    )
+    plot_layout = [gp]
 
     # Create unique ID for the JS playback info object for this plot
     _THIS_PLOT_ID = uuid.uuid4().hex
@@ -875,6 +879,52 @@ def __make_daybyday_interactive_timeline(
         s.write(js_code)
         d.write(tag_code)
 
+    if should_make_video:
+        save_dir: Path = PNG_SAVE_ROOT_DIR / out_file_basename
+        save_dir.mkdir(parents=True, exist_ok=True)
+
+        STILL_WIDTH = 1500
+        STILL_HEIGHT = int(
+            np.ceil(STILL_WIDTH / plot_aspect_ratio) * 1.05
+        )  # Unclear why *1.05 is necessary
+        gp.height = STILL_HEIGHT
+        gp.width = STILL_WIDTH
+        gp.sizing_mode = "fixed"
+        orig_title = anchor_fig.title.text
+
+        for date in dates:
+            date_str = date.strftime(DATE_FMT)
+            anchor_fig.title = Title(text=f"{orig_title} {date_str}")
+
+            for p in figures:
+                p.title = Title(text=p.title.text, text_font_size="20px")
+
+            # Just a reimplementation of the JS code in the date slider's callback
+            data = bokeh_data_source.data
+            data[value_col] = data[date_str]
+
+            for i, value in enumerate(data[value_col]):
+                if value == 0:
+                    data[COLOR_COL][i] = "NaN"
+                else:
+                    data[COLOR_COL][i] = value
+
+                data[FAKE_DATE_COL][i] = date_str
+
+            save_path: Path = (save_dir / date_str).with_suffix(".png")
+            export_png(gp, filename=save_path)
+            resize_to_even_dims(save_path, pad_bottom=0.08)
+
+            if date_str == pd.Timestamp(max_date).strftime(DATE_FMT) or True:
+                poster_path: Path = (
+                    PNG_SAVE_ROOT_DIR / (out_file_basename + "_poster")
+                ).with_suffix(".png")
+                poster_path.write_bytes(save_path.read_bytes())
+
+        make_video(save_dir, out_file_basename, 0.9)
+
+    print(f"Did interactive {out_file_basename}")
+
     return (js_code, tag_code)
 
 
@@ -1072,6 +1122,55 @@ def make_countries_daybyday_diff_interactive_timeline(
         count=count,
         **_get_countries_kwargs(),
     )
+
+
+def make_video(img_dir: Path, out_file_name: str, fps: float):
+    img_files = sorted(img_dir.glob("*.png"))
+    concat_demux_lines = []
+
+    # https://trac.ffmpeg.org/wiki/Slideshow
+    for f in img_files:
+        concat_demux_lines.append(f"file '{f}'")
+        concat_demux_lines.append(f"duration {1/fps}")
+
+    # Duplicate last frame 2x so that it's clear when video has ended
+    for _ in range(2):
+        concat_demux_lines.append(f"file '{img_files[-1]}'")
+        concat_demux_lines.append(f"duration {1/fps}")
+
+    concat_demux_lines.append(f"file '{img_files[-1]}'")
+
+    concat_demux_str = "\n".join(concat_demux_lines)
+
+    save_path = (PNG_SAVE_ROOT_DIR / out_file_name).with_suffix(".mp4")
+
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-f",
+        "concat",
+        "-protocol_whitelist",
+        "file,pipe,crypto",
+        "-safe",
+        "0",
+        "-i",
+        "-",
+        "-vsync",
+        "vfr",
+        "-vcodec",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-movflags",
+        "+faststart",
+        str(save_path),
+    ]
+
+    ps = subprocess.run(cmd, input=concat_demux_str, text=True)
+
+    ps.check_returncode()
+
+    print(f"Saved video '{save_path}'")
 
 
 if __name__ == "__main__":
