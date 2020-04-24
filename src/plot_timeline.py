@@ -8,7 +8,6 @@ from typing import List, Union
 
 import cmocean
 import geopandas
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -20,8 +19,6 @@ from typing_extensions import Literal
 
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
 from plotting_utils import format_float, resize_to_even_dims
-
-matplotlib.use("agg")
 
 
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"

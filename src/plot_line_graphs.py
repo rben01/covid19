@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
+import matplotlib
 import matplotlib.pyplot as plt
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -42,6 +42,8 @@ from plotting_utils import (
     get_savefile_path_and_location_heading,
     remove_empty_leading_dates,
 )
+
+matplotlib.use("agg")
 
 
 class EdgeGuide(ABCStrictEnum):
