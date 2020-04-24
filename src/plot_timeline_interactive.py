@@ -397,7 +397,9 @@ def __make_daybyday_interactive_timeline(
 
     df[COLOR_COL] = np.where(df[value_col] > 0, df[value_col], "NaN")
 
-    bokeh_data_source = ColumnDataSource(df)
+    bokeh_data_source = ColumnDataSource(
+        {k: v.tolist() for k, v in df.to_dict(orient="series").items()}
+    )
 
     filters = [
         [
