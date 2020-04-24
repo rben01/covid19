@@ -1,4 +1,6 @@
 # %%
+import enum
+import functools
 import itertools
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
@@ -25,10 +27,11 @@ from bokeh.models import (
     LogColorMapper,
     PanTool,
     RadioButtonGroup,
-    ZoomInTool,
-    ZoomOutTool,
+    Range1d,
     ResetTool,
     Toggle,
+    ZoomInTool,
+    ZoomOutTool,
 )
 from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
 from bokeh.models.tickers import FixedTicker
@@ -52,6 +55,33 @@ InfoForAutoload = Tuple[str, str]
 LAT_COL = "Lat_"
 LONG_COL = "Long_"
 REGION_NAME_COL = "Region_Name_"
+
+
+class WorldCRS(enum.Enum):
+    EQUIRECTANGULAR: "WorldCRS" = "EPSG:4087"
+    ECKERT_IV: "WorldCRS" = "ESRI:54012"
+    LOXIMUTHAL: "WorldCRS" = "ESRI:54023"
+
+    # If you don't care about faithfully representing data and hate the truth in
+    # general, you can use this as a case
+    # WEB_MERCATOR: "WorldCRS" = "EPSG:3857"
+
+    @staticmethod
+    def default() -> "WorldCRS":
+        return WorldCRS.EQUIRECTANGULAR
+
+    def get_axis_info(self) -> dict:
+        if self is WorldCRS.EQUIRECTANGULAR:
+            return {
+                "x_range": (-2.125e7, 2.125e7),
+                "y_range": (-7e6, 1e7),
+                "min_interval": 1e6,
+                "plot_aspect_ratio": 2,
+            }
+
+        raise NotImplementedError(
+            "Just use WorldCRS.EQUIRECTANGULAR; it's the best EPSG"
+        )
 
 
 def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
@@ -109,6 +139,7 @@ def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
     return geo_df
 
 
+@functools.lru_cache(None)
 def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
     """Get geometry and lat/lon coords for each US state
 
@@ -132,11 +163,37 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
     return get_longs_lats(geo_df)
 
 
+@functools.lru_cache(None)
 def get_countries_geo_df() -> geopandas.GeoDataFrame:
+
     geo_df: geopandas.GeoDataFrame = geopandas.read_file(
-        Paths.DATA / "Geo" / "Countries_WGS84" / "Countries_WGS84.shp"
-    ).to_crs("EPSG:3857").rename(
-        columns={"CNTRY_NAME": REGION_NAME_COL}, errors="raise"
+        Paths.DATA
+        / "Geo"
+        / "ne_110m_admin_0_map_units"
+        / "ne_110m_admin_0_map_units.shp"
+    ).to_crs(WorldCRS.default().value)
+
+    # display(geo_df)
+    # display(geo_df.columns)
+    geo_df = geo_df.rename(columns={"ADMIN": REGION_NAME_COL}, errors="raise")
+
+    geo_df[REGION_NAME_COL] = (
+        geo_df[REGION_NAME_COL]
+        .map(
+            {
+                "Central African Republic": "Central African Rep.",
+                "Democratic Republic of the Congo": "Dem. Rep. Congo",
+                "Equatorial Guinea": "Eq. Guinea",
+                "eSwatini": "Eswatini",
+                "Georgia (Country)": "Georgia (country)",
+                "South Sudan": "S. Sudan",
+                "United Arab Emirates": "UAE",
+                "United Kingdom": "Britain",
+                "Western Sahara": "W. Sahara",
+                "United States of America": "United States",
+            }
+        )
+        .fillna(geo_df[REGION_NAME_COL])
     )
 
     return get_longs_lats(geo_df)
@@ -152,11 +209,15 @@ def __make_daybyday_interactive_timeline(
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
     out_file_basename: str,
     subplot_title_prefix,
-    plot_aspect_ratio: float,
+    plot_aspect_ratio: float = None,
     cmap=None,
     n_cbar_buckets: int = None,
     n_buckets_btwn_major_ticks: int = None,
     n_minor_ticks_btwn_major_ticks: int = None,
+    per_capita_denominator: int = None,
+    x_range: Tuple[float, float],
+    y_range: Tuple[float, float],
+    min_interval: float,
 ) -> InfoForAutoload:
 
     Counting.verify(count, allow_select=True)
@@ -274,7 +335,7 @@ def __make_daybyday_interactive_timeline(
     vmins: pd.Series = values_mins_maxs["min"]
     vmaxs: pd.Series = values_mins_maxs["max"]
 
-    # pow10s_series: pd.Series = vmaxs.map(lambda x: int(10 ** (-np.floor(np.log10(x)))))
+    pow10s_series: pd.Series = vmaxs.map(lambda x: int(10 ** (-np.floor(np.log10(x)))))
 
     # _pow_10s_series_dict = {}
     # for stage in DiseaseStage:
@@ -292,7 +353,13 @@ def __make_daybyday_interactive_timeline(
 
     for stage in DiseaseStage:
         _value_key = (stage.name, Counting.PER_CAPITA.name)
-        _max_pow10 = pow10s_series.loc[(slice(None), Counting.PER_CAPITA.name)].max()
+        if per_capita_denominator is None:
+            _max_pow10 = pow10s_series.loc[
+                (slice(None), Counting.PER_CAPITA.name)
+            ].max()
+        else:
+            _max_pow10 = per_capita_denominator
+
         vmins[_value_key] *= _max_pow10
         vmaxs[_value_key] *= _max_pow10
         pow10s_series[_value_key] = _max_pow10
@@ -410,6 +477,14 @@ def __make_daybyday_interactive_timeline(
             toggleable=False,
         )
 
+        if plot_aspect_ratio is None:
+            if x_range is None or y_range is None:
+                raise ValueError(
+                    "Must provide both `x_range` and `y_range`"
+                    + " when `plot_aspect_ratio` is None"
+                )
+            plot_aspect_ratio = (x_range[1] - x_range[0]) / (y_range[1] - y_range[0])
+
         # Create figure object.
         p = bplotting.figure(
             title=fig_title,
@@ -422,13 +497,12 @@ def __make_daybyday_interactive_timeline(
                 ZoomOutTool(),
                 ResetTool(),
             ],
-            toolbar_location="above",
             aspect_ratio=plot_aspect_ratio,
             output_backend="webgl",
-            lod_factor=75,
-            lod_interval=100,
+            lod_factor=10,
+            lod_interval=400,
             lod_threshold=1,
-            lod_timeout=100,
+            lod_timeout=300,
         )
 
         p.xgrid.grid_line_color = None
@@ -508,6 +582,17 @@ def __make_daybyday_interactive_timeline(
     # Make all figs pan and zoom together
     figs_iter = iter(np.ravel(figures))
     anchor_fig = next(figs_iter)
+
+    if x_range is not None:
+        anchor_fig.x_range = Range1d(
+            *x_range, bounds="auto", min_interval=min_interval * plot_aspect_ratio
+        )
+
+    if y_range is not None:
+        anchor_fig.y_range = Range1d(
+            *y_range, bounds="auto", min_interval=min_interval * plot_aspect_ratio
+        )
+
     for fig in figs_iter:
         fig.x_range = anchor_fig.x_range
         fig.y_range = anchor_fig.y_range
@@ -793,7 +878,10 @@ def _make_daybyday_total_interactive_timeline(
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
     out_file_basename: str,
-    plot_aspect_ratio: float,
+    plot_aspect_ratio: float = None,
+    x_range: Tuple[float, float],
+    y_range: Tuple[float, float],
+    min_interval: float,
 ) -> InfoForAutoload:
 
     return __make_daybyday_interactive_timeline(
@@ -805,6 +893,10 @@ def _make_daybyday_total_interactive_timeline(
         out_file_basename=f"{out_file_basename}_total_interactive",
         subplot_title_prefix="Total",
         plot_aspect_ratio=plot_aspect_ratio,
+        per_capita_denominator=100_000,
+        x_range=x_range,
+        y_range=y_range,
+        min_interval=min_interval,
     )
 
 
@@ -815,7 +907,10 @@ def _make_daybyday_diff_interactive_timeline(
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
     out_file_basename: str,
-    plot_aspect_ratio: float,
+    plot_aspect_ratio: float = None,
+    x_range: Tuple[float, float],
+    y_range: Tuple[float, float],
+    min_interval: float,
 ) -> InfoForAutoload:
 
     DIFF_COL = "Diff_"
@@ -839,6 +934,10 @@ def _make_daybyday_diff_interactive_timeline(
         out_file_basename=f"{out_file_basename}_diff_interactive",
         subplot_title_prefix="New Daily",
         plot_aspect_ratio=plot_aspect_ratio,
+        per_capita_denominator=10000,
+        x_range=x_range,
+        y_range=y_range,
+        min_interval=min_interval,
     )
 
 
@@ -861,6 +960,24 @@ def _prepare_countries_df(df: pd.DataFrame) -> pd.DataFrame:
     return __assign_region_name_col(df, Columns.COUNTRY)
 
 
+@functools.lru_cache(None)
+def _get_usa_kwargs() -> dict:
+    return {
+        "out_file_basename": "usa_states",
+        "x_range": (-2.25e6, 2.7e6),
+        "y_range": (-2.3e6, 9e5),
+        "min_interval": 8.5e5,
+    }
+
+
+@functools.lru_cache(None)
+def _get_countries_kwargs() -> dict:
+    return {
+        "out_file_basename": "countries",
+        **WorldCRS.default().get_axis_info(),
+    }
+
+
 def make_usa_daybyday_total_interactive_timeline(
     states_df: pd.DataFrame,
     *,
@@ -879,8 +996,7 @@ def make_usa_daybyday_total_interactive_timeline(
         geo_df=usa_states_geo_df,
         stage=stage,
         count=count,
-        out_file_basename="usa_states",
-        plot_aspect_ratio=1.5,
+        **_get_usa_kwargs(),
     )
 
 
@@ -903,8 +1019,7 @@ def make_usa_daybyday_diff_interactive_timeline(
         geo_df=usa_states_geo_df,
         stage=stage,
         count=count,
-        out_file_basename="usa_states",
-        plot_aspect_ratio=1.5,
+        **_get_usa_kwargs(),
     )
 
 
@@ -926,8 +1041,7 @@ def make_countries_daybyday_total_interactive_timeline(
         geo_df=countries_geo_df,
         stage=stage,
         count=count,
-        out_file_basename="countries",
-        plot_aspect_ratio=2,
+        **_get_countries_kwargs(),
     )
 
 
@@ -949,8 +1063,7 @@ def make_countries_daybyday_diff_interactive_timeline(
         geo_df=countries_geo_df,
         stage=stage,
         count=count,
-        out_file_basename="countries",
-        plot_aspect_ratio=2,
+        **_get_countries_kwargs(),
     )
 
 

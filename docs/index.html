@@ -2881,18 +2881,19 @@ And the true CFR within a region can itself change over time as treatment qualit
 <div class="sect2">
 <h3 id="graphs-timeline-interactive-us"><a class="link" href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></h3>
 <div class="paragraph">
-<p>This section contains four interactive 2x2 grid-plots: two for the U.S. and two for the world&#8217;s countries.
-Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
-The first grid-plot shows these numbers cumulatively since coronavirus was first confirmed in the U.S.
-The second one shows how these numbers increased each day.
-For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6).<br>
-States that are light gray on a given day had no cases/deaths that day.
+<p>This section contains two pairs of interactive 2x2 grid-plots: one pair for the continental U.S. and one pair for the world&#8217;s countries (due to data issues, a handful of countries are not present).
+All four grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed over time.
+In each pair, the first grid-plot shows these numbers cumulatively and the second grid-plot shows how these numbers increased each day.
+For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first U.S. grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6).<br>
+Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8.
 Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.
-Also, note that because the per-capita numbers in the two grid-plots have such different magnitudes, they have different denominators (10,000 vs 100,000).<br>
+Also, note that because of the different scales of numbers, the cumulative and day-over-day per-capita numbers use different denominators (10,000 vs 100,000).<br>
+Each grid-plot has tools in the top right to pan, zoom, and reset the view.
+Along the bottoms are tools to control playback.
 In a given grid-plot, the date slider can be dragged to view a specific date.
-Hovering your cursor over a state will show its data for the selected date.
+Hovering your cursor over a region will show its data for the selected date.
 In addition, the play/pause button will step through date by date until it reaches the end.</p>
 </div>
 <div class="admonitionblock note">
@@ -2903,9 +2904,8 @@ In addition, the play/pause button will step through date by date until it reach
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The interactive timeline takes quite a while to load.
-If your device or browser isn&#8217;t well suited for interactivity, a static video showing the progression day-by-day differences is available <a href="./figures/Geo/dod_diffs.mp4">here</a>.<br>
-If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device.
+<p>The interactive timelines take quite a while to load.
+If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
 If you think your device is big enough and nothing is loading below, try refreshing the page.</p>
 </div>
 </td>
@@ -2916,12 +2916,12 @@ If you think your device is big enough and nothing is loading below, try refresh
 <h4 id="timeline-interactive-world"><a class="link" href="#timeline-interactive-world">🌍 World</a></h4>
 <div class="sect4">
 <h5 id="timeline-interactive-world-cummulative"><a class="link" href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></h5>
-<script src="countries_total_interactive_autoload.js" id="c3efc4b3-1cc5-4174-bd1f-5d93d67cccae"></script>
+<script src="countries_total_interactive_autoload.js" id="48582700-b892-4df2-89fb-707d063be9aa"></script>
 <div style="height: 1em;"></div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-world-dod-diff"><a class="link" href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></h5>
-<script src="countries_diff_interactive_autoload.js" id="d558eedc-e0bd-46b5-bb9f-698b9b0ba57a"></script>
+<script src="countries_diff_interactive_autoload.js" id="b373bb17-e322-4ccf-86b6-8398f1bfb1cd"></script>
 <div style="height: 1em;"></div>
 </div>
 </div>
@@ -2929,12 +2929,12 @@ If you think your device is big enough and nothing is loading below, try refresh
 <h4 id="timeline-interactive-usa-states"><a class="link" href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a></h4>
 <div class="sect4">
 <h5 id="timeline-interactive-usa-states-cummulative"><a class="link" href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></h5>
-<script src="usa_states_total_interactive_autoload.js" id="7eeff823-e2ce-4751-b75b-9a29c3d6d5c0"></script>
+<script src="usa_states_total_interactive_autoload.js" id="4f1a675b-c694-4d98-898f-68d9a899b1ea"></script>
 <div style="height: 1em;"></div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h5>
-<script src="usa_states_diff_interactive_autoload.js" id="f30f233b-7b5c-4f6b-abaf-3937b689adc8"></script>
+<script src="usa_states_diff_interactive_autoload.js" id="7f2c825c-875d-4d56-9b40-efa48f5ba6a8"></script>
 <div style="height: 1em;"></div>
 </div>
 </div>
@@ -3074,7 +3074,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-23 16:28:21 -0400
+Last updated 2020-04-23 20:19:28 -0400
 </div>
 </div>
 </body>

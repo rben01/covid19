@@ -236,25 +236,25 @@ And the true CFR within a region can itself change over time as treatment qualit
 [[graphs-timeline-interactive-us]]
 === {icon-interactive-timeline} Interactive Trackers
 
-This section contains four interactive 2x2 grid-plots: two for the U.S. and two for the world's countries.
-Both grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed in the 48 continental U.S. states and Washington, D.C.
-The first grid-plot shows these numbers cumulatively since coronavirus was first confirmed in the U.S.
-The second one shows how these numbers increased each day.
-For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6). +
-States that are light gray on a given day had no cases/deaths that day.
+This section contains two pairs of interactive 2x2 grid-plots: one pair for the continental U.S. and one pair for the world's countries (due to data issues, a handful of countries are not present).
+All four grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed over time.
+In each pair, the first grid-plot shows these numbers cumulatively and the second grid-plot shows how these numbers increased each day.
+For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first U.S. grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6). +
+Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
 Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant.
-Also, note that because the per-capita numbers in the two grid-plots have such different magnitudes, they have different denominators (10,000 vs 100,000). +
+Also, note that because of the different scales of numbers, the cumulative and day-over-day per-capita numbers use different denominators (10,000 vs 100,000). +
+Each grid-plot has tools in the top right to pan, zoom, and reset the view.
+Along the bottoms are tools to control playback.
 In a given grid-plot, the date slider can be dragged to view a specific date.
-Hovering your cursor over a state will show its data for the selected date.
+Hovering your cursor over a region will show its data for the selected date.
 In addition, the play/pause button will step through date by date until it reaches the end.
 
 [NOTE]
 --
-The interactive timeline takes quite a while to load.
-If your device or browser isn't well suited for interactivity, a static video showing the progression day-by-day differences is available link:{timeline-video-dir}/dod_diffs.mp4[here]. +
-If your device is small you may not see anything below; try rotating your device or visiting this site on a larger device.
+The interactive timelines take quite a while to load.
+If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
 If you think your device is big enough and nothing is loading below, try refreshing the page.
 --
 
