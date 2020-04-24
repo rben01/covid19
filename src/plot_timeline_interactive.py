@@ -485,14 +485,14 @@ def __make_daybyday_interactive_timeline(
                 )
             plot_aspect_ratio = (x_range[1] - x_range[0]) / (y_range[1] - y_range[0])
 
-        # Create figure object.
+        # Create figure object
         p = bplotting.figure(
             title=fig_title,
             title_location="above",
             tools=[
                 hover_tool,
-                PanTool(),
                 BoxZoomTool(match_aspect=True),
+                PanTool(),
                 ZoomInTool(),
                 ZoomOutTool(),
                 ResetTool(),
@@ -583,15 +583,18 @@ def __make_daybyday_interactive_timeline(
     figs_iter = iter(np.ravel(figures))
     anchor_fig = next(figs_iter)
 
+    if x_range is not None and y_range is not None:
+        data_aspect_ratio = (x_range[1] - x_range[0]) / (y_range[1] - y_range[0])
+    else:
+        data_aspect_ratio = plot_aspect_ratio
+
     if x_range is not None:
         anchor_fig.x_range = Range1d(
-            *x_range, bounds="auto", min_interval=min_interval * plot_aspect_ratio
+            *x_range, bounds="auto", min_interval=min_interval * data_aspect_ratio
         )
 
     if y_range is not None:
-        anchor_fig.y_range = Range1d(
-            *y_range, bounds="auto", min_interval=min_interval * plot_aspect_ratio
-        )
+        anchor_fig.y_range = Range1d(*y_range, bounds="auto", min_interval=min_interval)
 
     for fig in figs_iter:
         fig.x_range = anchor_fig.x_range
