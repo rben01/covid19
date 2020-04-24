@@ -2,6 +2,7 @@
 import enum
 import functools
 import itertools
+import re
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
 
@@ -614,6 +615,20 @@ def __make_daybyday_interactive_timeline(
     # for i, g in enumerate(plot_layout):
     #     plot_layout[i] = layout_row(g, sizing_mode="scale_both")
 
+    _THIS_PLOT_ID = re.sub(
+        r"\W+",
+        "_",
+        "__".join(
+            [
+                f"ofb_{out_file_basename}",
+                f"spp_{subplot_title_prefix}",
+                f"vc_{value_col}",
+                f"s_{'_'.join([s.name for s in stage_list])}",
+                f"c_{'_'.join([c.name for c in count_list])}",
+            ]
+        ),
+    )
+
     _TIMER_KEY = "'timer'"
     _IS_ACTIVE_KEY = "'isActive'"
     _SELECTED_INDEX_KEY = "'selectedIndex'"
@@ -621,7 +636,8 @@ def __make_daybyday_interactive_timeline(
     _TIMER_START_DATE = "'startDate'"
     _TIMER_ELAPSED_TIME_MS = "'elapsedTime'"
     _SPEEDS_KEY = "'SPEEDS'"
-    _PLAYBACK_INFO = "playbackInfo"
+    _PLAYBACK_INFO = f"window._playbackInfo__{_THIS_PLOT_ID}"
+    print(_PLAYBACK_INFO)
 
     _PBI_TIMER = f"{_PLAYBACK_INFO}[{_TIMER_KEY}]"
     _PBI_IS_ACTIVE = f"{_PLAYBACK_INFO}[{_IS_ACTIVE_KEY}]"
@@ -633,8 +649,8 @@ def __make_daybyday_interactive_timeline(
     _PBI_CURR_INTERVAL = f"{_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]"
 
     _SETUP_WINDOW_PLAYBACK_INFO = f"""
-        if (typeof(window._playbackInfo) === 'undefined') {{
-            window._playbackInfo = {{
+        if (typeof({_PLAYBACK_INFO}) === 'undefined') {{
+            {_PLAYBACK_INFO} = {{
                 {_TIMER_KEY}: null,
                 {_IS_ACTIVE_KEY}: false,
                 {_SELECTED_INDEX_KEY}: 1,
@@ -645,7 +661,6 @@ def __make_daybyday_interactive_timeline(
             }};
         }}
 
-        var {_PLAYBACK_INFO} = window._playbackInfo
     """
 
     _DEFFUN_INCR_DATE = f"""
@@ -660,6 +675,7 @@ def __make_daybyday_interactive_timeline(
             }}
 
             if (dateSlider.value >= maxDate) {{
+                console.log(dateSlider.value, maxDate)
                 console.log('reached end')
                 clearInterval({_PBI_TIMER});
                 {_PBI_IS_ACTIVE} = false;
