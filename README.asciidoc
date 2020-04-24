@@ -134,6 +134,10 @@ endif::[]
 :doubling-time-explanation-cases: The thin dotted lines are annoted with a time period and show how the number of cases would grow if it doubled periodically with that period.
 :doubling-time-explanation-deaths: The thin dotted lines are annoted with a time period and show how the number of deaths would grow if it doubled periodically with that period.
 
+ifdef::env-github[]
+__Read this page as a standalone webpage https://rben01.github.io/covid19/[here], where it is formatted much more nicely than GitHub's READMEs.__
+endif::[]
+
 [.lead]
 This page contains graphs of the spread of coronavirus throughout the world and code to create those graphs.
 
@@ -141,11 +145,6 @@ This page contains graphs of the spread of coronavirus throughout the world and 
 While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistic.
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.
 ****
-
-ifdef::env-github[]
-__Read this page as a standalone webpage https://rben01.github.io/covid19/[here], where it is formatted much more nicely than GitHub's READMEs.__
-endif::[]
-
 
 [[sect-setup]]
 == {icon-setup} Setup
