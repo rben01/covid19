@@ -2,7 +2,7 @@
 import enum
 import functools
 import itertools
-import re
+import uuid
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
 
@@ -612,22 +612,8 @@ def __make_daybyday_interactive_timeline(
         )
     ]
 
-    # for i, g in enumerate(plot_layout):
-    #     plot_layout[i] = layout_row(g, sizing_mode="scale_both")
-
-    _THIS_PLOT_ID = re.sub(
-        r"\W+",
-        "_",
-        "__".join(
-            [
-                f"ofb_{out_file_basename}",
-                f"spp_{subplot_title_prefix}",
-                f"vc_{value_col}",
-                f"s_{'_'.join([s.name for s in stage_list])}",
-                f"c_{'_'.join([c.name for c in count_list])}",
-            ]
-        ),
-    )
+    # Create unique ID for the JS playback info object for this plot
+    _THIS_PLOT_ID = uuid.uuid4().hex
 
     _TIMER_KEY = "'timer'"
     _IS_ACTIVE_KEY = "'isActive'"
@@ -636,8 +622,7 @@ def __make_daybyday_interactive_timeline(
     _TIMER_START_DATE = "'startDate'"
     _TIMER_ELAPSED_TIME_MS = "'elapsedTime'"
     _SPEEDS_KEY = "'SPEEDS'"
-    _PLAYBACK_INFO = f"window._playbackInfo__{_THIS_PLOT_ID}"
-    print(_PLAYBACK_INFO)
+    _PLAYBACK_INFO = f"window._playbackInfo_{_THIS_PLOT_ID}"
 
     _PBI_TIMER = f"{_PLAYBACK_INFO}[{_TIMER_KEY}]"
     _PBI_IS_ACTIVE = f"{_PLAYBACK_INFO}[{_IS_ACTIVE_KEY}]"
