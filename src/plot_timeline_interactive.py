@@ -499,9 +499,9 @@ def __make_daybyday_interactive_timeline(
             ],
             aspect_ratio=plot_aspect_ratio,
             output_backend="webgl",
-            lod_factor=10,
+            lod_factor=4,
             lod_interval=400,
-            lod_threshold=1,
+            lod_threshold=1000,
             lod_timeout=300,
         )
 
