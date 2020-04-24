@@ -937,7 +937,7 @@ def _make_daybyday_diff_interactive_timeline(
         out_file_basename=f"{out_file_basename}_diff_interactive",
         subplot_title_prefix="New Daily",
         plot_aspect_ratio=plot_aspect_ratio,
-        per_capita_denominator=10000,
+        per_capita_denominator=100000,
         x_range=x_range,
         y_range=y_range,
         min_interval=min_interval,

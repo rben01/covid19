@@ -243,8 +243,7 @@ For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left qu
 Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
-Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant.
-Also, note that because of the different scales of numbers, the cumulative and day-over-day per-capita numbers use different denominators (10,000 vs 100,000). +
+Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant. +
 Each grid-plot has tools in the top right to pan, zoom, and reset the view.
 Along the bottoms are tools to control playback.
 In a given grid-plot, the date slider can be dragged to view a specific date.
