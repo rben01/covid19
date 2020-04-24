@@ -430,7 +430,7 @@ image:{fig-dir}/{per-capita-dir}/{fixed-date-dir}/{stage-all-dir}/{img-usa-state
 image:{fig-dir}/{total-count-dir}/{since-outbreak-dir}/{stage-confirmed-dir}/{img-usa-states}[{img-args}]
 
 [[usa-top-states-deaths-since]]
-===== {title-usa-deaths-since-25}
+===== {title-usa-states-deaths-since-25}
 
 :img-alt: {title-usa-states-deaths-since-25}
 :img-desc: {img-alt}. {doubling-time-explanation-deaths}
