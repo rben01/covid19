@@ -9,6 +9,5 @@ curr_branch="$(git rev-parse --abbrev-ref HEAD)" &&
 	git status &&
 	git add -A . &&
 	git commit -m "Auto update with new data" &&
-	git push &&
 	git checkout "$curr_branch" &&
 	if [ "$curr_branch" != "$ghpages_branch" ]; then echo "Back on branch '$curr_branch'"; else echo "Still on branch '$ghpages_branch'"; fi
