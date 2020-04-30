@@ -528,7 +528,7 @@ class Urls:
         + "data/clean/world-daily-historical.csv"
     )
     COVIDTRACKING_STATES_DAILY_HISTORICAL = (
-        "https://covidtracking.com/api/states/daily.csv"
+        "https://covidtracking.com/api/v1/states/daily.csv"
     )
 
     HEADERS = {

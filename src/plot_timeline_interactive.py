@@ -5,7 +5,7 @@ import itertools
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Callable, List, Tuple, Union
+from typing import Callable, List, NewType, Tuple, Union
 
 import bokeh.plotting as bplotting
 import cmocean
@@ -51,11 +51,11 @@ GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 PNG_SAVE_ROOT_DIR: Path = GEO_FIG_DIR / "BokehInteractiveStatic"
 PNG_SAVE_ROOT_DIR.mkdir(parents=True, exist_ok=True)
 
-Polygon = List[Tuple[float, float]]
-MultiPolygon = List[Tuple[Polygon]]
-DateString = str
-BokehColor = str
-InfoForAutoload = Tuple[str, str]
+Polygon = NewType("Polygon", List[Tuple[float, float]])
+MultiPolygon = NewType("MultiPolygon", List[Tuple[Polygon]])
+DateString = NewType("DateString", str)
+BokehColor = NewType("BokehColor", str)
+InfoForAutoload = NewType("InfoForAutoload", Tuple[str, str])
 
 LAT_COL = "Lat_"
 LONG_COL = "Long_"
@@ -80,7 +80,7 @@ class WorldCRS(enum.Enum):
             return {
                 "x_range": (-2.125e7, 2.125e7),
                 "y_range": (-7e6, 1e7),
-                "min_interval": 1e6,
+                "min_visible_y_range": 1e6,
                 "plot_aspect_ratio": 2,
             }
 
@@ -178,10 +178,11 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         / "ne_110m_admin_0_map_units.shp"
     ).to_crs(WorldCRS.default().value)
 
-    # display(geo_df)
-    # display(geo_df.columns)
     geo_df = geo_df.rename(columns={"ADMIN": REGION_NAME_COL}, errors="raise")
 
+    # Keys are what's in the geo df, values are what we want to rename them to
+    # Values must match the names in the original data source (if you don't like those
+    # names, change them there and then come back and change the values here)
     geo_df[REGION_NAME_COL] = (
         geo_df[REGION_NAME_COL]
         .map(
@@ -222,8 +223,8 @@ def __make_daybyday_interactive_timeline(
     per_capita_denominator: int = None,
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
-    min_interval: float,
-    should_make_video=True,
+    min_visible_y_range: float,
+    should_make_video,
 ) -> InfoForAutoload:
 
     Counting.verify(count, allow_select=True)
@@ -296,7 +297,7 @@ def __make_daybyday_interactive_timeline(
 
     # Make sure data exists for every date for every state so that the entire country is
     # plotted each day; fill missing data with 0 (missing really *is* as good as 0)
-    # enums will be replaced by their name (this is kind of important)
+    # enums will be replaced by their name (kind of important)
     id_cols_product: pd.MultiIndex = pd.MultiIndex.from_product(
         [
             df[REGION_NAME_COL].unique(),
@@ -319,7 +320,7 @@ def __make_daybyday_interactive_timeline(
     if transform_df_func is not None:
         df = transform_df_func(df)
 
-    df = geo_df.merge(df, how="inner", on=REGION_NAME_COL,)[
+    df = geo_df.merge(df, how="inner", on=REGION_NAME_COL)[
         [
             REGION_NAME_COL,
             Columns.DATE,
@@ -381,7 +382,7 @@ def __make_daybyday_interactive_timeline(
     # Ideally we wouldn't have to pivot, and we could do a JIT join of state longs/lats
     # after filtering the data. Unfortunately this is not possible, and a long data
     # format leads to duplication of the very large long/lat lists; pivoting is how we
-    # avoid that
+    # avoid that. (This seems to be one downside of bokeh when compared to plotly)
     df = (
         df.pivot_table(
             index=[REGION_NAME_COL, Columns.STAGE, Columns.COUNT_TYPE],
@@ -413,13 +414,6 @@ def __make_daybyday_interactive_timeline(
         ]
         for stage, count in itertools.product(stage_list, count_list)
     ]
-
-    # Data is associated with the right endpoint of the data collection period,
-    # e.g., data collected *on* March 20 is labeled March 21 -- this is done so that
-    # data collected today (on the day the code is run) has a meaningful date
-    # associated with it (today's current time)
-    # Anyway, here we undo that and display data on the date it was collected
-    # in order to show a meaningful title on the graph
 
     figures = []
 
@@ -599,11 +593,15 @@ def __make_daybyday_interactive_timeline(
 
     if x_range is not None:
         anchor_fig.x_range = Range1d(
-            *x_range, bounds="auto", min_interval=min_interval * data_aspect_ratio
+            *x_range,
+            bounds="auto",
+            min_interval=min_visible_y_range * data_aspect_ratio,
         )
 
     if y_range is not None:
-        anchor_fig.y_range = Range1d(*y_range, bounds="auto", min_interval=min_interval)
+        anchor_fig.y_range = Range1d(
+            *y_range, bounds="auto", min_interval=min_visible_y_range
+        )
 
     for fig in figs_iter:
         fig.x_range = anchor_fig.x_range
@@ -938,7 +936,8 @@ def _make_daybyday_total_interactive_timeline(
     plot_aspect_ratio: float = None,
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
-    min_interval: float,
+    min_visible_y_range: float,
+    should_make_video: bool,
 ) -> InfoForAutoload:
 
     return __make_daybyday_interactive_timeline(
@@ -953,7 +952,8 @@ def _make_daybyday_total_interactive_timeline(
         per_capita_denominator=100_000,
         x_range=x_range,
         y_range=y_range,
-        min_interval=min_interval,
+        min_visible_y_range=min_visible_y_range,
+        should_make_video=should_make_video,
     )
 
 
@@ -967,7 +967,8 @@ def _make_daybyday_diff_interactive_timeline(
     plot_aspect_ratio: float = None,
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
-    min_interval: float,
+    min_visible_y_range: float,
+    should_make_video: bool,
 ) -> InfoForAutoload:
 
     DIFF_COL = "Diff_"
@@ -994,7 +995,8 @@ def _make_daybyday_diff_interactive_timeline(
         per_capita_denominator=100000,
         x_range=x_range,
         y_range=y_range,
-        min_interval=min_interval,
+        min_visible_y_range=min_visible_y_range,
+        should_make_video=should_make_video,
     )
 
 
@@ -1003,10 +1005,10 @@ def __assign_region_name_col(df: pd.DataFrame, region_name_col: str) -> pd.DataF
 
 
 def _prepare_usa_states_df(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()[
+    df = df[
         (df[Columns.TWO_LETTER_STATE_CODE].isin(USA_STATE_CODES))
         & (~df[Columns.TWO_LETTER_STATE_CODE].isin(["AK", "HI"]))
-    ]
+    ].copy()
 
     df = __assign_region_name_col(df, Columns.TWO_LETTER_STATE_CODE)
 
@@ -1023,15 +1025,22 @@ def _get_usa_kwargs() -> dict:
         "out_file_basename": "usa_states",
         "x_range": (-2.25e6, 2.7e6),
         "y_range": (-2.3e6, 9e5),
-        "min_interval": 8.5e5,
+        "min_visible_y_range": 8.5e5,
     }
 
 
 @functools.lru_cache(None)
-def _get_countries_kwargs() -> dict:
+def _get_countries_kwargs(
+    world_crs: Union[WorldCRS, Literal[Select.DEFAULT]] = Select.DEFAULT
+) -> dict:
+    if world_crs is Select.DEFAULT:
+        world_crs = WorldCRS.default()
+
+    world_crs: WorldCRS
+
     return {
         "out_file_basename": "countries",
-        **WorldCRS.default().get_axis_info(),
+        **world_crs.get_axis_info(),
     }
 
 
@@ -1041,6 +1050,7 @@ def make_usa_daybyday_total_interactive_timeline(
     usa_states_geo_df: geopandas.GeoDataFrame = None,
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    should_make_video: bool,
 ) -> Tuple:
 
     states_df = _prepare_usa_states_df(states_df)
@@ -1053,6 +1063,7 @@ def make_usa_daybyday_total_interactive_timeline(
         geo_df=usa_states_geo_df,
         stage=stage,
         count=count,
+        should_make_video=should_make_video,
         **_get_usa_kwargs(),
     )
 
@@ -1063,6 +1074,7 @@ def make_usa_daybyday_diff_interactive_timeline(
     usa_states_geo_df: geopandas.GeoDataFrame = None,
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    should_make_video: bool,
 ) -> InfoForAutoload:
 
     states_df = _prepare_usa_states_df(states_df)
@@ -1076,6 +1088,7 @@ def make_usa_daybyday_diff_interactive_timeline(
         geo_df=usa_states_geo_df,
         stage=stage,
         count=count,
+        should_make_video=should_make_video,
         **_get_usa_kwargs(),
     )
 
@@ -1086,6 +1099,7 @@ def make_countries_daybyday_total_interactive_timeline(
     countries_geo_df: geopandas.GeoDataFrame = None,
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    should_make_video: bool,
 ) -> InfoForAutoload:
 
     countries_df = _prepare_countries_df(countries_df)
@@ -1098,6 +1112,7 @@ def make_countries_daybyday_total_interactive_timeline(
         geo_df=countries_geo_df,
         stage=stage,
         count=count,
+        should_make_video=should_make_video,
         **_get_countries_kwargs(),
     )
 
@@ -1108,6 +1123,7 @@ def make_countries_daybyday_diff_interactive_timeline(
     countries_geo_df: geopandas.GeoDataFrame = None,
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
+    should_make_video: bool,
 ) -> InfoForAutoload:
 
     countries_df = _prepare_countries_df(countries_df)
@@ -1120,6 +1136,7 @@ def make_countries_daybyday_diff_interactive_timeline(
         geo_df=countries_geo_df,
         stage=stage,
         count=count,
+        should_make_video=should_make_video,
         **_get_countries_kwargs(),
     )
 

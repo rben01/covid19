@@ -35,14 +35,14 @@ if __name__ == "__main__":
         timeline_group.add_argument(
             "--no-timeline",
             action="store_true",
-            help="Don't create the USA timeline video",
+            help="Don't create the video timelines of case progression",
         )
         timeline_group.add_argument(
             "--force-timeline",
             action="store_true",
             help=(
-                "Unconditionally create the USA timeline "
-                + "video (even when there's no new data)"
+                "Unconditionally create the video timelines of case progression"
+                + " (even when there's no new data)"
             ),
         )
 
@@ -472,16 +472,7 @@ def _do_static_plots(df: pd.DataFrame):
     )
 
 
-def _do_timeline(df: pd.DataFrame):
-    from plot_timeline import plot_usa_daybyday_case_diffs, make_video
-
-    plot_usa_daybyday_case_diffs(
-        get_usa_states_df(df), stage=Select.ALL, count=Select.ALL
-    )
-    make_video(0.9)
-
-
-def _do_interactive(df: pd.DataFrame):
+def _do_interactive(df: pd.DataFrame, *, make_video: bool):
     from plot_timeline_interactive import (
         make_usa_daybyday_diff_interactive_timeline,
         make_usa_daybyday_total_interactive_timeline,
@@ -489,15 +480,15 @@ def _do_interactive(df: pd.DataFrame):
         make_countries_daybyday_total_interactive_timeline,
     )
 
-    make_usa_daybyday_diff_interactive_timeline(get_usa_states_df(df))
-    make_usa_daybyday_total_interactive_timeline(get_usa_states_df(df))
+    video_kwargs = {"should_make_video": make_video}
 
-    make_countries_daybyday_diff_interactive_timeline(
-        get_countries_df(df, include_china=True)
-    )
-    make_countries_daybyday_total_interactive_timeline(
-        get_countries_df(df, include_china=True)
-    )
+    states_df = get_usa_states_df(df)
+    make_usa_daybyday_diff_interactive_timeline(states_df, **video_kwargs)
+    make_usa_daybyday_total_interactive_timeline(states_df, **video_kwargs)
+
+    countries_df = get_countries_df(df, include_china=True)
+    make_countries_daybyday_diff_interactive_timeline(countries_df, **video_kwargs)
+    make_countries_daybyday_total_interactive_timeline(countries_df, **video_kwargs)
 
     print("Created interactive")
 
@@ -541,11 +532,8 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         if namespace.force_graphs:
             _do_static_plots(df)
 
-        if namespace.force_timeline:
-            _do_timeline(df)
-
         if namespace.force_interactive:
-            _do_interactive(df)
+            _do_interactive(df, make_video=namespace.force_timeline)
     else:
         print("Got new data")
         if namespace.create_data_table:
@@ -554,11 +542,8 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         if not namespace.no_graphs:
             _do_static_plots(df)
 
-        if not namespace.no_timeline:
-            _do_timeline(df)
-
         if not namespace.no_interactive:
-            _do_interactive(df)
+            _do_interactive(df, make_video=not namespace.no_timeline)
 
     return df
 
