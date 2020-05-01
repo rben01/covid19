@@ -47,6 +47,7 @@ from typing_extensions import Literal
 from constants import USA_STATE_CODES, Columns, Counting, DiseaseStage, Paths, Select
 from plotting_utils import resize_to_even_dims
 
+GEO_DATA_DIR = Paths.DATA / "Geo"
 GEO_FIG_DIR: Path = Paths.FIGURES / "Geo"
 PNG_SAVE_ROOT_DIR: Path = GEO_FIG_DIR / "BokehInteractiveStatic"
 PNG_SAVE_ROOT_DIR.mkdir(parents=True, exist_ok=True)
@@ -73,9 +74,28 @@ class WorldCRS(enum.Enum):
 
     @staticmethod
     def default() -> "WorldCRS":
+        """Get the default CRS (effectively a file-wide constant, except you can't
+        define constants in enums b/c they'll be interpreted as cases)
+
+        :return: The default case
+        :rtype: WorldCRS
+        """
         return WorldCRS.EQUIRECTANGULAR
 
     def get_axis_info(self) -> dict:
+        """Get axis parameters appropriate for this CRS
+
+        CRSes project the world into different coordinate systems (like, some are
+        long/lat, some are numbers in the hundreds of thousands). This function maps
+        CRSes to appropriate axis kwargs for plotting a choropleth in the given CRS.
+        The kwargs are used to construct Bokeh's Range1d, but there isn't a direct 1:1
+        correspondence between kwarg keys and Range1d's parameters (so you can use any
+        keys you want, but you then have to map them back to Range1d parameters).
+
+        :raises NotImplementedError: If `self` is anything other than EQUIRECTANGULAR
+        :return: The arguments to be
+        :rtype: dict
+        """
         if self is WorldCRS.EQUIRECTANGULAR:
             return {
                 "x_range": (-2.125e7, 2.125e7),
@@ -90,13 +110,22 @@ class WorldCRS(enum.Enum):
 
 
 def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
+    """Given a geopandas.GeoDataFrame, add two columns, long and lat, containing the
+    coordinates of the geometry's (multi)polygons in a format appropriate for Bokeh
+
+    :param geo_df: The GeoDataFrame for the region of interest (e.g., the world, the US)
+    :type geo_df: geopandas.GeoDataFrame
+    :return: The same GeoDataFrame with two additional columns, one with long and one
+    with lat. These columns' elements are lists of (multi)polygon vertices.
+    :rtype: geopandas.GeoDataFrame
+    """
 
     geo_df = geo_df.copy()
 
     # geopandas gives us geometry as (Multi)Polygons
     # bokeh expects two lists, lat and long, each of which is a 1-D list of floats with
-    # nan used to separate the discontiguous regions of a multi-polygon
-    # We do this conversion here
+    # "NaN" used to separate the discontiguous regions of a multi-polygon
+    # No that's not a typo, it's really the string "NaN"
     # Contrary to the usual English pairing "latitude/longitude", we always have long
     # precede lat here, as long is the x and lat is the y (and in this sense the
     # usual English specification is backwards)
@@ -109,8 +138,10 @@ def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
         # representing the vertices
         # MultiPolygons are lists thereof
         # I don't know why they use 1-tuples instead of just tup[0], but they do
-        shape_info = shapely_mapping(multipoly)
-        shape_type = shape_info["type"]
+        shape_info: dict = shapely_mapping(multipoly)
+        shape_type: str = shape_info["type"]
+        # Another option would be Point, but our geo data doesn't have locations
+        # like that
         assert shape_type in ["Polygon", "MultiPolygon"]
 
         polygons = shape_info["coordinates"]
@@ -121,10 +152,8 @@ def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
         polygons: MultiPolygon
 
         for poly_index, poly_tup in enumerate(polygons):
-            poly_tup: Tuple[Polygon]
-
             # Extract the sole element of the 1-tuple
-            poly = poly_tup[0]
+            poly: Polygon = poly_tup[0]
             polygon_vertex_longs, polygon_vertex_lats = zip(*poly)
 
             multipoly_vertex_longs.extend(polygon_vertex_longs)
@@ -146,19 +175,15 @@ def get_longs_lats(geo_df: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
 
 @functools.lru_cache(None)
 def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
-    """Get geometry and lat/lon coords for each US state
-
-    Bokeh's polygon plotting requires polygon vertices to be 1-D lists of floats with
-    nan separating the connected regions; here we take the geopandas geometry and
-    convert it into the desired lat/lon coords
+    """Get geometry and long/lat coords for each US state
 
     :return: GeoDataFrame containing, for each US state: 2-letter state code, geometry
-    (boundary), and lists of lat/lon coords in bokeh-compatible format
+    (boundary), and lists of long/lat coords in bokeh-compatible format
     :rtype: geopandas.GeoDataFrame
     """
 
     geo_df: geopandas.GeoDataFrame = geopandas.read_file(
-        Paths.DATA / "Geo" / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
+        GEO_DATA_DIR / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
     ).to_crs(
         "EPSG:2163"  # US National Atlas Equal Area (Google it)
     ).rename(
@@ -170,19 +195,25 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
 
 @functools.lru_cache(None)
 def get_countries_geo_df() -> geopandas.GeoDataFrame:
+    """Get geometry and long/lat coords for world countries
+
+    The country names in the returned GeoDataFrame must match those in the COVID data
+    source; if not, they must be remapped here.
+
+    :return: GeoDataFrame containing, for each country: name, geometry (boundary), and
+    lists of long/lat coords in bokeh-compatible format
+    :rtype: geopandas.GeoDataFrame
+    """
 
     geo_df: geopandas.GeoDataFrame = geopandas.read_file(
-        Paths.DATA
-        / "Geo"
-        / "ne_110m_admin_0_map_units"
-        / "ne_110m_admin_0_map_units.shp"
+        GEO_DATA_DIR / "ne_110m_admin_0_map_units" / "ne_110m_admin_0_map_units.shp"
     ).to_crs(WorldCRS.default().value)
 
     geo_df = geo_df.rename(columns={"ADMIN": REGION_NAME_COL}, errors="raise")
 
     # Keys are what's in the geo df, values are what we want to rename them to
-    # Values must match the names in the original data source (if you don't like those
-    # names, change them there and then come back and change the values here)
+    # Values must match the names in the original data source. If you don't like those
+    # names, change them there and then come back and change the values here.
     geo_df[REGION_NAME_COL] = (
         geo_df[REGION_NAME_COL]
         .map(
@@ -214,7 +245,7 @@ def __make_daybyday_interactive_timeline(
     stage: Union[DiseaseStage, Literal[Select.ALL]] = Select.ALL,
     count: Union[Counting, Literal[Select.ALL]] = Select.ALL,
     out_file_basename: str,
-    subplot_title_prefix,
+    subplot_title_prefix: str,
     plot_aspect_ratio: float = None,
     cmap=None,
     n_cbar_buckets: int = None,
@@ -224,17 +255,97 @@ def __make_daybyday_interactive_timeline(
     x_range: Tuple[float, float],
     y_range: Tuple[float, float],
     min_visible_y_range: float,
-    should_make_video,
+    should_make_video: bool,
 ) -> InfoForAutoload:
+    """Create the bokeh interactive timeline plot(s)
+
+    This function takes the given DataFrame, which must contain COVID data for locations
+    on different dates, and a GeoDataFrame, which contains the long/lat coords for those
+    locations, and creates an interactive choropleth of the COVID data over time.
+
+    :param df: The COVID data DataFrame
+    :type df: pd.DataFrame
+    :param geo_df: The geometry GeoDataFrame for the locations in `df`
+    :type geo_df: geopandas.GeoDataFrame
+    :param value_col: The column of `df` containing the values to plot in the
+    choropleth; should be something like "Case_Counts" or "Case_Diff_From_Prev_Day"
+    :type value_col: str
+    :param stage: The DiseaseStage to plot, defaults to Select.ALL. If ALL, then all
+    stages are plotted and are stacked vertically.
+    :type stage: Union[DiseaseStage, Literal[Select.ALL]], optional
+    :param count: The Counting to plot, defaults to Select.ALL. If ALL, then all
+    count types are plotted and are stacked horizontally.
+    :type count: Union[Counting, Literal[Select.ALL]], optional
+    :param out_file_basename: The basename of the file to save the interactive plots to
+    (there are two components, the JS script and the HTML <div>)
+    :type out_file_basename: str
+    :param subplot_title_prefix: What the first part of the subplot title should be;
+    probably a function of `value_col` (if value_col is "Case_Counts" then this param
+    might be "Cases" or "# of Cases")
+    :type subplot_title_prefix: str
+    :param x_range: The range of the x-axis as (min, max)
+    :type x_range: Tuple[float, float]
+    :param y_range: The range of the y-axis as (min, max)
+    :type y_range: Tuple[float, float]
+    :param min_visible_y_range: The minimum height (in axis units) of the y-axis; it
+    will not be possible to zoom in farther than this on the choropleth.
+    :type min_visible_y_range: float
+    :param should_make_video: Optionally run through the timeline day by day, capture
+    a screenshot for each day, and then stitch the screenshots into a video. The video
+    shows the same info as the interactive plots, but not interactively. This easily
+    takes 20x as long as just making the graphs themselves, so use with caution.
+    :type should_make_video: bool
+    :param transform_df_func: This function expects data in a certain format, and does
+    a bunch of preprocessing (expected to be common) before plotting. This gives you a
+    chance to do any customization on the postprocessed df before it's plotted. Defaults
+    to None, in which case no additional transformation is performed.
+    :type transform_df_func: Callable[[pd.DataFrame], pd.DataFrame], optional
+    :param plot_aspect_ratio: The aspect ratio of the plot as width/height; if set, the
+    aspect ratio will be fixed to this. Defaults to None, in which case the aspect ratio
+    is determined from the x_range and y_range arguments
+    :type plot_aspect_ratio: float, optional
+    :param cmap: The colormap to use as either a matplotlib-compatible colormap or a
+    list of hex strings (e.g., ["#ae8f1c", ...]). Defaults to None in which case a
+    reasonable default is used.
+    :type cmap: Matplotlib-compatible colormap or List[str], optional
+    :param n_cbar_buckets: How many colorbar buckets to use. Has little effect if the
+    colormap is continuous, but always works in conjunction with
+    n_buckets_btwn_major_ticks to determine the number of major ticks. Defaults to 6.
+    :type n_cbar_buckets: int, optional
+    :param n_buckets_btwn_major_ticks: How many buckets are to lie between colorbar
+    major ticks, determining how many major ticks are drawn. Defaults to 1.
+    :type n_buckets_btwn_major_ticks: int, optional
+    :param n_minor_ticks_btwn_major_ticks: How many minor ticks to draw between colorbar
+    major ticks. Defaults to 8 (which means each pair of major ticks has 10 ticks
+    total).
+    :type n_minor_ticks_btwn_major_ticks: int, optional
+    :param per_capita_denominator: When describing per-capita numbers, what to use as
+    the denominator (e.g., cases per 100,000 people). If None, it is automatically
+    computed per plot to be appropriately scaled for the data.
+    :type per_capita_denominator: int, optional
+    :raises ValueError: [description]
+    :return: The two pieces of info required to make a Bokeh autoloading HTML+JS plot:
+    the HTML div to be inserted somewhere in the HTML body, and the JS file that will
+    load the plot into that div.
+    :rtype: InfoForAutoload
+    """
 
     Counting.verify(count, allow_select=True)
     DiseaseStage.verify(stage, allow_select=True)
 
+    # The date as a string, so that bokeh can use it as a column name
     STRING_DATE_COL = "String_Date_"
+    # A column whose sole purpose is to be a (the same) date associated with each
+    # location
     FAKE_DATE_COL = "Fake_Date_"
+    # The column we'll actually use for the colors; it's computed from value_col
     COLOR_COL = "Color_"
 
+    # Under no circumstances may you change this date format
+    # It's not just a pretty date representation; it actually has to match up with the
+    # date strings computed in JS
     DATE_FMT = r"%Y-%m-%d"
+
     ID_COLS = [
         REGION_NAME_COL,
         Columns.DATE,
@@ -268,18 +379,22 @@ def __make_daybyday_interactive_timeline(
 
     color_list: List[BokehColor]
 
-    if count is Select.ALL:
-        count_list = list(Counting)
-    else:
-        count_list = [count]
-
     if stage is Select.ALL:
         stage_list = list(DiseaseStage)
     else:
         stage_list = [stage]
 
-    count_list: List[Counting]
+    if count is Select.ALL:
+        count_list = list(Counting)
+    else:
+        count_list = [count]
+
     stage_list: List[DiseaseStage]
+    count_list: List[Counting]
+
+    stage_count_list: List[Tuple[DiseaseStage, Counting]] = list(
+        itertools.product(stage_list, count_list)
+    )
 
     df = df.copy()
 
@@ -331,7 +446,7 @@ def __make_daybyday_interactive_timeline(
         ]
     ]
 
-    dates = [pd.Timestamp(d) for d in df[Columns.DATE].unique()]
+    dates: List[pd.Timestamp] = [pd.Timestamp(d) for d in df[Columns.DATE].unique()]
 
     values_mins_maxs = (
         df[df[value_col] > 0]
@@ -398,11 +513,12 @@ def __make_daybyday_interactive_timeline(
         )
     )
 
+    # All three oclumns are just initial values; they'll change with the date slider
     df[value_col] = df[max_date_str]
     df[FAKE_DATE_COL] = max_date_str
-
     df[COLOR_COL] = np.where(df[value_col] > 0, df[value_col], "NaN")
 
+    # Technically takes a df but we don't need the index
     bokeh_data_source = ColumnDataSource(
         {k: v.tolist() for k, v in df.to_dict(orient="series").items()}
     )
@@ -412,14 +528,12 @@ def __make_daybyday_interactive_timeline(
             GroupFilter(column_name=Columns.STAGE, group=stage.name),
             GroupFilter(column_name=Columns.COUNT_TYPE, group=count.name),
         ]
-        for stage, count in itertools.product(stage_list, count_list)
+        for stage, count in stage_count_list
     ]
 
     figures = []
 
-    for subplot_index, (stage, count) in enumerate(
-        itertools.product(stage_list, count_list)
-    ):
+    for subplot_index, (stage, count) in enumerate(stage_count_list):
         # fig = bplotting.figure()
         # ax: plt.Axes = fig.add_subplot(
         #     len(stage_list), len(count_list), subplot_index
@@ -441,11 +555,13 @@ def __make_daybyday_interactive_timeline(
         vmin = vmins[(stage.name, count.name)]
         vmax = vmaxs[(stage.name, count.name)]
 
-        # Set axes titles
-        fig_stage_name: str = {
-            DiseaseStage.CONFIRMED: "Cases",
-            DiseaseStage.DEATH: "Deaths",
-        }[stage]
+        # Compute and set axes titles
+        if stage is DiseaseStage.CONFIRMED:
+            fig_stage_name = "Cases"
+        elif stage is DiseaseStage.DEATH:
+            fig_stage_name = "Deaths"
+        else:
+            raise ValueError
 
         fig_title_components: List[str] = []
         if subplot_title_prefix is not None:
@@ -470,15 +586,6 @@ def __make_daybyday_interactive_timeline(
 
         fig_title = " ".join(fig_title_components)
 
-        hover_tool = HoverTool(
-            tooltips=[
-                ("Date", f"@{{{FAKE_DATE_COL}}}"),
-                ("State", f"@{{{REGION_NAME_COL}}}"),
-                ("Count", f"@{{{value_col}}}{tooltip_fmt}"),
-            ],
-            toggleable=False,
-        )
-
         if plot_aspect_ratio is None:
             if x_range is None or y_range is None:
                 raise ValueError(
@@ -492,7 +599,14 @@ def __make_daybyday_interactive_timeline(
             title=fig_title,
             title_location="above",
             tools=[
-                hover_tool,
+                HoverTool(
+                    tooltips=[
+                        ("Date", f"@{{{FAKE_DATE_COL}}}"),
+                        ("State", f"@{{{REGION_NAME_COL}}}"),
+                        ("Count", f"@{{{value_col}}}{tooltip_fmt}"),
+                    ],
+                    toggleable=False,
+                ),
                 PanTool(),
                 BoxZoomTool(match_aspect=True),
                 ZoomInTool(),
@@ -510,7 +624,7 @@ def __make_daybyday_interactive_timeline(
 
         p.xgrid.grid_line_color = None
         p.ygrid.grid_line_color = None
-        # Add patch renderer to figure.
+        # Finally, add the actual choropleth data we care about
         p.patches(
             LONG_COL,
             LAT_COL,
@@ -522,7 +636,7 @@ def __make_daybyday_interactive_timeline(
             fill_alpha=1,
         )
 
-        # Add evenly spaced ticks and their labels
+        # Add evenly spaced ticks and their labels to the colorbar
         # First major, then minor
         # Adapted from https://stackoverflow.com/a/50314773
         bucket_size = (vmax / vmin) ** (1 / n_cbar_buckets)
@@ -550,8 +664,6 @@ def __make_daybyday_interactive_timeline(
                 )[1:-1]
             )
 
-        # Define custom tick labels for color bar.
-        # Create color bar.
         color_bar = ColorBar(
             color_mapper=color_mapper,
             ticker=FixedTicker(ticks=major_tick_locs, minor_ticks=minor_tick_locs),
@@ -571,10 +683,7 @@ def __make_daybyday_interactive_timeline(
             orientation="vertical",
         )
 
-        # Specify figure layout.
         p.add_layout(color_bar, "right")
-
-        # Display figure inline in Jupyter Notebook.
         p.hover.point_policy = "follow_mouse"
 
         # Bokeh axes (and most other things) are splattable
@@ -582,7 +691,8 @@ def __make_daybyday_interactive_timeline(
 
         figures.append(p)
 
-    # Make all figs pan and zoom together
+    # Make all figs pan and zoom together by setting their axes equal to each other
+    # Also fix the plots' aspect ratios
     figs_iter = iter(np.ravel(figures))
     anchor_fig = next(figs_iter)
 
@@ -616,7 +726,19 @@ def __make_daybyday_interactive_timeline(
     )
     plot_layout = [gp]
 
-    # Create unique ID for the JS playback info object for this plot
+    # Ok, pause
+    # Now we're going into a whole other thing: we're doing all the JS logic behind a
+    # date slider that changes which date is shown on the graphs. The structure of the
+    # data is one column per date, one row per location, and a few extra columns to
+    # store the data the graph will use. When we adjust the date of the slider, we copy
+    # the relevant column of the df into the columns the graphs are looking at.
+    # That's the easy part; the hard part is handling the "play button" functionality,
+    # whereby the user can click one button and the date slider will periodically
+    # advance itself. That requires a fair bit of logic to schedule and cancel the
+    # timers and make it all feel right.
+
+    # Create unique ID for the JS playback info object for this plot (since it'll be on
+    # the webpage with other plots, and their playback info isn't shared)
     _THIS_PLOT_ID = uuid.uuid4().hex
 
     _TIMER_KEY = "'timer'"
@@ -653,6 +775,12 @@ def __make_daybyday_interactive_timeline(
     """
 
     _DEFFUN_INCR_DATE = f"""
+        // See this link for why this works (it's an undocumented feature?)
+        // https://discourse.bokeh.org/t/5254
+        // Tl;dr we need this to automatically update the hover as the play button plays
+        // Without this, the hover tooltip only updates when we jiggle the mouse
+        // slightly
+
         let prev_val = null;
         source.inspect.connect(v => prev_val = v);
 
@@ -675,6 +803,7 @@ def __make_daybyday_interactive_timeline(
 
             dateSlider.change.emit();
 
+            // This is pt. 2 of the prev_val/inspect stuff above
             if (prev_val !== null) {{
                 source.inspect.emit(prev_val);
             }}
@@ -721,7 +850,7 @@ def __make_daybyday_interactive_timeline(
 
         const sliderValue = cb_obj.value;
         const sliderDate = new Date(sliderValue)
-        // Ugh, actually requiring the date to be YYYY-MM-DD
+        // Ugh, actually requiring the date to be YYYY-MM-DD (matching DATE_FMT)
         const dateStr = sliderDate.toISOString().split('T')[0]
 
         const data = source.data;
@@ -754,7 +883,7 @@ def __make_daybyday_interactive_timeline(
     )
 
     # Taking day-over-day diffs means the min slider day is one more than the min data
-    # date
+    # date (might be off by 1 if not using day over diffs but in practice not an issue)
     min_slider_date = min_date + pd.Timedelta(days=1)
     date_slider = DateSlider(
         start=min_slider_date,
@@ -791,8 +920,8 @@ def __make_daybyday_interactive_timeline(
                 dateSlider.value = minDate;
                 dateSlider.change.emit();
 
-                // Hack to get timer to wait after date slider wraps; any nonzero number
-                // works but the smaller the better
+                // Hack to get timer to wait after date slider wraps; any positive
+                // number works but the smaller the better
                 {_PBI_TIMER_ELAPSED_TIME_MS} = 1;
             }}
         }}
@@ -866,17 +995,20 @@ def __make_daybyday_interactive_timeline(
 
     # grid = gridplot(figures, ncols=len(count_list), sizing_mode="stretch_both")
 
+    # Create the autoloading bokeh plot info (HTML + JS)
     js_path = str(Path(out_file_basename + "_autoload").with_suffix(".js"))
     tag_html_path = str(Path(out_file_basename + "_div_tag").with_suffix(".html"))
 
     js_code, tag_code = autoload_static(plot_layout, CDN, js_path)
 
-    with open(Paths.DOCS / js_path, "w") as s, open(
+    with open(Paths.DOCS / js_path, "w") as f_js, open(
         Paths.DOCS / tag_html_path, "w"
-    ) as d:
-        s.write(js_code)
-        d.write(tag_code)
+    ) as f_html:
+        f_js.write(js_code)
+        f_html.write(tag_code)
 
+    # Create the video by creating stills of the graphs for each date and then stitching
+    # the images into a video
     if should_make_video:
         save_dir: Path = PNG_SAVE_ROOT_DIR / out_file_basename
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -913,7 +1045,7 @@ def __make_daybyday_interactive_timeline(
             export_png(gp, filename=save_path)
             resize_to_even_dims(save_path, pad_bottom=0.08)
 
-            if date_str == pd.Timestamp(max_date).strftime(DATE_FMT) or True:
+            if date == max(dates):
                 poster_path: Path = (
                     PNG_SAVE_ROOT_DIR / (out_file_basename + "_poster")
                 ).with_suffix(".png")
@@ -1001,6 +1133,15 @@ def _make_daybyday_diff_interactive_timeline(
 
 
 def __assign_region_name_col(df: pd.DataFrame, region_name_col: str) -> pd.DataFrame:
+    """Replace the df-specific region column name with the generic, file-wide constant
+
+    :param df: The DataFrame containing a location column to rename
+    :type df: pd.DataFrame
+    :param region_name_col: The name of the column to rename
+    :type region_name_col: str
+    :return: `df` with the column renamed
+    :rtype: pd.DataFrame
+    """
     return df.rename(columns={region_name_col: REGION_NAME_COL})
 
 
@@ -1142,9 +1283,24 @@ def make_countries_daybyday_diff_interactive_timeline(
 
 
 def make_video(img_dir: Path, out_file_name: str, fps: float):
-    img_files = sorted(img_dir.glob("*.png"))
-    concat_demux_lines = []
+    """Given a folder containing PNGs, stitch the PNGs into a video
 
+    Uses ffmpeg to take PNGs in the specified folder and create a video out of them,
+    which plays at the specific FPS
+
+    :param img_dir: The folder of PNGs
+    :type img_dir: Path
+    :param out_file_name: Where to save the video
+    :type out_file_name: str
+    :param fps: The FPS; in the output video, one image will be shown every `fps`
+    seconds
+    :type fps: float
+    """
+
+    img_files = sorted(img_dir.glob("*.png"))
+
+    # Prepare the concat demuxer, which describes how to stitch the images into a video
+    concat_demux_lines = []
     # https://trac.ffmpeg.org/wiki/Slideshow
     for f in img_files:
         concat_demux_lines.append(f"file '{f}'")
@@ -1171,7 +1327,7 @@ def make_video(img_dir: Path, out_file_name: str, fps: float):
         "-safe",
         "0",
         "-i",
-        "-",
+        "-",  # Read concat demux info from stdin
         "-vsync",
         "vfr",
         "-vcodec",
@@ -1180,6 +1336,8 @@ def make_video(img_dir: Path, out_file_name: str, fps: float):
         "yuv420p",
         "-movflags",
         "+faststart",
+        "-tune",
+        "stillimage",
         str(save_path),
     ]
 
