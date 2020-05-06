@@ -741,34 +741,43 @@ def __make_daybyday_interactive_timeline(
     # the webpage with other plots, and their playback info isn't shared)
     _THIS_PLOT_ID = uuid.uuid4().hex
 
-    _TIMER_KEY = "'timer'"
-    _IS_ACTIVE_KEY = "'isActive'"
-    _SELECTED_INDEX_KEY = "'selectedIndex'"
-    _BASE_INTERVAL_KEY = "'BASE_INTERVAL'"
-    _TIMER_START_DATE = "'startDate'"
-    _TIMER_ELAPSED_TIME_MS = "'elapsedTime'"
-    _SPEEDS_KEY = "'SPEEDS'"
-    _PLAYBACK_INFO = f"window._playbackInfo_{_THIS_PLOT_ID}"
+    __TIMER_KEY = "'timer'"
+    __IS_ACTIVE_KEY = "'isActive'"
+    __SELECTED_INDEX_KEY = "'selectedIndex'"
+    __BASE_INTERVAL_MS = "'BASE_INTERVAL'"  # Time (in MS) btwn frames when speed==1
+    __TIMER_START_DATE = "'startDate'"
+    __TIMER_ELAPSED_TIME_MS = "'elapsedTimeMS'"
+    __TIMER_ELAPSED_TIME_PROPORTION = "'elapsedTimeProportion'"
+    __SPEEDS_KEY = "'SPEEDS'"
+    __PLAYBACK_INFO = f"window._playbackInfo_{_THIS_PLOT_ID}"
 
-    _PBI_TIMER = f"{_PLAYBACK_INFO}[{_TIMER_KEY}]"
-    _PBI_IS_ACTIVE = f"{_PLAYBACK_INFO}[{_IS_ACTIVE_KEY}]"
-    _PBI_SELECTED_INDEX = f"{_PLAYBACK_INFO}[{_SELECTED_INDEX_KEY}]"
-    _PBI_TIMER_START_DATE = f"{_PLAYBACK_INFO}[{_TIMER_START_DATE}]"
-    _PBI_TIMER_ELAPSED_TIME_MS = f"{_PLAYBACK_INFO}[{_TIMER_ELAPSED_TIME_MS}]"
-    _PBI_BASE_INTERVAL = f"{_PLAYBACK_INFO}[{_BASE_INTERVAL_KEY}]"
-    _PBI_SPEEDS = f"{_PLAYBACK_INFO}[{_SPEEDS_KEY}]"
-    _PBI_CURR_INTERVAL = f"{_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]"
+    _PBI_TIMER = f"{__PLAYBACK_INFO}[{__TIMER_KEY}]"
+    _PBI_IS_ACTIVE = f"{__PLAYBACK_INFO}[{__IS_ACTIVE_KEY}]"
+    _PBI_SELECTED_INDEX = f"{__PLAYBACK_INFO}[{__SELECTED_INDEX_KEY}]"
+    _PBI_TIMER_START_DATE = f"{__PLAYBACK_INFO}[{__TIMER_START_DATE}]"
+    _PBI_TIMER_ELAPSED_TIME_MS = f"{__PLAYBACK_INFO}[{__TIMER_ELAPSED_TIME_MS}]"
+    _PBI_TIMER_ELAPSED_TIME_PROPORTION = (
+        f"{__PLAYBACK_INFO}[{__TIMER_ELAPSED_TIME_PROPORTION}]"
+    )
+    _PBI_BASE_INTERVAL = f"{__PLAYBACK_INFO}[{__BASE_INTERVAL_MS}]"
+    _PBI_SPEEDS = f"{__PLAYBACK_INFO}[{__SPEEDS_KEY}]"
+    _PBI_CURR_INTERVAL_MS = (
+        f"{_PBI_BASE_INTERVAL} / {_PBI_SPEEDS}[{_PBI_SELECTED_INDEX}]"
+    )
+
+    _SPEED_OPTIONS = [0.25, 0.5, 1.0, 2.0]
 
     _SETUP_WINDOW_PLAYBACK_INFO = f"""
-        if (typeof({_PLAYBACK_INFO}) === 'undefined') {{
-            {_PLAYBACK_INFO} = {{
-                {_TIMER_KEY}: null,
-                {_IS_ACTIVE_KEY}: false,
-                {_SELECTED_INDEX_KEY}: 1,
-                {_TIMER_START_DATE}: null,
-                {_TIMER_ELAPSED_TIME_MS}: 0,
-                {_BASE_INTERVAL_KEY}: 1000,
-                {_SPEEDS_KEY}: [0.5, 1.0, 2.0]
+        if (typeof({__PLAYBACK_INFO}) === 'undefined') {{
+            {__PLAYBACK_INFO} = {{
+                {__TIMER_KEY}: null,
+                {__IS_ACTIVE_KEY}: false,
+                {__SELECTED_INDEX_KEY}: 1,
+                {__TIMER_START_DATE}: null,
+                {__TIMER_ELAPSED_TIME_MS}: 0,
+                {__TIMER_ELAPSED_TIME_PROPORTION}: 0,
+                {__BASE_INTERVAL_MS}: 1000,
+                {__SPEEDS_KEY}: {_SPEED_OPTIONS}
             }};
         }}
 
@@ -813,10 +822,21 @@ def __make_daybyday_interactive_timeline(
     _DO_START_TIMER = f"""
         {_PBI_TIMER_START_DATE} = new Date();
 
+        // Should never be <0 or >1 but I am being very defensive here
+        const proportionRemaining = 1 - (
+            {_PBI_TIMER_ELAPSED_TIME_PROPORTION} <= 0
+            ? 0
+            : {_PBI_TIMER_ELAPSED_TIME_PROPORTION} >= 1
+            ? 1
+            : {_PBI_TIMER_ELAPSED_TIME_PROPORTION}
+        );
+        const remainingTimeMS = (
+            {_PBI_CURR_INTERVAL_MS} * proportionRemaining
+        );
         const initialInterval = (
-            {_PBI_TIMER_ELAPSED_TIME_MS} === 0 ?
-            0 :
-            Math.max({_PBI_CURR_INTERVAL} - {_PBI_TIMER_ELAPSED_TIME_MS}, 0)
+            {_PBI_TIMER_ELAPSED_TIME_MS} === 0
+            ? 0
+            : remainingTimeMS
         );
 
         {_PBI_TIMER} = setTimeout(
@@ -828,7 +848,7 @@ def __make_daybyday_interactive_timeline(
         function startLoopTimer() {{
             updateDate();
             if ({_PBI_IS_ACTIVE}) {{
-                {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL})
+                {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL_MS})
             }}
 
         }}
@@ -838,6 +858,9 @@ def __make_daybyday_interactive_timeline(
         const now = new Date();
         {_PBI_TIMER_ELAPSED_TIME_MS} += (
             now.getTime() - {_PBI_TIMER_START_DATE}.getTime()
+        );
+        {_PBI_TIMER_ELAPSED_TIME_PROPORTION} = (
+            {_PBI_TIMER_ELAPSED_TIME_MS} / {_PBI_CURR_INTERVAL_MS}
         );
         clearInterval({_PBI_TIMER});
     """
@@ -954,6 +977,8 @@ def __make_daybyday_interactive_timeline(
         {_SETUP_WINDOW_PLAYBACK_INFO}
         {_DEFFUN_INCR_DATE}
 
+        // Must stop timer before handling changing the speed, as stopping the timer
+        // saves values based on the current (unchaged) speed selection
         if ({_PBI_TIMER} !== null) {{
             {_DO_STOP_TIMER}
         }}
@@ -967,13 +992,13 @@ def __make_daybyday_interactive_timeline(
             {_PBI_TIMER_ELAPSED_TIME_MS} = 0
         }}
 
-        console.log({_PLAYBACK_INFO})
+        console.log({__PLAYBACK_INFO})
 
     """,
     )
 
     playback_speed_radio = RadioButtonGroup(
-        labels=["0.5x speed", "1x speed", "2x speed"],
+        labels=[f"{speed:.2g}x speed" for speed in _SPEED_OPTIONS],
         active=1,
         sizing_mode="stretch_width",
     )
