@@ -741,9 +741,9 @@ def __make_daybyday_interactive_timeline(
     # the webpage with other plots, and their playback info isn't shared)
     _THIS_PLOT_ID = uuid.uuid4().hex
 
-    __TIMER_KEY = "'timer'"
-    __IS_ACTIVE_KEY = "'isActive'"
-    __SELECTED_INDEX_KEY = "'selectedIndex'"
+    __TIMER = "'timer'"
+    __IS_ACTIVE = "'isActive'"
+    __SELECTED_INDEX = "'selectedIndex'"
     __BASE_INTERVAL_MS = "'BASE_INTERVAL'"  # Time (in MS) btwn frames when speed==1
     __TIMER_START_DATE = "'startDate'"
     __TIMER_ELAPSED_TIME_MS = "'elapsedTimeMS'"
@@ -751,9 +751,9 @@ def __make_daybyday_interactive_timeline(
     __SPEEDS_KEY = "'SPEEDS'"
     __PLAYBACK_INFO = f"window._playbackInfo_{_THIS_PLOT_ID}"
 
-    _PBI_TIMER = f"{__PLAYBACK_INFO}[{__TIMER_KEY}]"
-    _PBI_IS_ACTIVE = f"{__PLAYBACK_INFO}[{__IS_ACTIVE_KEY}]"
-    _PBI_SELECTED_INDEX = f"{__PLAYBACK_INFO}[{__SELECTED_INDEX_KEY}]"
+    _PBI_TIMER = f"{__PLAYBACK_INFO}[{__TIMER}]"
+    _PBI_IS_ACTIVE = f"{__PLAYBACK_INFO}[{__IS_ACTIVE}]"
+    _PBI_SELECTED_INDEX = f"{__PLAYBACK_INFO}[{__SELECTED_INDEX}]"
     _PBI_TIMER_START_DATE = f"{__PLAYBACK_INFO}[{__TIMER_START_DATE}]"
     _PBI_TIMER_ELAPSED_TIME_MS = f"{__PLAYBACK_INFO}[{__TIMER_ELAPSED_TIME_MS}]"
     _PBI_TIMER_ELAPSED_TIME_PROPORTION = (
@@ -766,13 +766,15 @@ def __make_daybyday_interactive_timeline(
     )
 
     _SPEED_OPTIONS = [0.25, 0.5, 1.0, 2.0]
+    _DEFAULT_SPEED = 1.0
+    _DEFAULT_SELECTED_INDEX = _SPEED_OPTIONS.index(_DEFAULT_SPEED)
 
     _SETUP_WINDOW_PLAYBACK_INFO = f"""
         if (typeof({__PLAYBACK_INFO}) === 'undefined') {{
             {__PLAYBACK_INFO} = {{
-                {__TIMER_KEY}: null,
-                {__IS_ACTIVE_KEY}: false,
-                {__SELECTED_INDEX_KEY}: 1,
+                {__TIMER}: null,
+                {__IS_ACTIVE}: false,
+                {__SELECTED_INDEX}: {_DEFAULT_SELECTED_INDEX},
                 {__TIMER_START_DATE}: null,
                 {__TIMER_ELAPSED_TIME_MS}: 0,
                 {__TIMER_ELAPSED_TIME_PROPORTION}: 0,
@@ -999,7 +1001,7 @@ def __make_daybyday_interactive_timeline(
 
     playback_speed_radio = RadioButtonGroup(
         labels=[f"{speed:.2g}x speed" for speed in _SPEED_OPTIONS],
-        active=1,
+        active=_DEFAULT_SELECTED_INDEX,
         sizing_mode="stretch_width",
     )
     playback_speed_radio.js_on_click(change_playback_speed_callback)
