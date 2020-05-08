@@ -2,6 +2,7 @@
 import enum
 import functools
 import itertools
+import re
 import subprocess
 import uuid
 from pathlib import Path
@@ -822,6 +823,14 @@ def __make_daybyday_interactive_timeline(
     """
 
     _DO_START_TIMER = f"""
+        function startLoopTimer() {{
+            updateDate();
+            if ({_PBI_IS_ACTIVE}) {{
+                {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL_MS})
+            }}
+
+        }}
+
         {_PBI_TIMER_START_DATE} = new Date();
 
         // Should never be <0 or >1 but I am being very defensive here
@@ -845,15 +854,6 @@ def __make_daybyday_interactive_timeline(
             startLoopTimer,
             initialInterval
         );
-
-
-        function startLoopTimer() {{
-            updateDate();
-            if ({_PBI_IS_ACTIVE}) {{
-                {_PBI_TIMER} = setInterval(updateDate, {_PBI_CURR_INTERVAL_MS})
-            }}
-
-        }}
     """
 
     _DO_STOP_TIMER = f"""
@@ -1027,6 +1027,8 @@ def __make_daybyday_interactive_timeline(
     tag_html_path = str(Path(out_file_basename + "_div_tag").with_suffix(".html"))
 
     js_code, tag_code = autoload_static(plot_layout, CDN, js_path)
+    tag_uuid = re.search(r'id="([^"]+)"', tag_code).group(1)
+    tag_code = re.sub(r'src="([^"]+)"', f'src="\\1?uuid={tag_uuid}"', tag_code)
 
     with open(Paths.DOCS / js_path, "w") as f_js, open(
         Paths.DOCS / tag_html_path, "w"
