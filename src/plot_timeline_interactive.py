@@ -921,7 +921,7 @@ def __make_daybyday_interactive_timeline(
     date_slider.js_on_change("value", update_on_date_change_callback)
 
     play_pause_button = Toggle(
-        label="Play/pause (paused)",
+        label="Start playing",
         button_type="success",
         active=False,
         sizing_mode="stretch_width",
