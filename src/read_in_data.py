@@ -186,13 +186,7 @@ class SaveFormats(enum.Enum):
         df[Columns.DATE] = self._adjust_dates(df[Columns.DATE])
 
         df = df.melt(
-            id_vars=[
-                Columns.COUNTRY,
-                "countryGeo",
-                Columns.DATE,
-                "dateInProgress",
-                "updated",
-            ],
+            id_vars=[Columns.COUNTRY, "countryIso", Columns.DATE, "updated", "source"],
             value_vars=[CaseTypes.CONFIRMED, CaseTypes.DEATHS],
             var_name=Columns.CASE_TYPE,
             value_name=Columns.CASE_COUNT,
@@ -203,7 +197,7 @@ class SaveFormats(enum.Enum):
         df[Columns.COUNTRY] = (
             df[Columns.COUNTRY]
             .map({"U.S.": Locations.USA, "Georgia": "Georgia (country)"})
-            .fillna(df[Columns.COUNTRY])
+            .fillna(df[Columns.COUNTRY])    
         )
 
         population_series = df.merge(

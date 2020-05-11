@@ -523,9 +523,8 @@ class Urls:
     """
 
     WAPO_COUNTRIES_DAILY_HISTORICAL = (
-        "https://www.washingtonpost.com/graphics/2020/"
-        + "world/mapping-spread-new-coronavirus/"
-        + "data/clean/world-daily-historical.csv"
+        "https://inv-covid-data-prod.elections.aws.wapo.pub/world-daily-historical/"
+        + "world-daily-historical-combined.csv"
     )
     COVIDTRACKING_STATES_DAILY_HISTORICAL = (
         "https://covidtracking.com/api/v1/states/daily.csv"
