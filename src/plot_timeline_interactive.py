@@ -955,10 +955,10 @@ def __make_daybyday_interactive_timeline(
         {_PBI_IS_ACTIVE} = active;
 
         if (active) {{
-            playPauseButton.label = 'Play/pause (playing)'
+            playPauseButton.label = 'Playing – Click/tap to pause'
             {_DO_START_TIMER}
         }} else {{
-            playPauseButton.label = 'Play/pause (paused)'
+            playPauseButton.label = 'Paused – Click/tap to play'
             {_DO_STOP_TIMER}
         }}
 
