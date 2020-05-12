@@ -2656,6 +2656,35 @@ video {
     .insufficient-width-warning {
       display: none;
     }
+
+  }
+
+  .mobile-vertical-spacer {
+    height: 1in;
+  }
+
+  /*
+  .interactive-graph-container {
+    max-width: 90%;
+  }
+  */
+
+  @media screen and (max-width: 4in) {
+    .mobile-vertical-spacer {
+      display: none;
+    }
+  }
+
+  @media screen and (min-width: 4.0000000001in) and (max-width: 6in) {
+    .mobile-vertical-spacer {
+      display: inherit;
+    }
+  }
+
+  @media screen and (min-width: 6.0000000001in) {
+    .mobile-vertical-spacer {
+      display: none;
+    }
   }
 </style>
 </head>
@@ -2948,8 +2977,11 @@ You can also view these timelines as non-interactive videos here:<br>
 </tr>
 </table>
 </div>
-<script src="countries_total_interactive_autoload.js?uuid=9969abfc-637e-408c-a5e5-4d06a50b6d83" id="9969abfc-637e-408c-a5e5-4d06a50b6d83"></script>
-<div style="height: 1em;"></div>
+<div class='interactive-graph-container'>
+
+<script src="countries_total_interactive_autoload.js?uuid=4d400d8a-992c-4cd9-b6d3-929a304a2125" id="4d400d8a-992c-4cd9-b6d3-929a304a2125"></script>
+<div class="mobile-vertical-spacer"></div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-world-dod-diff"><a class="link" href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></h5>
@@ -2967,8 +2999,11 @@ You can also view these timelines as non-interactive videos here:<br>
 </tr>
 </table>
 </div>
-<script src="countries_diff_interactive_autoload.js?uuid=203058cb-d69e-4d2d-a129-afb465d84b11" id="203058cb-d69e-4d2d-a129-afb465d84b11"></script>
-<div style="height: 1em;"></div>
+<div class='interactive-graph-container'>
+
+<script src="countries_diff_interactive_autoload.js?uuid=10cd9af0-b525-4eb2-af83-e70662a06013" id="10cd9af0-b525-4eb2-af83-e70662a06013"></script>
+<div class="mobile-vertical-spacer"></div>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -2989,8 +3024,11 @@ You can also view these timelines as non-interactive videos here:<br>
 </tr>
 </table>
 </div>
-<script src="usa_states_total_interactive_autoload.js?uuid=8297b9ac-0241-404c-a3ca-dced382e5ad5" id="8297b9ac-0241-404c-a3ca-dced382e5ad5"></script>
-<div style="height: 1em;"></div>
+<div class='interactive-graph-container'>
+
+<script src="usa_states_total_interactive_autoload.js?uuid=1312b64b-6246-4eaa-8010-bc2c97b01e02" id="1312b64b-6246-4eaa-8010-bc2c97b01e02"></script>
+<div class="mobile-vertical-spacer"></div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h5>
@@ -3008,8 +3046,11 @@ You can also view these timelines as non-interactive videos here:<br>
 </tr>
 </table>
 </div>
-<script src="usa_states_diff_interactive_autoload.js?uuid=cb6ef369-592d-4471-9df3-c412fbe798b0" id="cb6ef369-592d-4471-9df3-c412fbe798b0"></script>
-<div style="height: 1em;"></div>
+<div class='interactive-graph-container'>
+
+<script src="usa_states_diff_interactive_autoload.js?uuid=e8434d30-d877-4425-918a-138ade1e131f" id="e8434d30-d877-4425-918a-138ade1e131f"></script>
+<div class="mobile-vertical-spacer"></div>
+</div>
 </div>
 </div>
 </div>
@@ -3148,7 +3189,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-11 23:56:37 -0400
+Last updated 2020-05-12 01:09:49 -0400
 </div>
 </div>
 </body>

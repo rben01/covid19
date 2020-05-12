@@ -93,5 +93,34 @@
     .insufficient-width-warning {
       display: none;
     }
+
+  }
+
+  .mobile-vertical-spacer {
+    height: 1in;
+  }
+
+  /*
+  .interactive-graph-container {
+    max-width: 90%;
+  }
+  */
+
+  @media screen and (max-width: 4in) {
+    .mobile-vertical-spacer {
+      display: none;
+    }
+  }
+
+  @media screen and (min-width: 4.0000000001in) and (max-width: 6in) {
+    .mobile-vertical-spacer {
+      display: inherit;
+    }
+  }
+
+  @media screen and (min-width: 6.0000000001in) {
+    .mobile-vertical-spacer {
+      display: none;
+    }
   }
 </style>
