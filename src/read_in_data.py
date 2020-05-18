@@ -197,7 +197,7 @@ class SaveFormats(enum.Enum):
         df[Columns.COUNTRY] = (
             df[Columns.COUNTRY]
             .map({"U.S.": Locations.USA, "Georgia": "Georgia (country)"})
-            .fillna(df[Columns.COUNTRY])    
+            .fillna(df[Columns.COUNTRY])
         )
 
         population_series = df.merge(
