@@ -24,7 +24,7 @@ def data_to_json(outfile: Path):
 
     records = {}
     for col in df.columns:
-        if col in cat_cols:
+        if col in cat_cols and False:
             col_as_cat = df[col].astype("category")
             category_map[col] = dict(
                 zip(col_as_cat.cat.codes, df[col].map(nan_to_none),)
@@ -36,7 +36,7 @@ def data_to_json(outfile: Path):
     data = {"categories": category_map, "records": records}
     if outfile is not None:
         with outfile.open("w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f)
 
     return data
 
