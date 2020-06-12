@@ -1,6 +1,7 @@
 # %%
 import json
 from pathlib import Path
+import io
 
 import pandas as pd
 
@@ -29,20 +30,8 @@ def data_to_json(outfile: Path):
         columns=[Columns.STATE, Columns.TWO_LETTER_STATE_CODE]
     )
 
-    usa_geo_df = (
-        get_usa_states_geo_df()[GEO_COL_REMAPPER.keys()]
-        .drop_duplicates(REGION_NAME_COL)
-        .rename(columns=GEO_COL_REMAPPER)
-        .set_index("region_name")
-        .sort_index()
-    )
-    countries_geo_df = (
-        get_countries_geo_df()[GEO_COL_REMAPPER.keys()]
-        .drop_duplicates(REGION_NAME_COL)
-        .rename(columns=GEO_COL_REMAPPER)
-        .set_index("region_name")
-        .sort_index()
-    )
+    usa_geo_df = get_usa_states_geo_df()
+    countries_geo_df = get_countries_geo_df()
 
     # category_map = {}
     # cat_cols = [
@@ -74,7 +63,7 @@ def data_to_json(outfile: Path):
 
     for name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
         r = data[name]
-        r["geo"] = df.to_dict(orient="index")
+        r["geo"] = df._to_geo()
 
     # data = {
     #     "records": records,
@@ -88,7 +77,7 @@ def data_to_json(outfile: Path):
 
     if outfile is not None:
         with outfile.open("w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f)
 
     return data
 

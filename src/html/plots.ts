@@ -1,10 +1,5 @@
 declare const d3: any;
-
-interface GeoDatum {
-	region_name: string;
-	lat: number[];
-	lon: number[];
-}
+declare const Plotly: any;
 
 interface CovidDatum {
 	state: string;
@@ -19,7 +14,15 @@ interface CovidDatum {
 
 interface Data {
 	records: CovidDatum[];
-	geo: { [key: string]: GeoDatum[] };
+	geo: { [key: string]: { lat: number[]; lon: number[] } };
+}
+
+function plotData(data) {
+	const data = [
+		{
+			type: "choropleth",
+		},
+	];
 }
 
 d3.json(
