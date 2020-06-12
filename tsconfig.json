@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"outDir": "./src/built",
+		"allowJs": true,
+		"target": "es2020",
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true
+	},
+	"include": [
+		"./src/**/*"
+	]
+}

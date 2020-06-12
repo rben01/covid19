@@ -13,6 +13,8 @@ from plot_timeline_interactive import (
     LAT_COL,
 )
 
+GEO_COL_REMAPPER = {REGION_NAME_COL: "region_name", LONG_COL: "lon", LAT_COL: "lat"}
+
 
 def nan_to_none(x):
     return None if pd.isna(x) else x
@@ -21,8 +23,12 @@ def nan_to_none(x):
 def data_to_json(outfile: Path):
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
 
-    usa_df = get_usa_states_geo_df()[[REGION_NAME_COL, LONG_COL, LAT_COL]]
-    countries_df = get_countries_geo_df()[[REGION_NAME_COL, LONG_COL, LAT_COL]]
+    usa_df = get_usa_states_geo_df()[GEO_COL_REMAPPER.keys()].rename(
+        columns=GEO_COL_REMAPPER
+    )
+    countries_df = get_countries_geo_df()[GEO_COL_REMAPPER.keys()].rename(
+        columns=GEO_COL_REMAPPER
+    )
 
     category_map = {}
     cat_cols = [
@@ -48,8 +54,8 @@ def data_to_json(outfile: Path):
     data = {
         "records": records,
         "geo": {
-            "usa": usa_df.to_dict(orient="list"),
-            "world": countries_df.to_dict(orient="list"),
+            "usa": usa_df.to_dict(orient="records"),
+            "world": countries_df.to_dict(orient="records"),
         },
     }
     if category_map:
