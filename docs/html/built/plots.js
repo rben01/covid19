@@ -32,6 +32,6 @@ Promise.all([
     d3.json("https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_world.json"),
     ,
 ]).then(([covidData, geoUsa, geoWorld]) => {
+    console.log(covidData.world);
     plotData(covidData.world, geoWorld, "2020-05-11");
-    console.log("here");
 });

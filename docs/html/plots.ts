@@ -72,6 +72,6 @@ Promise.all([
 	),
 	,
 ]).then(([covidData, geoUsa, geoWorld]) => {
+	console.log(covidData.world);
 	plotData(covidData.world, geoWorld, "2020-05-11");
-	console.log("here");
 });
