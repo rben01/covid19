@@ -1,0 +1,39 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true
+	},
+	"extends": "eslint:recommended",
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly",
+		"d3": "readonly"
+	},
+	"parserOptions": {
+		"ecmaVersion": 11,
+		"sourceType": "module"
+	},
+	"rules": {
+		"eqeqeq": "error",
+		"no-mixed-spaces-and-tabs": "off",
+		"curly": [
+			"error",
+			"all"
+		],
+		"no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_"
+			}
+		],
+		"no-multi-spaces": "error",
+		"no-unused-expressions": "error",
+		"no-use-before-define": "error",
+		"no-var": "error",
+		"prefer-const": "error",
+		"prefer-rest-params": "error",
+		"prefer-spread": "error",
+		"prefer-template": "error",
+		"semi": "error"
+	}
+}

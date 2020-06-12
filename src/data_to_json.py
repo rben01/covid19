@@ -23,11 +23,19 @@ def nan_to_none(x):
 def data_to_json(outfile: Path):
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
 
-    usa_df = get_usa_states_geo_df()[GEO_COL_REMAPPER.keys()].rename(
-        columns=GEO_COL_REMAPPER
+    usa_df = (
+        get_usa_states_geo_df()[GEO_COL_REMAPPER.keys()]
+        .drop_duplicates(REGION_NAME_COL)
+        .rename(columns=GEO_COL_REMAPPER)
+        .set_index("region_name")
+        .sort_index()
     )
-    countries_df = get_countries_geo_df()[GEO_COL_REMAPPER.keys()].rename(
-        columns=GEO_COL_REMAPPER
+    countries_df = (
+        get_countries_geo_df()[GEO_COL_REMAPPER.keys()]
+        .drop_duplicates(REGION_NAME_COL)
+        .rename(columns=GEO_COL_REMAPPER)
+        .set_index("region_name")
+        .sort_index()
     )
 
     category_map = {}
@@ -54,8 +62,8 @@ def data_to_json(outfile: Path):
     data = {
         "records": records,
         "geo": {
-            "usa": usa_df.to_dict(orient="records"),
-            "world": countries_df.to_dict(orient="records"),
+            "usa": usa_df.to_dict(orient="index"),
+            "world": countries_df.to_dict(orient="index"),
         },
     }
     if category_map:
@@ -63,7 +71,7 @@ def data_to_json(outfile: Path):
 
     if outfile is not None:
         with outfile.open("w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=2)
 
     return data
 
