@@ -30,7 +30,9 @@ def data_to_json(outfile: Path):
     usa_df = (
         df[is_state]
         .drop(columns=Columns.COUNTRY)
-        .rename(columns={Columns.TWO_LETTER_STATE_CODE: "code", Columns.STATE: "name"})
+        .rename(
+            columns={Columns.TWO_LETTER_STATE_CODE: "codes", Columns.STATE: "names"}
+        )
     )
     countries_df = df[
         (~is_state)
@@ -82,8 +84,8 @@ def data_to_json(outfile: Path):
     )
     countries_df = countries_df.merge(
         country_codes_df, how="left", left_on=Columns.COUNTRY, right_on="COUNTRY",
-    ).rename(columns={"A3 (UN)": "code", Columns.COUNTRY: "name"})
-    countries_df = countries_df[countries_df["code"].notna()]
+    ).rename(columns={"A3 (UN)": "codes", Columns.COUNTRY: "names"})
+    countries_df = countries_df[countries_df["codes"].notna()]
 
     usa_geo_df = get_usa_states_geo_df()
     countries_geo_df = get_countries_geo_df()

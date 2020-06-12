@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
-		"outDir": "./src/html/built",
+		"outDir": "./docs/html/built",
 		"allowJs": true,
 		"target": "es2020",
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true
 	},
 	"include": [
-		"./src/html/*"
+		"./docs/html/*"
 	]
 }
