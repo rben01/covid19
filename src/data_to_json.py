@@ -6,7 +6,7 @@ import geopandas
 import pandas as pd
 from IPython.display import display  # noqa E401
 
-from constants import Columns, Locations, Paths
+from constants import Columns, CaseTypes, Locations, Paths
 from plot_timeline_interactive import GEO_DATA_DIR
 
 REGION_NAME_COL = "code"
@@ -14,6 +14,13 @@ REGION_NAME_COL = "code"
 
 DATA_DIR: Path = Paths.DOCS / "data"
 DATA_DIR.mkdir(exist_ok=True, parents=True)
+
+CASE_TYPES = [
+    CaseTypes.CONFIRMED,
+    CaseTypes.CONFIRMED_PER_CAPITA,
+    CaseTypes.DEATHS,
+    CaseTypes.DEATHS_PER_CAPITA,
+]
 
 
 def get_countries_geo_df() -> geopandas.GeoDataFrame:
@@ -193,6 +200,10 @@ def nan_to_none(x):
     return None if pd.isna(x) else x
 
 
+def jsonify(s):
+    return s.lower().replace(" ", "_").replace("cap.", "capita")
+
+
 def data_to_json(outfile: Path):
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
 
@@ -242,9 +253,13 @@ def data_to_json(outfile: Path):
         if df_name not in data:
             data[df_name] = {}
 
-        # data[name] = df.to_dict('records')
-
         d = data[df_name]
+
+        agg_methods = ["min", "max"]
+        agg_stats: pd.DataFrame = df[CASE_TYPES].agg(agg_methods).rename(
+            columns=jsonify
+        )
+        d["agg"] = agg_stats.to_dict("dict")
 
         for code, group in df.groupby("code"):
             d[code] = {}
@@ -258,9 +273,7 @@ def data_to_json(outfile: Path):
                     d[code][col] = g["name"].iloc[0]
                     continue
 
-                d[code][col.lower().replace(" ", "_").replace("cap.", "capita")] = list(
-                    map(nan_to_none, g[col].tolist())
-                )
+                d[code][jsonify(col)] = list(map(nan_to_none, g[col].tolist()))
 
     for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
         with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
