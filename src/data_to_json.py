@@ -2,21 +2,79 @@
 import json
 from pathlib import Path
 
+import geopandas
 import pandas as pd
+from IPython.display import display
 
-from constants import Columns, Paths, Locations
+from constants import Columns, Locations, Paths
 from plot_timeline_interactive import (
-    get_usa_states_geo_df,
-    get_countries_geo_df,
-    REGION_NAME_COL,
-    LONG_COL,
+    GEO_DATA_DIR,
     LAT_COL,
+    LONG_COL,
+    REGION_NAME_COL,
 )
 
 GEO_COL_REMAPPER = {REGION_NAME_COL: "region_name", LONG_COL: "lon", LAT_COL: "lat"}
 
 DATA_DIR: Path = Paths.DOCS / "data"
 DATA_DIR.mkdir(exist_ok=True, parents=True)
+
+
+def get_countries_geo_df() -> geopandas.GeoDataFrame:
+    """Get geometry and long/lat coords for world countries
+
+    The country names in the returned GeoDataFrame must match those in the COVID data
+    source; if not, they must be remapped here.
+
+    :return: GeoDataFrame containing, for each country: name, geometry (boundary), and
+    lists of long/lat coords in bokeh-compatible format
+    :rtype: geopandas.GeoDataFrame
+    """
+
+    geo_df: geopandas.GeoDataFrame = geopandas.read_file(
+        GEO_DATA_DIR / "ne_110m_admin_0_map_units" / "ne_110m_admin_0_map_units.shp"
+    )
+
+    geo_df = geo_df.rename(columns={"ADMIN": REGION_NAME_COL}, errors="raise")
+
+    # Keys are what's in the geo df, values are what we want to rename them to
+    # Values must match the names in the original data source. If you don't like those
+    # names, change them there and then come back and change the values here.
+    geo_df[REGION_NAME_COL] = (
+        geo_df[REGION_NAME_COL]
+        .map(
+            {
+                "Central African Republic": "Central African Rep.",
+                "Democratic Republic of the Congo": "Dem. Rep. Congo",
+                "Equatorial Guinea": "Eq. Guinea",
+                "eSwatini": "Eswatini",
+                "Georgia (Country)": "Georgia (country)",
+                "South Sudan": "S. Sudan",
+                "United Arab Emirates": "UAE",
+                "United Kingdom": "Britain",
+                "Western Sahara": "W. Sahara",
+                "United States of America": "United States",
+            }
+        )
+        .fillna(geo_df[REGION_NAME_COL])
+    )
+
+    return geo_df
+
+
+def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
+    """Get geometry and long/lat coords for each US state
+
+    :return: GeoDataFrame containing, for each US state: 2-letter state code, geometry
+    (boundary), and lists of long/lat coords in bokeh-compatible format
+    :rtype: geopandas.GeoDataFrame
+    """
+
+    geo_df: geopandas.GeoDataFrame = geopandas.read_file(
+        GEO_DATA_DIR / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
+    ).rename(columns={"STUSPS": REGION_NAME_COL}, errors="raise")
+
+    return geo_df
 
 
 def nan_to_none(x):
