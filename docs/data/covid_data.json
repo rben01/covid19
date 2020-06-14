@@ -1,23 +1,6 @@
 {
 "usa": {
-"agg": {
-"cases": {
-"min": 0,
-"max": 379482
-},
-"cases_per_capita": {
-"min": 0.0,
-"max": 0.019507071224646226
-},
-"deaths": {
-"min": 0,
-"max": 24348
-},
-"deaths_per_capita": {
-"min": 0.0,
-"max": 0.0013851313696284365
-}
-},
+"data": {
 "AK": {
 "name": "Alaska",
 "date": [
@@ -25497,25 +25480,27 @@
 ]
 }
 },
-"world": {
 "agg": {
 "cases": {
 "min": 0,
-"max": 1982691
+"max": 379482
 },
 "cases_per_capita": {
 "min": 0.0,
-"max": 0.02678829475823741
+"max": 0.019507071224646226
 },
 "deaths": {
 "min": 0,
-"max": 110996
+"max": 24348
 },
 "deaths_per_capita": {
 "min": 0.0,
-"max": 0.0012509680109608625
+"max": 0.0013851313696284365
+}
 }
 },
+"world": {
+"data": {
 "Afghanistan": {
 "name": "Afghanistan",
 "date": [
@@ -122520,6 +122505,25 @@ null
 2.6385878699893875e-07,
 2.6385878699893875e-07
 ]
+}
+},
+"agg": {
+"cases": {
+"min": 0,
+"max": 1982691
+},
+"cases_per_capita": {
+"min": 0.0,
+"max": 0.02678829475823741
+},
+"deaths": {
+"min": 0,
+"max": 110996
+},
+"deaths_per_capita": {
+"min": 0.0,
+"max": 0.0012509680109608625
+}
 }
 }
 }

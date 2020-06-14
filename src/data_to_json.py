@@ -250,16 +250,16 @@ def data_to_json(outfile: Path):
 
     data = {}
     for df_name, df in [("usa", usa_df), ("world", countries_df)]:
-        if df_name not in data:
-            data[df_name] = {}
 
-        d = data[df_name]
+        data[df_name] = {"data": {}}
+
+        d = data[df_name]["data"]
 
         agg_methods = ["min", "max"]
         agg_stats: pd.DataFrame = df[CASE_TYPES].agg(agg_methods).rename(
             columns=jsonify
         )
-        d["agg"] = agg_stats.to_dict("dict")
+        data[df_name]["agg"] = agg_stats.to_dict("dict")
 
         for code, group in df.groupby("code"):
             d[code] = {}
