@@ -52,12 +52,113 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
                 "South Sudan": "S. Sudan",
                 "United Arab Emirates": "UAE",
                 "United Kingdom": "Britain",
+                "United Republic of Tanzania": "Tanzania",
                 "Western Sahara": "W. Sahara",
                 "United States of America": "United States",
             }
         )
         .fillna(geo_df[REGION_NAME_COL])
     )
+
+    geo_df = geo_df[
+        [
+            "featurecla",
+            "scalerank",
+            "LABELRANK",
+            # "SOVEREIGNT",
+            # "SOV_A3",
+            # "ADM0_DIF",
+            "LEVEL",
+            # "TYPE",
+            "Region_Name_",
+            # "ADM0_A3",
+            # "GEOU_DIF",
+            # "GEOUNIT",
+            # "GU_A3",
+            # "SU_DIF",
+            # "SUBUNIT",
+            # "SU_A3",
+            # "BRK_DIFF",
+            # "NAME",
+            # "NAME_LONG",
+            # "BRK_A3",
+            # "BRK_NAME",
+            # "BRK_GROUP",
+            "ABBREV",
+            # "POSTAL",
+            # "FORMAL_EN",
+            # "FORMAL_FR",
+            # "NAME_CIAWF",
+            # "NOTE_ADM0",
+            # "NOTE_BRK",
+            "NAME_SORT",
+            # "NAME_ALT",
+            # "MAPCOLOR7",
+            # "MAPCOLOR8",
+            # "MAPCOLOR9",
+            # "MAPCOLOR13",
+            # "POP_EST",
+            # "POP_RANK",
+            # "GDP_MD_EST",
+            # "POP_YEAR",
+            # "LASTCENSUS",
+            # "GDP_YEAR",
+            "ECONOMY",
+            "INCOME_GRP",
+            # "WIKIPEDIA",
+            # "FIPS_10_",
+            # "ISO_A2",
+            # "ISO_A3",
+            # "ISO_A3_EH",
+            # "ISO_N3",
+            # "UN_A3",
+            # "WB_A2",
+            # "WB_A3",
+            # "WOE_ID",
+            # "WOE_ID_EH",
+            # "WOE_NOTE",
+            # "ADM0_A3_IS",
+            # "ADM0_A3_US",
+            # "ADM0_A3_UN",
+            # "ADM0_A3_WB",
+            "CONTINENT",
+            "REGION_UN",
+            "SUBREGION",
+            "REGION_WB",
+            # "NAME_LEN",
+            # "LONG_LEN",
+            # "ABBREV_LEN",
+            # "TINY",
+            # "HOMEPART",
+            # "MIN_ZOOM",
+            # "MIN_LABEL",
+            # "MAX_LABEL",
+            # "NE_ID",
+            # "WIKIDATAID",
+            # "NAME_AR",
+            # "NAME_BN",
+            # "NAME_DE",
+            # "NAME_EN",
+            # "NAME_ES",
+            # "NAME_FR",
+            # "NAME_EL",
+            # "NAME_HI",
+            # "NAME_HU",
+            # "NAME_ID",
+            # "NAME_IT",
+            # "NAME_JA",
+            # "NAME_KO",
+            # "NAME_NL",
+            # "NAME_PL",
+            # "NAME_PT",
+            # "NAME_RU",
+            # "NAME_SV",
+            # "NAME_TR",
+            # "NAME_VI",
+            # "NAME_ZH",
+            "geometry",
+        ]
+    ]
 
     return geo_df
 
@@ -74,6 +175,21 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
         GEO_DATA_DIR / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
     ).rename(columns={"STUSPS": REGION_NAME_COL}, errors="raise")
 
+    geo_df = geo_df[
+        [
+            "STATEFP",
+            # "STATENS",
+            # "AFFGEOID",
+            # "GEOID",
+            "Region_Name_",
+            "NAME",
+            "LSAD",
+            # "ALAND",
+            # "AWATER",
+            "geometry",
+        ]
+    ]
+
     return geo_df
 
 
@@ -88,9 +204,7 @@ def data_to_json(outfile: Path):
     usa_df = (
         df[is_state]
         .drop(columns=Columns.COUNTRY)
-        .rename(
-            columns={Columns.TWO_LETTER_STATE_CODE: "codes", Columns.STATE: "names"}
-        )
+        .rename(columns={Columns.STATE: "name"})
     )
     countries_df = df[
         (~is_state)
@@ -113,37 +227,7 @@ def data_to_json(outfile: Path):
         )
         .fillna(countries_df[Columns.COUNTRY])
     )
-
-    country_codes_df = pd.read_csv(Paths.DATA / "country_codes.csv").sort_values(
-        "COUNTRY"
-    )
-    country_codes_df["COUNTRY"] = (
-        country_codes_df["COUNTRY"]
-        .map(
-            {
-                "Brunei Darussalam": "Brunei",
-                "Democratic Republic of the Congo": "Dem. Rep. Congo",
-                "Equatorial Guinea": "Eq. Guinea",
-                "Holy See (Vatican City State)": "Holy See",
-                "Iran, Islamic Republic of": "Iran",
-                "Cote d'Ivoire": "Ivory Coast",
-                "Lao People's Democratic Republic": "Laos",
-                "Moldova, Republic of": "Moldova",
-                "Macedonia, the Former Yugoslav Republic of": "North Macedonia",
-                "Russian Federation": "Russia",
-                "Korea, Republic of": "South Korea",
-                "Syrian Arab Republic": "Syria",
-                "United Republic of Tanzania": "Tanzania",
-                "United Arab Emirates": "UAE",
-                "Viet Nam": "Vietnam",
-            }
-        )
-        .fillna(country_codes_df["COUNTRY"])
-    )
-    countries_df = countries_df.merge(
-        country_codes_df, how="left", left_on=Columns.COUNTRY, right_on="COUNTRY",
-    ).rename(columns={"A3 (UN)": "codes", Columns.COUNTRY: "names"})
-    countries_df = countries_df[countries_df["codes"].notna()]
+    countries_df = countries_df.rename(columns={Columns.COUNTRY: "name"})
 
     usa_geo_df = get_usa_states_geo_df()
     countries_geo_df = get_countries_geo_df()
@@ -172,7 +256,7 @@ def data_to_json(outfile: Path):
 
     for name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
         with (DATA_DIR / f"geo_{name}.json").open("w") as f:
-            f.write(df.to_json())
+            f.write(df.to_json(indent=0))
 
     # data = {
     #     "records": records,
@@ -186,7 +270,7 @@ def data_to_json(outfile: Path):
 
     if outfile is not None:
         with outfile.open("w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=0)
 
     return data
 
