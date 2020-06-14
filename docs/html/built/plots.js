@@ -1,5 +1,12 @@
+const plotLayout = Object.freeze({
+    width: 600,
+    height: 500,
+});
 const numberFormatter = d3.formatPrefix(",.2~s", 1e3);
-function plotData(covidData, geoData, date) {
+const geoPaths = {
+    usa: d3.geoPath(d3.geoAlbersUsa()),
+};
+function getPlotData(covidData, geoData, date) {
     const data = {
         cases: [],
         dates: [],
@@ -15,35 +22,6 @@ function plotData(covidData, geoData, date) {
         }
     });
     console.log(data);
-    const plotData = [
-        {
-            type: "choropleth",
-            // geojson: geoData,
-            locationmode: "USA-states",
-            locations: data.locations,
-            z: data.cases,
-            text: data.text,
-            colorscale: d3.range(256).map(i => {
-                const t = i / 255;
-                return [t, d3.interpolateCividis(t)];
-            }),
-            hoverinfo: "text",
-        },
-    ];
-    const plotLayout = {
-        hoverinfo: "text",
-        geo: {
-            scope: "usa",
-        },
-        coloraxis: { showscale: false },
-        margins: {
-            t: 0,
-            b: 0,
-            l: 0,
-            r: 0,
-        },
-    };
-    Plotly.react("usa-1", plotData, plotLayout);
 }
 const nowMS = new Date().getTime();
 Promise.all([
@@ -52,5 +30,23 @@ Promise.all([
     d3.json("https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_world.json"),
     ,
 ]).then(([covidData, geoUSA, geoWorld]) => {
-    plotData(covidData.usa, geoUSA, "2020-05-11");
+    const projection = d3.geoAlbersUsa().fitWidth(plotLayout.width, geoUSA);
+    const path = d3.geoPath(projection);
+    d3.select("#usa-1")
+        .attr("width", plotLayout.width)
+        .attr("height", plotLayout.height)
+        .attr("background-color", "white")
+        .selectAll("path")
+        .data(geoUSA.features)
+        .join("path")
+        .attr("d", path)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("fill-opacity", 0);
+    // 	.append("path")
+    // 	.datum(geoUSA)
+    // 	.attr("d", geoPaths.usa)
+    // 	.attr("stroke", "black")
+    // 	.attr("stroke-width", 0.5);
+    // plotData(covidData.usa, geoUSA, "2020-05-11");
 });
