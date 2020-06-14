@@ -9,7 +9,7 @@ from IPython.display import display  # noqa E401
 from constants import Columns, CaseTypes, Locations, Paths
 from plot_timeline_interactive import GEO_DATA_DIR
 
-REGION_NAME_COL = "code"
+CODE = "code"
 
 
 DATA_DIR: Path = Paths.DOCS / "data"
@@ -38,13 +38,13 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         GEO_DATA_DIR / "ne_110m_admin_0_map_units" / "ne_110m_admin_0_map_units.shp"
     )
 
-    geo_df = geo_df.rename(columns={"ADMIN": REGION_NAME_COL}, errors="raise")
+    geo_df = geo_df.rename(columns={"ADMIN": CODE}, errors="raise")
 
     # Keys are what's in the geo df, values are what we want to rename them to
     # Values must match the names in the original data source. If you don't like those
     # names, change them there and then come back and change the values here.
-    geo_df[REGION_NAME_COL] = (
-        geo_df[REGION_NAME_COL]
+    geo_df[CODE] = (
+        geo_df[CODE]
         .map(
             {
                 "Central African Republic": "Central African Rep.",
@@ -60,10 +60,10 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
                 "United States of America": "United States",
             }
         )
-        .fillna(geo_df[REGION_NAME_COL])
+        .fillna(geo_df[CODE])
     )
 
-    geo_df["name"] = geo_df[REGION_NAME_COL]
+    geo_df["name"] = geo_df[CODE]
 
     geo_df = geo_df[
         [
@@ -75,7 +75,7 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
             # "ADM0_DIF",
             "LEVEL",
             # "TYPE",
-            REGION_NAME_COL,
+            CODE,
             "name",
             # "ADM0_A3",
             # "GEOU_DIF",
@@ -179,7 +179,7 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
 
     geo_df: geopandas.GeoDataFrame = geopandas.read_file(
         GEO_DATA_DIR / "cb_2017_us_state_20m" / "cb_2017_us_state_20m.shp"
-    ).rename(columns={"STUSPS": REGION_NAME_COL}, errors="raise")
+    ).rename(columns={"STUSPS": CODE}, errors="raise")
 
     geo_df = geo_df[
         [
@@ -187,8 +187,8 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
             # "STATENS",
             # "AFFGEOID",
             # "GEOID",
-            REGION_NAME_COL,
-            "NAME",
+            CODE,
+            # "NAME",
             "LSAD",
             # "ALAND",
             # "AWATER",
@@ -244,6 +244,12 @@ def data_to_json(outfile: Path):
     countries_df["code"] = countries_df["name"]
 
     usa_geo_df = get_usa_states_geo_df()
+    usa_geo_df["name"] = usa_geo_df.merge(
+        usa_df.groupby([CODE, "name"]).first().index.to_frame(index=False),
+        how="left",
+        on=CODE,
+    )["name"]
+
     countries_geo_df = get_countries_geo_df()
 
     data = {}

@@ -7,9 +7,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Alaska",
 "STATEFP": "02",
-"code": "AK"
+"code": "AK",
+"name": "Alaska"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -9286,9 +9286,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "California",
 "STATEFP": "06",
-"code": "CA"
+"code": "CA",
+"name": "California"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -11193,9 +11193,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Colorado",
 "STATEFP": "08",
-"code": "CO"
+"code": "CO",
+"name": "Colorado"
 },
 "geometry": {
 "type": "Polygon",
@@ -11606,9 +11606,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "District of Columbia",
 "STATEFP": "11",
-"code": "DC"
+"code": "DC",
+"name": "District of Columbia"
 },
 "geometry": {
 "type": "Polygon",
@@ -11663,9 +11663,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Idaho",
 "STATEFP": "16",
-"code": "ID"
+"code": "ID",
+"name": "Idaho"
 },
 "geometry": {
 "type": "Polygon",
@@ -12748,9 +12748,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Illinois",
 "STATEFP": "17",
-"code": "IL"
+"code": "IL",
+"name": "Illinois"
 },
 "geometry": {
 "type": "Polygon",
@@ -14053,9 +14053,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Iowa",
 "STATEFP": "19",
-"code": "IA"
+"code": "IA",
+"name": "Iowa"
 },
 "geometry": {
 "type": "Polygon",
@@ -15086,9 +15086,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Kentucky",
 "STATEFP": "21",
-"code": "KY"
+"code": "KY",
+"name": "Kentucky"
 },
 "geometry": {
 "type": "Polygon",
@@ -16439,9 +16439,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Louisiana",
 "STATEFP": "22",
-"code": "LA"
+"code": "LA",
+"name": "Louisiana"
 },
 "geometry": {
 "type": "Polygon",
@@ -17660,9 +17660,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Maryland",
 "STATEFP": "24",
-"code": "MD"
+"code": "MD",
+"name": "Maryland"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -18751,9 +18751,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Minnesota",
 "STATEFP": "27",
-"code": "MN"
+"code": "MN",
+"name": "Minnesota"
 },
 "geometry": {
 "type": "Polygon",
@@ -20016,9 +20016,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Missouri",
 "STATEFP": "29",
-"code": "MO"
+"code": "MO",
+"name": "Missouri"
 },
 "geometry": {
 "type": "Polygon",
@@ -21301,9 +21301,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "New York",
 "STATEFP": "36",
-"code": "NY"
+"code": "NY",
+"name": "New York"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -22668,9 +22668,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Oregon",
 "STATEFP": "41",
-"code": "OR"
+"code": "OR",
+"name": "Oregon"
 },
 "geometry": {
 "type": "Polygon",
@@ -23701,9 +23701,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Tennessee",
 "STATEFP": "47",
-"code": "TN"
+"code": "TN",
+"name": "Tennessee"
 },
 "geometry": {
 "type": "Polygon",
@@ -24718,9 +24718,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Texas",
 "STATEFP": "48",
-"code": "TX"
+"code": "TX",
+"name": "Texas"
 },
 "geometry": {
 "type": "Polygon",
@@ -26955,9 +26955,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Virginia",
 "STATEFP": "51",
-"code": "VA"
+"code": "VA",
+"name": "Virginia"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -28282,9 +28282,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Wisconsin",
 "STATEFP": "55",
-"code": "WI"
+"code": "WI",
+"name": "Wisconsin"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -29637,9 +29637,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Alabama",
 "STATEFP": "01",
-"code": "AL"
+"code": "AL",
+"name": "Alabama"
 },
 "geometry": {
 "type": "Polygon",
@@ -30382,9 +30382,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Arizona",
 "STATEFP": "04",
-"code": "AZ"
+"code": "AZ",
+"name": "Arizona"
 },
 "geometry": {
 "type": "Polygon",
@@ -31031,9 +31031,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Arkansas",
 "STATEFP": "05",
-"code": "AR"
+"code": "AR",
+"name": "Arkansas"
 },
 "geometry": {
 "type": "Polygon",
@@ -31924,9 +31924,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Indiana",
 "STATEFP": "18",
-"code": "IN"
+"code": "IN",
+"name": "Indiana"
 },
 "geometry": {
 "type": "Polygon",
@@ -32817,9 +32817,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Kansas",
 "STATEFP": "20",
-"code": "KS"
+"code": "KS",
+"name": "Kansas"
 },
 "geometry": {
 "type": "Polygon",
@@ -33518,9 +33518,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Maine",
 "STATEFP": "23",
-"code": "ME"
+"code": "ME",
+"name": "Maine"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -34577,9 +34577,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Connecticut",
 "STATEFP": "09",
-"code": "CT"
+"code": "CT",
+"name": "Connecticut"
 },
 "geometry": {
 "type": "Polygon",
@@ -34986,9 +34986,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Delaware",
 "STATEFP": "10",
-"code": "DE"
+"code": "DE",
+"name": "Delaware"
 },
 "geometry": {
 "type": "Polygon",
@@ -35215,9 +35215,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Georgia",
 "STATEFP": "13",
-"code": "GA"
+"code": "GA",
+"name": "Georgia"
 },
 "geometry": {
 "type": "Polygon",
@@ -36308,9 +36308,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Hawaii",
 "STATEFP": "15",
-"code": "HI"
+"code": "HI",
+"name": "Hawaii"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -37295,9 +37295,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "South Carolina",
 "STATEFP": "45",
-"code": "SC"
+"code": "SC",
+"name": "South Carolina"
 },
 "geometry": {
 "type": "Polygon",
@@ -38084,9 +38084,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "South Dakota",
 "STATEFP": "46",
-"code": "SD"
+"code": "SD",
+"name": "South Dakota"
 },
 "geometry": {
 "type": "Polygon",
@@ -38853,9 +38853,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Massachusetts",
 "STATEFP": "25",
-"code": "MA"
+"code": "MA",
+"name": "Massachusetts"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -39752,9 +39752,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Michigan",
 "STATEFP": "26",
-"code": "MI"
+"code": "MI",
+"name": "Michigan"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -41699,9 +41699,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Mississippi",
 "STATEFP": "28",
-"code": "MS"
+"code": "MS",
+"name": "Mississippi"
 },
 "geometry": {
 "type": "Polygon",
@@ -42624,9 +42624,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Nebraska",
 "STATEFP": "31",
-"code": "NE"
+"code": "NE",
+"name": "Nebraska"
 },
 "geometry": {
 "type": "Polygon",
@@ -43469,9 +43469,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Nevada",
 "STATEFP": "32",
-"code": "NV"
+"code": "NV",
+"name": "Nevada"
 },
 "geometry": {
 "type": "Polygon",
@@ -44058,9 +44058,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "New Hampshire",
 "STATEFP": "33",
-"code": "NH"
+"code": "NH",
+"name": "New Hampshire"
 },
 "geometry": {
 "type": "Polygon",
@@ -44603,9 +44603,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "New Jersey",
 "STATEFP": "34",
-"code": "NJ"
+"code": "NJ",
+"name": "New Jersey"
 },
 "geometry": {
 "type": "Polygon",
@@ -45284,9 +45284,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "New Mexico",
 "STATEFP": "35",
-"code": "NM"
+"code": "NM",
+"name": "New Mexico"
 },
 "geometry": {
 "type": "Polygon",
@@ -45741,9 +45741,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "North Carolina",
 "STATEFP": "37",
-"code": "NC"
+"code": "NC",
+"name": "North Carolina"
 },
 "geometry": {
 "type": "Polygon",
@@ -46670,9 +46670,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "North Dakota",
 "STATEFP": "38",
-"code": "ND"
+"code": "ND",
+"name": "North Dakota"
 },
 "geometry": {
 "type": "Polygon",
@@ -47203,9 +47203,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Rhode Island",
 "STATEFP": "44",
-"code": "RI"
+"code": "RI",
+"name": "Rhode Island"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -47462,9 +47462,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Ohio",
 "STATEFP": "39",
-"code": "OH"
+"code": "OH",
+"name": "Ohio"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -48429,9 +48429,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Oklahoma",
 "STATEFP": "40",
-"code": "OK"
+"code": "OK",
+"name": "Oklahoma"
 },
 "geometry": {
 "type": "Polygon",
@@ -49390,9 +49390,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Pennsylvania",
 "STATEFP": "42",
-"code": "PA"
+"code": "PA",
+"name": "Pennsylvania"
 },
 "geometry": {
 "type": "Polygon",
@@ -50127,9 +50127,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Florida",
 "STATEFP": "12",
-"code": "FL"
+"code": "FL",
+"name": "Florida"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -51698,9 +51698,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Montana",
 "STATEFP": "30",
-"code": "MT"
+"code": "MT",
+"name": "Montana"
 },
 "geometry": {
 "type": "Polygon",
@@ -52695,9 +52695,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Utah",
 "STATEFP": "49",
-"code": "UT"
+"code": "UT",
+"name": "Utah"
 },
 "geometry": {
 "type": "Polygon",
@@ -53096,9 +53096,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Vermont",
 "STATEFP": "50",
-"code": "VT"
+"code": "VT",
+"name": "Vermont"
 },
 "geometry": {
 "type": "Polygon",
@@ -53633,9 +53633,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Washington",
 "STATEFP": "53",
-"code": "WA"
+"code": "WA",
+"name": "Washington"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -54604,9 +54604,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "West Virginia",
 "STATEFP": "54",
-"code": "WV"
+"code": "WV",
+"name": "West Virginia"
 },
 "geometry": {
 "type": "Polygon",
@@ -55589,9 +55589,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Wyoming",
 "STATEFP": "56",
-"code": "WY"
+"code": "WY",
+"name": "Wyoming"
 },
 "geometry": {
 "type": "Polygon",
@@ -55994,9 +55994,9 @@
 "type": "Feature",
 "properties": {
 "LSAD": "00",
-"NAME": "Puerto Rico",
 "STATEFP": "72",
-"code": "PR"
+"code": "PR",
+"name": null
 },
 "geometry": {
 "type": "MultiPolygon",
