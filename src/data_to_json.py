@@ -204,7 +204,7 @@ def data_to_json(outfile: Path):
     usa_df = (
         df[is_state]
         .drop(columns=Columns.COUNTRY)
-        .rename(columns={Columns.STATE: "name"})
+        .rename(columns={Columns.STATE: "name", Columns.TWO_LETTER_STATE_CODE: "code"})
     )
     countries_df = df[
         (~is_state)
@@ -228,6 +228,7 @@ def data_to_json(outfile: Path):
         .fillna(countries_df[Columns.COUNTRY])
     )
     countries_df = countries_df.rename(columns={Columns.COUNTRY: "name"})
+    countries_df["code"] = countries_df["name"]
 
     usa_geo_df = get_usa_states_geo_df()
     countries_geo_df = get_countries_geo_df()
@@ -241,21 +242,32 @@ def data_to_json(outfile: Path):
     # ]
 
     data = {}
-    for name, df in [("usa", usa_df), ("world", countries_df)]:
-        if name not in data:
-            data[name] = {}
+    for df_name, df in [("usa", usa_df), ("world", countries_df)]:
+        if df_name not in data:
+            data[df_name] = {}
 
         # data[name] = df.to_dict('records')
 
-        d = data[name]
+        d = data[df_name]
 
-        for col in df.columns:
-            d[col.lower().replace(" ", "_").replace("cap.", "capita")] = list(
-                map(nan_to_none, df[col].tolist())
-            )
+        for code, group in df.groupby("code"):
+            d[code] = {}
+            g = group.copy()
 
-    for name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
-        with (DATA_DIR / f"geo_{name}.json").open("w") as f:
+            for col in g.columns:
+                if col == "code":
+                    continue
+
+                if col == "name":
+                    d[code][col] = g["name"].iloc[0]
+                    continue
+
+                d[code][col.lower().replace(" ", "_").replace("cap.", "capita")] = list(
+                    map(nan_to_none, g[col].tolist())
+                )
+
+    for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
+        with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
             f.write(df.to_json(indent=0))
 
     # data = {
