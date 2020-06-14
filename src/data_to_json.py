@@ -246,10 +246,13 @@ def data_to_json(outfile: Path):
         data[df_name] = {}
 
         agg_methods = ["min", "max"]
-        agg_stats: pd.DataFrame = df[CASE_TYPES].agg(agg_methods).rename(
-            columns=jsonify
-        )
+        agg_stats: pd.DataFrame = df[[Columns.DATE, *CASE_TYPES]].agg(
+            agg_methods
+        ).rename(columns=jsonify)
         data[df_name]["agg"] = agg_stats.to_dict("dict")
+        data[df_name]["agg"][jsonify(Columns.DATE)]["min_nonzero"] = df.loc[
+            df[CaseTypes.CONFIRMED] > 0, "Date"
+        ].iloc[0]
 
         data[df_name]["data"] = {}
         d = data[df_name]["data"]
