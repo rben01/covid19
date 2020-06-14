@@ -276,15 +276,21 @@ def data_to_json(outfile: Path):
 
         data[df_name]["data"] = {}
         d = data[df_name]["data"]
-        for code, group in df.groupby("code"):
+        for code, group in df.groupby(CODE):
             d[code] = {}
             g = group.copy()
 
             for col in g.columns:
-                if col in ["code", "name"]:
+                if col in [CODE, "name"]:
                     continue
 
-                d[code][jsonify(col)] = list(map(nan_to_none, g[col].tolist()))
+                if col == Columns.DATE:
+                    elem = {k: i for i, k in enumerate(g[col].tolist())}
+                else:
+                    elem = list(map(nan_to_none, g[col].tolist()))
+
+                d[code][jsonify(col)] = elem
+
     with (DATA_DIR / "geo_data.json").open("w") as f:
         geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
         json.dump(geojson, f, indent=0)
