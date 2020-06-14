@@ -240,20 +240,10 @@ def data_to_json(outfile: Path):
     usa_geo_df = get_usa_states_geo_df()
     countries_geo_df = get_countries_geo_df()
 
-    # category_map = {}
-    # cat_cols = [
-    #     Columns.STATE,
-    #     Columns.COUNTRY,
-    #     Columns.TWO_LETTER_STATE_CODE,
-    #     Columns.DATE,
-    # ]
-
     data = {}
     for df_name, df in [("usa", usa_df), ("world", countries_df)]:
 
-        data[df_name] = {"data": {}}
-
-        d = data[df_name]["data"]
+        data[df_name] = {}
 
         agg_methods = ["min", "max"]
         agg_stats: pd.DataFrame = df[CASE_TYPES].agg(agg_methods).rename(
@@ -261,6 +251,8 @@ def data_to_json(outfile: Path):
         )
         data[df_name]["agg"] = agg_stats.to_dict("dict")
 
+        data[df_name]["data"] = {}
+        d = data[df_name]["data"]
         for code, group in df.groupby("code"):
             d[code] = {}
             g = group.copy()
@@ -278,16 +270,6 @@ def data_to_json(outfile: Path):
     for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
         with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
             f.write(df.to_json(indent=0))
-
-    # data = {
-    #     "records": records,
-    #     "geo": {
-    #         "usa": usa_geo_df.to_dict(orient="index"),
-    #         "world": countries_geo_df.to_dict(orient="index"),
-    #     },
-    # }
-    # if category_map:
-    #     data["categories"] = category_map
 
     if outfile is not None:
         with outfile.open("w") as f:
