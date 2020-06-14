@@ -250,9 +250,17 @@ def data_to_json(outfile: Path):
             agg_methods
         ).rename(columns=jsonify)
         data[df_name]["agg"] = agg_stats.to_dict("dict")
+
         data[df_name]["agg"][jsonify(Columns.DATE)]["min_nonzero"] = df.loc[
-            df[CaseTypes.CONFIRMED] > 0, "Date"
-        ].iloc[0]
+            df[CaseTypes.CONFIRMED] > 0, Columns.DATE
+        ].min()
+
+        for ct in CASE_TYPES:
+            min_val = df.loc[df[ct] > 0, ct].min()
+            if int(min_val) == min_val:
+                min_val = int(min_val)
+
+            data[df_name]["agg"][jsonify(ct)]["min_nonzero"] = min_val
 
         data[df_name]["data"] = {}
         d = data[df_name]["data"]

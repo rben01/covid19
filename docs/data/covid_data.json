@@ -4,23 +4,27 @@
 "date": {
 "min": "2020-01-23",
 "max": "2020-06-10",
-"min_nonzero": "2020-03-14"
+"min_nonzero": "2020-01-23"
 },
 "cases": {
 "min": 0,
-"max": 379482
+"max": 379482,
+"min_nonzero": 1
 },
 "cases_per_capita": {
 "min": 0.0,
-"max": 0.019507071224646226
+"max": 0.019507071224646226,
+"min_nonzero": 3.448765705722133e-08
 },
 "deaths": {
 "min": 0,
-"max": 24348
+"max": 24348,
+"min_nonzero": 1
 },
 "deaths_per_capita": {
 "min": 0.0,
-"max": 0.0013851313696284365
+"max": 0.0013851313696284365,
+"min_nonzero": 3.448765705722133e-08
 }
 },
 "data": {
@@ -25513,19 +25517,23 @@
 },
 "cases": {
 "min": 0,
-"max": 1982691
+"max": 1982691,
+"min_nonzero": 1
 },
 "cases_per_capita": {
 "min": 0.0,
-"max": 0.02678829475823741
+"max": 0.02678829475823741,
+"min_nonzero": 2.2054032388172635e-09
 },
 "deaths": {
 "min": 0,
-"max": 110996
+"max": 110996,
+"min_nonzero": 1
 },
 "deaths_per_capita": {
 "min": 0.0,
-"max": 0.0012509680109608625
+"max": 0.0012509680109608625,
+"min_nonzero": 7.351344129390877e-10
 }
 },
 "data": {
