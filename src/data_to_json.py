@@ -4,17 +4,13 @@ from pathlib import Path
 
 import geopandas
 import pandas as pd
-from IPython.display import display
+from IPython.display import display  # noqa E401
 
 from constants import Columns, Locations, Paths
-from plot_timeline_interactive import (
-    GEO_DATA_DIR,
-    LAT_COL,
-    LONG_COL,
-    REGION_NAME_COL,
-)
+from plot_timeline_interactive import GEO_DATA_DIR
 
-GEO_COL_REMAPPER = {REGION_NAME_COL: "region_name", LONG_COL: "lon", LAT_COL: "lat"}
+REGION_NAME_COL = "code"
+
 
 DATA_DIR: Path = Paths.DOCS / "data"
 DATA_DIR.mkdir(exist_ok=True, parents=True)
@@ -70,7 +66,7 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
             # "ADM0_DIF",
             "LEVEL",
             # "TYPE",
-            "Region_Name_",
+            REGION_NAME_COL,
             # "ADM0_A3",
             # "GEOU_DIF",
             # "GEOUNIT",
@@ -181,7 +177,7 @@ def get_usa_states_geo_df() -> geopandas.GeoDataFrame:
             # "STATENS",
             # "AFFGEOID",
             # "GEOID",
-            "Region_Name_",
+            REGION_NAME_COL,
             "NAME",
             "LSAD",
             # "ALAND",

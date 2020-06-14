@@ -7,8 +7,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Alaska",
-"Region_Name_": "AK",
-"STATEFP": "02"
+"STATEFP": "02",
+"code": "AK"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -9286,8 +9286,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "California",
-"Region_Name_": "CA",
-"STATEFP": "06"
+"STATEFP": "06",
+"code": "CA"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -11193,8 +11193,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Colorado",
-"Region_Name_": "CO",
-"STATEFP": "08"
+"STATEFP": "08",
+"code": "CO"
 },
 "geometry": {
 "type": "Polygon",
@@ -11606,8 +11606,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "District of Columbia",
-"Region_Name_": "DC",
-"STATEFP": "11"
+"STATEFP": "11",
+"code": "DC"
 },
 "geometry": {
 "type": "Polygon",
@@ -11663,8 +11663,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Idaho",
-"Region_Name_": "ID",
-"STATEFP": "16"
+"STATEFP": "16",
+"code": "ID"
 },
 "geometry": {
 "type": "Polygon",
@@ -12748,8 +12748,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Illinois",
-"Region_Name_": "IL",
-"STATEFP": "17"
+"STATEFP": "17",
+"code": "IL"
 },
 "geometry": {
 "type": "Polygon",
@@ -14053,8 +14053,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Iowa",
-"Region_Name_": "IA",
-"STATEFP": "19"
+"STATEFP": "19",
+"code": "IA"
 },
 "geometry": {
 "type": "Polygon",
@@ -15086,8 +15086,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Kentucky",
-"Region_Name_": "KY",
-"STATEFP": "21"
+"STATEFP": "21",
+"code": "KY"
 },
 "geometry": {
 "type": "Polygon",
@@ -16439,8 +16439,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Louisiana",
-"Region_Name_": "LA",
-"STATEFP": "22"
+"STATEFP": "22",
+"code": "LA"
 },
 "geometry": {
 "type": "Polygon",
@@ -17660,8 +17660,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Maryland",
-"Region_Name_": "MD",
-"STATEFP": "24"
+"STATEFP": "24",
+"code": "MD"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -18751,8 +18751,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Minnesota",
-"Region_Name_": "MN",
-"STATEFP": "27"
+"STATEFP": "27",
+"code": "MN"
 },
 "geometry": {
 "type": "Polygon",
@@ -20016,8 +20016,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Missouri",
-"Region_Name_": "MO",
-"STATEFP": "29"
+"STATEFP": "29",
+"code": "MO"
 },
 "geometry": {
 "type": "Polygon",
@@ -21301,8 +21301,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "New York",
-"Region_Name_": "NY",
-"STATEFP": "36"
+"STATEFP": "36",
+"code": "NY"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -22668,8 +22668,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Oregon",
-"Region_Name_": "OR",
-"STATEFP": "41"
+"STATEFP": "41",
+"code": "OR"
 },
 "geometry": {
 "type": "Polygon",
@@ -23701,8 +23701,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Tennessee",
-"Region_Name_": "TN",
-"STATEFP": "47"
+"STATEFP": "47",
+"code": "TN"
 },
 "geometry": {
 "type": "Polygon",
@@ -24718,8 +24718,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Texas",
-"Region_Name_": "TX",
-"STATEFP": "48"
+"STATEFP": "48",
+"code": "TX"
 },
 "geometry": {
 "type": "Polygon",
@@ -26955,8 +26955,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Virginia",
-"Region_Name_": "VA",
-"STATEFP": "51"
+"STATEFP": "51",
+"code": "VA"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -28282,8 +28282,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Wisconsin",
-"Region_Name_": "WI",
-"STATEFP": "55"
+"STATEFP": "55",
+"code": "WI"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -29637,8 +29637,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Alabama",
-"Region_Name_": "AL",
-"STATEFP": "01"
+"STATEFP": "01",
+"code": "AL"
 },
 "geometry": {
 "type": "Polygon",
@@ -30382,8 +30382,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Arizona",
-"Region_Name_": "AZ",
-"STATEFP": "04"
+"STATEFP": "04",
+"code": "AZ"
 },
 "geometry": {
 "type": "Polygon",
@@ -31031,8 +31031,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Arkansas",
-"Region_Name_": "AR",
-"STATEFP": "05"
+"STATEFP": "05",
+"code": "AR"
 },
 "geometry": {
 "type": "Polygon",
@@ -31924,8 +31924,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Indiana",
-"Region_Name_": "IN",
-"STATEFP": "18"
+"STATEFP": "18",
+"code": "IN"
 },
 "geometry": {
 "type": "Polygon",
@@ -32817,8 +32817,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Kansas",
-"Region_Name_": "KS",
-"STATEFP": "20"
+"STATEFP": "20",
+"code": "KS"
 },
 "geometry": {
 "type": "Polygon",
@@ -33518,8 +33518,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Maine",
-"Region_Name_": "ME",
-"STATEFP": "23"
+"STATEFP": "23",
+"code": "ME"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -34577,8 +34577,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Connecticut",
-"Region_Name_": "CT",
-"STATEFP": "09"
+"STATEFP": "09",
+"code": "CT"
 },
 "geometry": {
 "type": "Polygon",
@@ -34986,8 +34986,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Delaware",
-"Region_Name_": "DE",
-"STATEFP": "10"
+"STATEFP": "10",
+"code": "DE"
 },
 "geometry": {
 "type": "Polygon",
@@ -35215,8 +35215,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Georgia",
-"Region_Name_": "GA",
-"STATEFP": "13"
+"STATEFP": "13",
+"code": "GA"
 },
 "geometry": {
 "type": "Polygon",
@@ -36308,8 +36308,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Hawaii",
-"Region_Name_": "HI",
-"STATEFP": "15"
+"STATEFP": "15",
+"code": "HI"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -37295,8 +37295,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "South Carolina",
-"Region_Name_": "SC",
-"STATEFP": "45"
+"STATEFP": "45",
+"code": "SC"
 },
 "geometry": {
 "type": "Polygon",
@@ -38084,8 +38084,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "South Dakota",
-"Region_Name_": "SD",
-"STATEFP": "46"
+"STATEFP": "46",
+"code": "SD"
 },
 "geometry": {
 "type": "Polygon",
@@ -38853,8 +38853,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Massachusetts",
-"Region_Name_": "MA",
-"STATEFP": "25"
+"STATEFP": "25",
+"code": "MA"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -39752,8 +39752,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Michigan",
-"Region_Name_": "MI",
-"STATEFP": "26"
+"STATEFP": "26",
+"code": "MI"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -41699,8 +41699,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Mississippi",
-"Region_Name_": "MS",
-"STATEFP": "28"
+"STATEFP": "28",
+"code": "MS"
 },
 "geometry": {
 "type": "Polygon",
@@ -42624,8 +42624,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Nebraska",
-"Region_Name_": "NE",
-"STATEFP": "31"
+"STATEFP": "31",
+"code": "NE"
 },
 "geometry": {
 "type": "Polygon",
@@ -43469,8 +43469,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Nevada",
-"Region_Name_": "NV",
-"STATEFP": "32"
+"STATEFP": "32",
+"code": "NV"
 },
 "geometry": {
 "type": "Polygon",
@@ -44058,8 +44058,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "New Hampshire",
-"Region_Name_": "NH",
-"STATEFP": "33"
+"STATEFP": "33",
+"code": "NH"
 },
 "geometry": {
 "type": "Polygon",
@@ -44603,8 +44603,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "New Jersey",
-"Region_Name_": "NJ",
-"STATEFP": "34"
+"STATEFP": "34",
+"code": "NJ"
 },
 "geometry": {
 "type": "Polygon",
@@ -45284,8 +45284,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "New Mexico",
-"Region_Name_": "NM",
-"STATEFP": "35"
+"STATEFP": "35",
+"code": "NM"
 },
 "geometry": {
 "type": "Polygon",
@@ -45741,8 +45741,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "North Carolina",
-"Region_Name_": "NC",
-"STATEFP": "37"
+"STATEFP": "37",
+"code": "NC"
 },
 "geometry": {
 "type": "Polygon",
@@ -46670,8 +46670,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "North Dakota",
-"Region_Name_": "ND",
-"STATEFP": "38"
+"STATEFP": "38",
+"code": "ND"
 },
 "geometry": {
 "type": "Polygon",
@@ -47203,8 +47203,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Rhode Island",
-"Region_Name_": "RI",
-"STATEFP": "44"
+"STATEFP": "44",
+"code": "RI"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -47462,8 +47462,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Ohio",
-"Region_Name_": "OH",
-"STATEFP": "39"
+"STATEFP": "39",
+"code": "OH"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -48429,8 +48429,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Oklahoma",
-"Region_Name_": "OK",
-"STATEFP": "40"
+"STATEFP": "40",
+"code": "OK"
 },
 "geometry": {
 "type": "Polygon",
@@ -49390,8 +49390,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Pennsylvania",
-"Region_Name_": "PA",
-"STATEFP": "42"
+"STATEFP": "42",
+"code": "PA"
 },
 "geometry": {
 "type": "Polygon",
@@ -50127,8 +50127,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Florida",
-"Region_Name_": "FL",
-"STATEFP": "12"
+"STATEFP": "12",
+"code": "FL"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -51698,8 +51698,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Montana",
-"Region_Name_": "MT",
-"STATEFP": "30"
+"STATEFP": "30",
+"code": "MT"
 },
 "geometry": {
 "type": "Polygon",
@@ -52695,8 +52695,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Utah",
-"Region_Name_": "UT",
-"STATEFP": "49"
+"STATEFP": "49",
+"code": "UT"
 },
 "geometry": {
 "type": "Polygon",
@@ -53096,8 +53096,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Vermont",
-"Region_Name_": "VT",
-"STATEFP": "50"
+"STATEFP": "50",
+"code": "VT"
 },
 "geometry": {
 "type": "Polygon",
@@ -53633,8 +53633,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Washington",
-"Region_Name_": "WA",
-"STATEFP": "53"
+"STATEFP": "53",
+"code": "WA"
 },
 "geometry": {
 "type": "MultiPolygon",
@@ -54604,8 +54604,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "West Virginia",
-"Region_Name_": "WV",
-"STATEFP": "54"
+"STATEFP": "54",
+"code": "WV"
 },
 "geometry": {
 "type": "Polygon",
@@ -55589,8 +55589,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Wyoming",
-"Region_Name_": "WY",
-"STATEFP": "56"
+"STATEFP": "56",
+"code": "WY"
 },
 "geometry": {
 "type": "Polygon",
@@ -55994,8 +55994,8 @@
 "properties": {
 "LSAD": "00",
 "NAME": "Puerto Rico",
-"Region_Name_": "PR",
-"STATEFP": "72"
+"STATEFP": "72",
+"code": "PR"
 },
 "geometry": {
 "type": "MultiPolygon",

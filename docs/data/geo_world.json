@@ -14,8 +14,8 @@
 "NAME_SORT": "Fiji",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Fiji",
 "SUBREGION": "Melanesia",
+"code": "Fiji",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -138,8 +138,8 @@
 "NAME_SORT": "Tanzania",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Tanzania",
 "SUBREGION": "Eastern Africa",
+"code": "Tanzania",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -372,8 +372,8 @@
 "NAME_SORT": "Western Sahara",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "W. Sahara",
 "SUBREGION": "Northern Africa",
+"code": "W. Sahara",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -510,8 +510,8 @@
 "NAME_SORT": "Canada",
 "REGION_UN": "Americas",
 "REGION_WB": "North America",
-"Region_Name_": "Canada",
 "SUBREGION": "Northern America",
+"code": "Canada",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -3830,8 +3830,8 @@
 "NAME_SORT": "United States of America",
 "REGION_UN": "Americas",
 "REGION_WB": "North America",
-"Region_Name_": "United States",
 "SUBREGION": "Northern America",
+"code": "United States",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -5682,8 +5682,8 @@
 "NAME_SORT": "Kazakhstan",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Kazakhstan",
 "SUBREGION": "Central Asia",
+"code": "Kazakhstan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -6156,8 +6156,8 @@
 "NAME_SORT": "Uzbekistan",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Uzbekistan",
 "SUBREGION": "Central Asia",
+"code": "Uzbekistan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -6398,8 +6398,8 @@
 "NAME_SORT": "Papua New Guinea",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Papua New Guinea",
 "SUBREGION": "Melanesia",
+"code": "Papua New Guinea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -6714,8 +6714,8 @@
 "NAME_SORT": "Indonesia",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Indonesia",
 "SUBREGION": "South-Eastern Asia",
+"code": "Indonesia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -7790,8 +7790,8 @@
 "NAME_SORT": "Argentina",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Argentina",
 "SUBREGION": "South America",
+"code": "Argentina",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -8306,8 +8306,8 @@
 "NAME_SORT": "Chile",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Chile",
 "SUBREGION": "South America",
+"code": "Chile",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -8794,8 +8794,8 @@
 "NAME_SORT": "Congo, Dem. Rep.",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Dem. Rep. Congo",
 "SUBREGION": "Middle Africa",
+"code": "Dem. Rep. Congo",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -9316,8 +9316,8 @@
 "NAME_SORT": "Somalia",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Somalia",
 "SUBREGION": "Eastern Africa",
+"code": "Somalia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -9490,8 +9490,8 @@
 "NAME_SORT": "Kenya",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Kenya",
 "SUBREGION": "Eastern Africa",
+"code": "Kenya",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -9664,8 +9664,8 @@
 "NAME_SORT": "Sudan",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Sudan",
 "SUBREGION": "Northern Africa",
+"code": "Sudan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -10014,8 +10014,8 @@
 "NAME_SORT": "Chad",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Chad",
 "SUBREGION": "Middle Africa",
+"code": "Chad",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -10272,8 +10272,8 @@
 "NAME_SORT": "Haiti",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Haiti",
 "SUBREGION": "Caribbean",
+"code": "Haiti",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -10382,8 +10382,8 @@
 "NAME_SORT": "Dominican Republic",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Dominican Republic",
 "SUBREGION": "Caribbean",
+"code": "Dominican Republic",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -10512,8 +10512,8 @@
 "NAME_SORT": "Russian Federation",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Russia",
 "SUBREGION": "Eastern Europe",
+"code": "Russia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -13092,8 +13092,8 @@
 "NAME_SORT": "Bahamas, The",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "The Bahamas",
 "SUBREGION": "Caribbean",
+"code": "The Bahamas",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -13212,8 +13212,8 @@
 "NAME_SORT": "Falkland Islands",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Falkland Islands",
 "SUBREGION": "South America",
+"code": "Falkland Islands",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -13278,8 +13278,8 @@
 "NAME_SORT": "Svalbard Is.",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Norway",
 "SUBREGION": "Northern Europe",
+"code": "Norway",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -13466,8 +13466,8 @@
 "NAME_SORT": "Greenland",
 "REGION_UN": "Americas",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Greenland",
 "SUBREGION": "Northern America",
+"code": "Greenland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -14020,8 +14020,8 @@
 "NAME_SORT": "French Southern and Antarctic Lands",
 "REGION_UN": "Seven seas (open ocean)",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "French Southern and Antarctic Lands",
 "SUBREGION": "Seven seas (open ocean)",
+"code": "French Southern and Antarctic Lands",
 "featurecla": "Admin-0 map unit",
 "scalerank": 3
 },
@@ -14082,8 +14082,8 @@
 "NAME_SORT": "Timor-Leste",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "East Timor",
 "SUBREGION": "South-Eastern Asia",
+"code": "East Timor",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -14152,8 +14152,8 @@
 "NAME_SORT": "South Africa",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "South Africa",
 "SUBREGION": "Southern Africa",
+"code": "South Africa",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -14556,8 +14556,8 @@
 "NAME_SORT": "Lesotho",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Lesotho",
 "SUBREGION": "Southern Africa",
+"code": "Lesotho",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -14630,8 +14630,8 @@
 "NAME_SORT": "Mexico",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Mexico",
 "SUBREGION": "Central America",
+"code": "Mexico",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -15336,8 +15336,8 @@
 "NAME_SORT": "Uruguay",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Uruguay",
 "SUBREGION": "South America",
+"code": "Uruguay",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -15446,8 +15446,8 @@
 "NAME_SORT": "Brazil",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Brazil",
 "SUBREGION": "South America",
+"code": "Brazil",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -16284,8 +16284,8 @@
 "NAME_SORT": "Bolivia",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Bolivia",
 "SUBREGION": "South America",
+"code": "Bolivia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -16550,8 +16550,8 @@
 "NAME_SORT": "Peru",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Peru",
 "SUBREGION": "South America",
+"code": "Peru",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -16880,8 +16880,8 @@
 "NAME_SORT": "Colombia",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Colombia",
 "SUBREGION": "South America",
+"code": "Colombia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -17306,8 +17306,8 @@
 "NAME_SORT": "Panama",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Panama",
 "SUBREGION": "Central America",
+"code": "Panama",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -17540,8 +17540,8 @@
 "NAME_SORT": "Costa Rica",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Costa Rica",
 "SUBREGION": "Central America",
+"code": "Costa Rica",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -17710,8 +17710,8 @@
 "NAME_SORT": "Nicaragua",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Nicaragua",
 "SUBREGION": "Central America",
+"code": "Nicaragua",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -17944,8 +17944,8 @@
 "NAME_SORT": "Honduras",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Honduras",
 "SUBREGION": "Central America",
+"code": "Honduras",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -18198,8 +18198,8 @@
 "NAME_SORT": "El Salvador",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "El Salvador",
 "SUBREGION": "Central America",
+"code": "El Salvador",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -18304,8 +18304,8 @@
 "NAME_SORT": "Guatemala",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Guatemala",
 "SUBREGION": "Central America",
+"code": "Guatemala",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -18470,8 +18470,8 @@
 "NAME_SORT": "Belize",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Belize",
 "SUBREGION": "Central America",
+"code": "Belize",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -18576,8 +18576,8 @@
 "NAME_SORT": "Venezuela, RB",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Venezuela",
 "SUBREGION": "South America",
+"code": "Venezuela",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -18970,8 +18970,8 @@
 "NAME_SORT": "Guyana",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Guyana",
 "SUBREGION": "South America",
+"code": "Guyana",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19156,8 +19156,8 @@
 "NAME_SORT": "Suriname",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Suriname",
 "SUBREGION": "South America",
+"code": "Suriname",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19286,8 +19286,8 @@
 "NAME_SORT": "French Guiana",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "France",
 "SUBREGION": "South America",
+"code": "France",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19388,8 +19388,8 @@
 "NAME_SORT": "Ecuador",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Ecuador",
 "SUBREGION": "South America",
+"code": "Ecuador",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19546,8 +19546,8 @@
 "NAME_SORT": "Puerto Rico",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Puerto Rico",
 "SUBREGION": "Caribbean",
+"code": "Puerto Rico",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19608,8 +19608,8 @@
 "NAME_SORT": "Jamaica",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Jamaica",
 "SUBREGION": "Caribbean",
+"code": "Jamaica",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19678,8 +19678,8 @@
 "NAME_SORT": "Cuba",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Cuba",
 "SUBREGION": "Caribbean",
+"code": "Cuba",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -19872,8 +19872,8 @@
 "NAME_SORT": "Zimbabwe",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Zimbabwe",
 "SUBREGION": "Eastern Africa",
+"code": "Zimbabwe",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -20046,8 +20046,8 @@
 "NAME_SORT": "Botswana",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Botswana",
 "SUBREGION": "Southern Africa",
+"code": "Botswana",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -20232,8 +20232,8 @@
 "NAME_SORT": "Namibia",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Namibia",
 "SUBREGION": "Southern Africa",
+"code": "Namibia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -20434,8 +20434,8 @@
 "NAME_SORT": "Senegal",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Senegal",
 "SUBREGION": "Western Africa",
+"code": "Senegal",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -20636,8 +20636,8 @@
 "NAME_SORT": "Mali",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Mali",
 "SUBREGION": "Western Africa",
+"code": "Mali",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -20966,8 +20966,8 @@
 "NAME_SORT": "Mauritania",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Mauritania",
 "SUBREGION": "Western Africa",
+"code": "Mauritania",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -21148,8 +21148,8 @@
 "NAME_SORT": "Benin",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Benin",
 "SUBREGION": "Western Africa",
+"code": "Benin",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -21274,8 +21274,8 @@
 "NAME_SORT": "Niger",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Niger",
 "SUBREGION": "Western Africa",
+"code": "Niger",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -21532,8 +21532,8 @@
 "NAME_SORT": "Nigeria",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Nigeria",
 "SUBREGION": "Western Africa",
+"code": "Nigeria",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -21790,8 +21790,8 @@
 "NAME_SORT": "Cameroon",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Cameroon",
 "SUBREGION": "Middle Africa",
+"code": "Cameroon",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22060,8 +22060,8 @@
 "NAME_SORT": "Togo",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Togo",
 "SUBREGION": "Western Africa",
+"code": "Togo",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22162,8 +22162,8 @@
 "NAME_SORT": "Ghana",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Ghana",
 "SUBREGION": "Western Africa",
+"code": "Ghana",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22288,8 +22288,8 @@
 "NAME_SORT": "C\u00f4te d'Ivoire",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Ivory Coast",
 "SUBREGION": "Western Africa",
+"code": "Ivory Coast",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22498,8 +22498,8 @@
 "NAME_SORT": "Guinea",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Guinea",
 "SUBREGION": "Western Africa",
+"code": "Guinea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22804,8 +22804,8 @@
 "NAME_SORT": "Guinea-Bissau",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Guinea-Bissau",
 "SUBREGION": "Western Africa",
+"code": "Guinea-Bissau",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -22906,8 +22906,8 @@
 "NAME_SORT": "Liberia",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Liberia",
 "SUBREGION": "Western Africa",
+"code": "Liberia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23040,8 +23040,8 @@
 "NAME_SORT": "Sierra Leone",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Sierra Leone",
 "SUBREGION": "Western Africa",
+"code": "Sierra Leone",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23154,8 +23154,8 @@
 "NAME_SORT": "Burkina Faso",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Burkina Faso",
 "SUBREGION": "Western Africa",
+"code": "Burkina Faso",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23336,8 +23336,8 @@
 "NAME_SORT": "Central African Republic",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Central African Rep.",
 "SUBREGION": "Middle Africa",
+"code": "Central African Rep.",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23610,8 +23610,8 @@
 "NAME_SORT": "Congo, Rep.",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Republic of the Congo",
 "SUBREGION": "Middle Africa",
+"code": "Republic of the Congo",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23832,8 +23832,8 @@
 "NAME_SORT": "Gabon",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Gabon",
 "SUBREGION": "Middle Africa",
+"code": "Gabon",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -23982,8 +23982,8 @@
 "NAME_SORT": "Equatorial Guinea",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Eq. Guinea",
 "SUBREGION": "Middle Africa",
+"code": "Eq. Guinea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -24036,8 +24036,8 @@
 "NAME_SORT": "Zambia",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Zambia",
 "SUBREGION": "Eastern Africa",
+"code": "Zambia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -24306,8 +24306,8 @@
 "NAME_SORT": "Malawi",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Malawi",
 "SUBREGION": "Eastern Africa",
+"code": "Malawi",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -24444,8 +24444,8 @@
 "NAME_SORT": "Mozambique",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Mozambique",
 "SUBREGION": "Eastern Africa",
+"code": "Mozambique",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -24786,8 +24786,8 @@
 "NAME_SORT": "eSwatini",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Eswatini",
 "SUBREGION": "Southern Africa",
+"code": "Eswatini",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -24856,8 +24856,8 @@
 "NAME_SORT": "Angola",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Angola",
 "SUBREGION": "Middle Africa",
+"code": "Angola",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25188,8 +25188,8 @@
 "NAME_SORT": "Burundi",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Burundi",
 "SUBREGION": "Eastern Africa",
+"code": "Burundi",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25266,8 +25266,8 @@
 "NAME_SORT": "Israel",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Israel",
 "SUBREGION": "Western Asia",
+"code": "Israel",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25396,8 +25396,8 @@
 "NAME_SORT": "Lebanon",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Lebanon",
 "SUBREGION": "Western Asia",
+"code": "Lebanon",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25466,8 +25466,8 @@
 "NAME_SORT": "Madagascar",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Madagascar",
 "SUBREGION": "Eastern Africa",
+"code": "Madagascar",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25688,8 +25688,8 @@
 "NAME_SORT": "West Bank",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Palestine",
 "SUBREGION": "Western Asia",
+"code": "Palestine",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25750,8 +25750,8 @@
 "NAME_SORT": "Gambia, The",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Gambia",
 "SUBREGION": "Western Africa",
+"code": "Gambia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25840,8 +25840,8 @@
 "NAME_SORT": "Tunisia",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Tunisia",
 "SUBREGION": "Northern Africa",
+"code": "Tunisia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -25990,8 +25990,8 @@
 "NAME_SORT": "Algeria",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Algeria",
 "SUBREGION": "Northern Africa",
+"code": "Algeria",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26264,8 +26264,8 @@
 "NAME_SORT": "Jordan",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Jordan",
 "SUBREGION": "Western Asia",
+"code": "Jordan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26366,8 +26366,8 @@
 "NAME_SORT": "United Arab Emirates",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "UAE",
 "SUBREGION": "Western Asia",
+"code": "UAE",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26480,8 +26480,8 @@
 "NAME_SORT": "Qatar",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Qatar",
 "SUBREGION": "Western Asia",
+"code": "Qatar",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26542,8 +26542,8 @@
 "NAME_SORT": "Kuwait",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Kuwait",
 "SUBREGION": "Western Asia",
+"code": "Kuwait",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26604,8 +26604,8 @@
 "NAME_SORT": "Iraq",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Iraq",
 "SUBREGION": "Western Asia",
+"code": "Iraq",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26750,8 +26750,8 @@
 "NAME_SORT": "Oman",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Oman",
 "SUBREGION": "Western Asia",
+"code": "Oman",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -26970,8 +26970,8 @@
 "NAME_SORT": "Vanuatu",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Vanuatu",
 "SUBREGION": "Melanesia",
+"code": "Vanuatu",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -27050,8 +27050,8 @@
 "NAME_SORT": "Cambodia",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Cambodia",
 "SUBREGION": "South-Eastern Asia",
+"code": "Cambodia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -27144,8 +27144,8 @@
 "NAME_SORT": "Thailand",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Thailand",
 "SUBREGION": "South-Eastern Asia",
+"code": "Thailand",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -27426,8 +27426,8 @@
 "NAME_SORT": "Lao PDR",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Laos",
 "SUBREGION": "South-Eastern Asia",
+"code": "Laos",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -27600,8 +27600,8 @@
 "NAME_SORT": "Myanmar",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Myanmar",
 "SUBREGION": "South-Eastern Asia",
+"code": "Myanmar",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -27906,8 +27906,8 @@
 "NAME_SORT": "Vietnam",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Vietnam",
 "SUBREGION": "South-Eastern Asia",
+"code": "Vietnam",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -28108,8 +28108,8 @@
 "NAME_SORT": "Korea, Dem. Rep.",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "North Korea",
 "SUBREGION": "Eastern Asia",
+"code": "North Korea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -28332,8 +28332,8 @@
 "NAME_SORT": "Korea, Rep.",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "South Korea",
 "SUBREGION": "Eastern Asia",
+"code": "South Korea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -28434,8 +28434,8 @@
 "NAME_SORT": "Mongolia",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Mongolia",
 "SUBREGION": "Eastern Asia",
+"code": "Mongolia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -28760,8 +28760,8 @@
 "NAME_SORT": "India",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "India",
 "SUBREGION": "Southern Asia",
+"code": "India",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -29330,8 +29330,8 @@
 "NAME_SORT": "Bangladesh",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Bangladesh",
 "SUBREGION": "Southern Asia",
+"code": "Bangladesh",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -29500,8 +29500,8 @@
 "NAME_SORT": "Bhutan",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Bhutan",
 "SUBREGION": "Southern Asia",
+"code": "Bhutan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -29578,8 +29578,8 @@
 "NAME_SORT": "Nepal",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Nepal",
 "SUBREGION": "Southern Asia",
+"code": "Nepal",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -29696,8 +29696,8 @@
 "NAME_SORT": "Pakistan",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Pakistan",
 "SUBREGION": "Southern Asia",
+"code": "Pakistan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -29986,8 +29986,8 @@
 "NAME_SORT": "Afghanistan",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Afghanistan",
 "SUBREGION": "Southern Asia",
+"code": "Afghanistan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -30288,8 +30288,8 @@
 "NAME_SORT": "Tajikistan",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Tajikistan",
 "SUBREGION": "Central Asia",
+"code": "Tajikistan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -30478,8 +30478,8 @@
 "NAME_SORT": "Kyrgyz Republic",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Kyrgyzstan",
 "SUBREGION": "Central Asia",
+"code": "Kyrgyzstan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -30644,8 +30644,8 @@
 "NAME_SORT": "Turkmenistan",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Turkmenistan",
 "SUBREGION": "Central Asia",
+"code": "Turkmenistan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -30886,8 +30886,8 @@
 "NAME_SORT": "Iran, Islamic Rep.",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Iran",
 "SUBREGION": "Southern Asia",
+"code": "Iran",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -31216,8 +31216,8 @@
 "NAME_SORT": "Syrian Arab Republic",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Syria",
 "SUBREGION": "Western Asia",
+"code": "Syria",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -31350,8 +31350,8 @@
 "NAME_SORT": "Armenia",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Armenia",
 "SUBREGION": "Western Asia",
+"code": "Armenia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -31456,8 +31456,8 @@
 "NAME_SORT": "Norway",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Norway",
 "SUBREGION": "Northern Europe",
+"code": "Norway",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -31682,8 +31682,8 @@
 "NAME_SORT": "Sweden",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Sweden",
 "SUBREGION": "Northern Europe",
+"code": "Sweden",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -31868,8 +31868,8 @@
 "NAME_SORT": "Belarus",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Belarus",
 "SUBREGION": "Eastern Europe",
+"code": "Belarus",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -32074,8 +32074,8 @@
 "NAME_SORT": "Ukraine",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Ukraine",
 "SUBREGION": "Eastern Europe",
+"code": "Ukraine",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -32472,8 +32472,8 @@
 "NAME_SORT": "Poland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Poland",
 "SUBREGION": "Eastern Europe",
+"code": "Poland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -32678,8 +32678,8 @@
 "NAME_SORT": "Austria",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Austria",
 "SUBREGION": "Western Europe",
+"code": "Austria",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -32852,8 +32852,8 @@
 "NAME_SORT": "Hungary",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Hungary",
 "SUBREGION": "Eastern Europe",
+"code": "Hungary",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33006,8 +33006,8 @@
 "NAME_SORT": "Moldova",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Moldova",
 "SUBREGION": "Eastern Europe",
+"code": "Moldova",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33140,8 +33140,8 @@
 "NAME_SORT": "Romania",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Romania",
 "SUBREGION": "Eastern Europe",
+"code": "Romania",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33342,8 +33342,8 @@
 "NAME_SORT": "Lithuania",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Lithuania",
 "SUBREGION": "Northern Europe",
+"code": "Lithuania",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33444,8 +33444,8 @@
 "NAME_SORT": "Latvia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Latvia",
 "SUBREGION": "Northern Europe",
+"code": "Latvia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33558,8 +33558,8 @@
 "NAME_SORT": "Estonia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Estonia",
 "SUBREGION": "Northern Europe",
+"code": "Estonia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33660,8 +33660,8 @@
 "NAME_SORT": "Germany",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Germany",
 "SUBREGION": "Western Europe",
+"code": "Germany",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -33918,8 +33918,8 @@
 "NAME_SORT": "Bulgaria",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Bulgaria",
 "SUBREGION": "Eastern Europe",
+"code": "Bulgaria",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -34056,8 +34056,8 @@
 "NAME_SORT": "Greece",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Greece",
 "SUBREGION": "Southern Europe",
+"code": "Greece",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -34304,8 +34304,8 @@
 "NAME_SORT": "Turkey",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Turkey",
 "SUBREGION": "Western Asia",
+"code": "Turkey",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -34608,8 +34608,8 @@
 "NAME_SORT": "Albania",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Albania",
 "SUBREGION": "Southern Europe",
+"code": "Albania",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -34730,8 +34730,8 @@
 "NAME_SORT": "Croatia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Croatia",
 "SUBREGION": "Southern Europe",
+"code": "Croatia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -34928,8 +34928,8 @@
 "NAME_SORT": "Switzerland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Switzerland",
 "SUBREGION": "Western Europe",
+"code": "Switzerland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35050,8 +35050,8 @@
 "NAME_SORT": "Luxembourg",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Luxembourg",
 "SUBREGION": "Western Europe",
+"code": "Luxembourg",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35104,8 +35104,8 @@
 "NAME_SORT": "Belgium",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Belgium",
 "SUBREGION": "Western Europe",
+"code": "Belgium",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35198,8 +35198,8 @@
 "NAME_SORT": "Netherlands",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Netherlands",
 "SUBREGION": "Western Europe",
+"code": "Netherlands",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35284,8 +35284,8 @@
 "NAME_SORT": "Portugal",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Portugal",
 "SUBREGION": "Southern Europe",
+"code": "Portugal",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35442,8 +35442,8 @@
 "NAME_SORT": "Spain",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Spain",
 "SUBREGION": "Southern Europe",
+"code": "Spain",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35672,8 +35672,8 @@
 "NAME_SORT": "Ireland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Ireland",
 "SUBREGION": "Northern Europe",
+"code": "Ireland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35750,8 +35750,8 @@
 "NAME_SORT": "New Caledonia",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "New Caledonia",
 "SUBREGION": "Melanesia",
+"code": "New Caledonia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -35828,8 +35828,8 @@
 "NAME_SORT": "Solomon Islands",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Solomon Islands",
 "SUBREGION": "Melanesia",
+"code": "Solomon Islands",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -36020,8 +36020,8 @@
 "NAME_SORT": "Bougainville",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Papua New Guinea",
 "SUBREGION": "Melanesia",
+"code": "Papua New Guinea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -36090,8 +36090,8 @@
 "NAME_SORT": "New Zealand",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "New Zealand",
 "SUBREGION": "Australia and New Zealand",
+"code": "New Zealand",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -36386,8 +36386,8 @@
 "NAME_SORT": "Australia",
 "REGION_UN": "Oceania",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Australia",
 "SUBREGION": "Australia and New Zealand",
+"code": "Australia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -37382,8 +37382,8 @@
 "NAME_SORT": "Sri Lanka",
 "REGION_UN": "Asia",
 "REGION_WB": "South Asia",
-"Region_Name_": "Sri Lanka",
 "SUBREGION": "Southern Asia",
+"code": "Sri Lanka",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -37448,8 +37448,8 @@
 "NAME_SORT": "China",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "China",
 "SUBREGION": "Eastern Asia",
+"code": "China",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -38440,8 +38440,8 @@
 "NAME_SORT": "Taiwan",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Taiwan",
 "SUBREGION": "Eastern Asia",
+"code": "Taiwan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -38502,8 +38502,8 @@
 "NAME_SORT": "Italy",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Italy",
 "SUBREGION": "Southern Europe",
+"code": "Italy",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -38886,8 +38886,8 @@
 "NAME_SORT": "France, Metropolitan",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "France",
 "SUBREGION": "Western Europe",
+"code": "France",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39138,8 +39138,8 @@
 "NAME_SORT": "Denmark",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Denmark",
 "SUBREGION": "Northern Europe",
+"code": "Denmark",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39266,8 +39266,8 @@
 "NAME_SORT": "Northern Ireland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Britain",
 "SUBREGION": "Northern Europe",
+"code": "Britain",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39324,8 +39324,8 @@
 "NAME_SORT": "England",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Britain",
 "SUBREGION": "Northern Europe",
+"code": "Britain",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39486,8 +39486,8 @@
 "NAME_SORT": "Iceland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Iceland",
 "SUBREGION": "Northern Europe",
+"code": "Iceland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39592,8 +39592,8 @@
 "NAME_SORT": "Azerbaijan",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Azerbaijan",
 "SUBREGION": "Western Asia",
+"code": "Azerbaijan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39800,8 +39800,8 @@
 "NAME_SORT": "Georgia",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Georgia",
 "SUBREGION": "Western Asia",
+"code": "Georgia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -39922,8 +39922,8 @@
 "NAME_SORT": "Philippines",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Philippines",
 "SUBREGION": "South-Eastern Asia",
+"code": "Philippines",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -40414,8 +40414,8 @@
 "NAME_SORT": "Malaysia",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Malaysia",
 "SUBREGION": "South-Eastern Asia",
+"code": "Malaysia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -40694,8 +40694,8 @@
 "NAME_SORT": "Brunei",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Brunei",
 "SUBREGION": "South-Eastern Asia",
+"code": "Brunei",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -40752,8 +40752,8 @@
 "NAME_SORT": "Slovenia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Slovenia",
 "SUBREGION": "Southern Europe",
+"code": "Slovenia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -40850,8 +40850,8 @@
 "NAME_SORT": "Finland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Finland",
 "SUBREGION": "Northern Europe",
+"code": "Finland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41036,8 +41036,8 @@
 "NAME_SORT": "Slovak Republic",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Slovakia",
 "SUBREGION": "Eastern Europe",
+"code": "Slovakia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41194,8 +41194,8 @@
 "NAME_SORT": "Czechia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Czechia",
 "SUBREGION": "Eastern Europe",
+"code": "Czechia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41360,8 +41360,8 @@
 "NAME_SORT": "Eritrea",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Eritrea",
 "SUBREGION": "Eastern Africa",
+"code": "Eritrea",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41498,8 +41498,8 @@
 "NAME_SORT": "Japan",
 "REGION_UN": "Asia",
 "REGION_WB": "East Asia & Pacific",
-"Region_Name_": "Japan",
 "SUBREGION": "Eastern Asia",
+"code": "Japan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41794,8 +41794,8 @@
 "NAME_SORT": "Paraguay",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Paraguay",
 "SUBREGION": "South America",
+"code": "Paraguay",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -41952,8 +41952,8 @@
 "NAME_SORT": "Yemen, Rep.",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Yemen",
 "SUBREGION": "Western Asia",
+"code": "Yemen",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -42154,8 +42154,8 @@
 "NAME_SORT": "Saudi Arabia",
 "REGION_UN": "Asia",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Saudi Arabia",
 "SUBREGION": "Western Asia",
+"code": "Saudi Arabia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -42484,8 +42484,8 @@
 "NAME_SORT": "Antarctica",
 "REGION_UN": "Antarctica",
 "REGION_WB": "Antarctica",
-"Region_Name_": "Antarctica",
 "SUBREGION": "Antarctica",
+"code": "Antarctica",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -45184,8 +45184,8 @@
 "NAME_SORT": "Cyprus, Northern",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Northern Cyprus",
 "SUBREGION": "Western Asia",
+"code": "Northern Cyprus",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -45274,8 +45274,8 @@
 "NAME_SORT": "Cyprus",
 "REGION_UN": "Asia",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Cyprus",
 "SUBREGION": "Western Asia",
+"code": "Cyprus",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -45360,8 +45360,8 @@
 "NAME_SORT": "Morocco",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Morocco",
 "SUBREGION": "Northern Africa",
+"code": "Morocco",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -45638,8 +45638,8 @@
 "NAME_SORT": "Egypt, Arab Rep.",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Egypt",
 "SUBREGION": "Northern Africa",
+"code": "Egypt",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -45840,8 +45840,8 @@
 "NAME_SORT": "Libya",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Libya",
 "SUBREGION": "Northern Africa",
+"code": "Libya",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46090,8 +46090,8 @@
 "NAME_SORT": "Ethiopia",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Ethiopia",
 "SUBREGION": "Eastern Africa",
+"code": "Ethiopia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46352,8 +46352,8 @@
 "NAME_SORT": "Djibouti",
 "REGION_UN": "Africa",
 "REGION_WB": "Middle East & North Africa",
-"Region_Name_": "Djibouti",
 "SUBREGION": "Eastern Africa",
+"code": "Djibouti",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46438,8 +46438,8 @@
 "NAME_SORT": "Somaliland",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Somaliland",
 "SUBREGION": "Eastern Africa",
+"code": "Somaliland",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46568,8 +46568,8 @@
 "NAME_SORT": "Uganda",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Uganda",
 "SUBREGION": "Eastern Africa",
+"code": "Uganda",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46706,8 +46706,8 @@
 "NAME_SORT": "Rwanda",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "Rwanda",
 "SUBREGION": "Eastern Africa",
+"code": "Rwanda",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46788,8 +46788,8 @@
 "NAME_SORT": "Bosnia and Herzegovina",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Bosnia and Herzegovina",
 "SUBREGION": "Southern Europe",
+"code": "Bosnia and Herzegovina",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -46906,8 +46906,8 @@
 "NAME_SORT": "Macedonia, FYR",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Macedonia",
 "SUBREGION": "Southern Europe",
+"code": "Macedonia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47004,8 +47004,8 @@
 "NAME_SORT": "Serbia",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Republic of Serbia",
 "SUBREGION": "Southern Europe",
+"code": "Republic of Serbia",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47222,8 +47222,8 @@
 "NAME_SORT": "Montenegro",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Montenegro",
 "SUBREGION": "Southern Europe",
+"code": "Montenegro",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47320,8 +47320,8 @@
 "NAME_SORT": "Kosovo",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Kosovo",
 "SUBREGION": "Southern Europe",
+"code": "Kosovo",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47430,8 +47430,8 @@
 "NAME_SORT": "Trinidad and Tobago",
 "REGION_UN": "Americas",
 "REGION_WB": "Latin America & Caribbean",
-"Region_Name_": "Trinidad and Tobago",
 "SUBREGION": "Caribbean",
+"code": "Trinidad and Tobago",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47488,8 +47488,8 @@
 "NAME_SORT": "Wales",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Britain",
 "SUBREGION": "Northern Europe",
+"code": "Britain",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47570,8 +47570,8 @@
 "NAME_SORT": "Scotland",
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
-"Region_Name_": "Britain",
 "SUBREGION": "Northern Europe",
+"code": "Britain",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
@@ -47692,8 +47692,8 @@
 "NAME_SORT": "South Sudan",
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
-"Region_Name_": "S. Sudan",
 "SUBREGION": "Eastern Africa",
+"code": "S. Sudan",
 "featurecla": "Admin-0 map unit",
 "scalerank": 1
 },
