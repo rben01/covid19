@@ -206,6 +206,9 @@ def jsonify(s):
 
 def data_to_json(outfile: Path):
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
+    for c in df:
+        if "per cap." in c.lower():
+            df[c] *= 100000
 
     is_state = df[Columns.STATE].notna()
     usa_df = (
