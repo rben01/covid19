@@ -17,6 +17,7 @@ interface ScopedGeoData {
 interface Feature {
 	properties: {
 		code: string;
+		name: string;
 	};
 	covidData: LocationCovidData;
 }
@@ -52,7 +53,6 @@ interface ScopedCovidData {
 }
 
 interface LocationCovidData {
-	name: string;
 	date: string[];
 	cases: number[];
 	cases_per_capita: number[];
@@ -103,8 +103,8 @@ function assignData({
 	allGeoData: AllGeoData;
 }) {
 	["usa", "world"].forEach(key => {
-		const geoData: ScopedGeoData = allGeoData[key];
-		geoData.features.forEach(feature => {
+		const scopedGeoData: ScopedGeoData = allGeoData[key];
+		scopedGeoData.features.forEach(feature => {
 			feature.covidData = allCovidData[key].data[feature.properties.code];
 		});
 	});
@@ -127,13 +127,21 @@ function updateMap({ svg, date }: { svg: any; date: DateString }) {
 			return plotAesthetics.colors.scale(colorScale(d.covidData[caseType][i]));
 		})
 		.on("mouseover", function (d: Feature) {
-			if (typeof d.covidData === "undefined") {
-				return tooltip.style("visibility", "visible");
-			}
-			const i = d.covidData.date.indexOf(date);
-			const caseCount =
-				i >= 0 ? numberFormatter(d.covidData[caseType][i]) : "No data";
-			tooltip.html(`${date}<br>${d.covidData.name}<br>${caseCount}`);
+			const noDataStr = "~No data~";
+
+			const caseCount = (() => {
+				if (typeof d.covidData === "undefined") {
+					return noDataStr;
+				}
+
+				const i = d.covidData.date.indexOf(date);
+				if (i < 0) {
+					return noDataStr;
+				}
+
+				return numberFormatter(d.covidData[caseType][i]);
+			})();
+			tooltip.html(`${date}<br>${d.properties.name}<br>${caseCount}`);
 			return tooltip.style("visibility", "visible");
 		})
 		.on("mousemove", function () {
@@ -154,10 +162,10 @@ const tooltip = d3
 	.style("position", "absolute")
 	.style("z-index", "100")
 	.style("visibility", "hidden")
-	.style("background", "#fffd")
+	.style("background", "#ffff")
 	.style("color", "#111")
-	.style("border-radius", "2px")
-	.style("border-width", "2px")
+	.style("border-radius", "1px")
+	.style("border-width", "1px")
 	.style("border-color", "#111")
 	.style("border-style", "solid")
 
