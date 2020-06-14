@@ -1,24 +1,53 @@
 declare const d3: any;
 
-interface CovidDatum {
-	state: string;
-	country: string;
-	state_code: string;
-	date: string;
-	cases: number;
-	cases_per_capita: number;
-	deaths: number;
-	deaths_per_capita: number;
+type DateString = string;
+type CaseType = "cases" | "cases_per_capita" | "deaths" | "deaths_per_capita";
+type Scope = "usa" | "world";
+
+interface AllGeoData {
+	usa: ScopedGeoData;
+	world: ScopedGeoData;
 }
 
-interface GeoJson {}
+interface ScopedGeoData {
+	type: string;
+	features: Feature[];
+}
 
-interface Data {
-	names: string[];
-	codes: string[];
-	state?: string[];
-	state_code?: string[];
-	country?: string[];
+interface Feature {
+	properties: {
+		code: string;
+	};
+	covidData: LocationCovidData;
+}
+
+// usa/world -> "data" -> state/country -> date -> data
+interface AllCovidData {
+	usa: ScopedCovidData;
+	world: ScopedCovidData;
+}
+
+interface AggData {
+	min: number;
+	max: number;
+}
+
+interface ScopedCovidData {
+	agg: {
+		cases: AggData;
+		cases_per_capita: AggData;
+		deaths: AggData;
+		deaths_per_capita: AggData;
+	};
+	data: {
+		[key: string]: {
+			[key: string]: LocationCovidData;
+		};
+	};
+}
+
+interface LocationCovidData {
+	name: string;
 	date: string[];
 	cases: number[];
 	cases_per_capita: number[];
@@ -26,11 +55,23 @@ interface Data {
 	deaths_per_capita: number[];
 }
 
-interface DateString {}
-
-const plotLayout = Object.freeze({
+const plotAesthetics = Object.freeze({
 	width: 600,
-	height: 500,
+	height: 300,
+	colorScale: (t: number) => d3.interpolateOrRd(t),
+	nColorSteps: 101,
+	legend: {
+		padLeft: 40,
+		barWidth: 20,
+		padRight: 40,
+		height: 250,
+		gradientID: "verticalLegendGradient",
+	},
+
+	get mapWidth() {
+		const legend = this.legend;
+		return this.width - (legend.padLeft + legend.barWidth + legend.padRight);
+	},
 });
 
 const numberFormatter = d3.formatPrefix(",.2~s", 1e3);
@@ -39,25 +80,108 @@ const geoPaths = {
 	usa: d3.geoPath(d3.geoAlbersUsa()),
 };
 
-function getPlotData(covidData: Data, geoData: GeoJson, date: DateString) {
-	const data = {
-		cases: [],
-		dates: [],
-		locations: [],
-		text: [],
-	};
-	covidData.date.forEach((d, i) => {
-		if (d === date) {
-			data.cases.push(covidData.cases[i]);
-			data.dates.push(d);
-			data.locations.push(covidData.codes[i]);
-			data.text.push(
-				covidData.names[i] + "<br>" + numberFormatter(covidData.cases[i]),
-			);
-		}
+function assignData({
+	allCovidData,
+	allGeoData,
+}: {
+	allCovidData: AllCovidData;
+	allGeoData: AllGeoData;
+}) {
+	["usa", "world"].forEach(key => {
+		const geoData: ScopedGeoData = allGeoData[key];
+		geoData.features.forEach(feature => {
+			feature.covidData = allCovidData[key].data[feature.properties.code];
+		});
 	});
-	console.log(data);
 }
+
+function initializeMap({
+	svg,
+	allCovidData,
+	allGeoData,
+	scope,
+	date,
+	caseType,
+}: {
+	svg: any;
+	allCovidData: AllCovidData;
+	allGeoData: AllGeoData;
+	scope: Scope;
+	date: DateString;
+	caseType: CaseType;
+}) {
+	const scopedCovidData = allCovidData[scope];
+	const scopedGeoData = allGeoData[scope];
+
+	const projection = (scope === "usa"
+		? d3.geoAlbersUsa()
+		: d3.geoNaturalEarth1()
+	).fitSize([plotAesthetics.mapWidth, plotAesthetics.height], scopedGeoData);
+	const path = d3.geoPath(projection);
+	const colorScale = d3
+		.scaleLinear()
+		.domain([scopedCovidData.agg[caseType].min, scopedCovidData.agg[caseType].max])
+		.range([0, 1]);
+
+	svg.selectAll("path")
+		.data(scopedGeoData.features)
+		.join("path")
+		.attr("d", path)
+		.attr("stroke", "#fff8")
+		.attr("stroke-width", 1)
+		.attr("fill", (d: Feature) => {
+			if (typeof d.covidData === "undefined") {
+				return null;
+			}
+			const i = d.covidData.date.indexOf(date);
+			if (i < 0) {
+				return null;
+			}
+			return plotAesthetics.colorScale(colorScale(d.covidData[caseType][i]));
+		});
+
+	const legendTransX = plotAesthetics.mapWidth + plotAesthetics.legend.padLeft;
+	const legendTransY = (plotAesthetics.height - plotAesthetics.legend.height) / 2;
+	const legend = svg
+		.append("g")
+		.attr("transform", `translate(${legendTransX},${legendTransY})`);
+
+	legend
+		.append("rect")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", plotAesthetics.legend.barWidth)
+		.attr("height", plotAesthetics.legend.height)
+		.attr("fill", `url(${plotAesthetics.legend.gradientID})`);
+}
+
+const svg = d3
+	.select("#usa-1")
+	.attr("width", plotAesthetics.width)
+	.attr("height", plotAesthetics.height)
+	.attr("background-color", "white");
+
+// Create gradient
+(() => {
+	const defs = svg.append("defs");
+	const verticalLegendGradient = defs
+		.append("linearGradient")
+		.attr("id", plotAesthetics.legend.gradientID)
+		.attr("x1", "0%")
+		.attr("x2", "0%")
+		.attr("y1", "0%")
+		.attr("y2", "100%");
+	d3.range(plotAesthetics.nColorSteps).forEach(i => {
+		const percent = (100 * i) / (plotAesthetics.nColorSteps - 1);
+		const proptn = percent / 100;
+
+		verticalLegendGradient
+			.append("stop")
+			.attr("offset", `${percent}%`)
+			.attr("stop-color", plotAesthetics.colorScale(proptn))
+			.attr("stop-opacity", 1);
+	});
+})();
 
 const nowMS = new Date().getTime();
 Promise.all([
@@ -65,26 +189,63 @@ Promise.all([
 		`https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/covid_data.json?t=${nowMS}`,
 	),
 	d3.json(
-		"https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_usa.json",
-	),
-	d3.json(
-		"https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_world.json",
+		"https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_data.json",
 	),
 	,
-]).then(([covidData, geoUSA, geoWorld]) => {
-	const projection = d3.geoAlbersUsa().fitWidth(plotLayout.width, geoUSA);
-	const path = d3.geoPath(projection);
-	d3.select("#usa-1")
-		.attr("width", plotLayout.width)
-		.attr("height", plotLayout.height)
-		.attr("background-color", "white")
-		.selectAll("path")
-		.data(geoUSA.features)
-		.join("path")
-		.attr("d", path)
-		.attr("stroke", "black")
-		.attr("stroke-width", 1)
-		.attr("fill-opacity", 0);
+]).then(objects => {
+	const allCovidData: AllCovidData = objects[0];
+	const allGeoData: AllGeoData = objects[1];
+
+	assignData({ allCovidData, allGeoData });
+
+	initializeMap({
+		svg,
+		allCovidData,
+		allGeoData,
+		scope: "usa",
+		date: "2020-06-01",
+		caseType: "cases_per_capita",
+	});
+
+	// const projection = d3
+	// 	.geoAlbersUsa()
+	// 	.fitSize(
+	// 		[plotAesthetics.width - plotAesthetics.legendWidth, plotAesthetics.height],
+	// 		geoUSA,
+	// 	);
+	// const path = d3.geoPath(projection);
+	// const date = "2020-06-05";
+	// const caseType = "cases_per_capita";
+	// const colorScale = d3
+	// 	.scaleLinear()
+	// 	.domain([
+	// 		allCovidData.usa.agg[caseType].min,
+	// 		allCovidData.usa.agg[caseType].max,
+	// 	])
+	// 	.range([0, 1]);
+
+	// svg.selectAll("path")
+	// 	.data(geoUSA.features)
+	// 	.join("path")
+	// 	.attr("d", path)
+	// 	.attr("stroke", "#fff8")
+	// 	.attr("stroke-width", 1)
+	// 	.attr("fill", (d: Feature) => {
+	// 		if (typeof d.covidData === "undefined") {
+	// 			return null;
+	// 		}
+	// 		const i = d.covidData.date.indexOf(date);
+	// 		if (i < 0) {
+	// 			return null;
+	// 		}
+	// 		return plotAesthetics.colorScale(colorScale(d.covidData[caseType][i]));
+	// 	});
+
+	// svg.call(
+	// 	d3.zoom().on("zoom", function () {
+	// 		svg.selectAll("path").attr("transform", d3.event.transform);
+	// 	}),
+	// );
 
 	// 	.append("path")
 	// 	.datum(geoUSA)
