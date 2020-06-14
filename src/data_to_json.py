@@ -63,6 +63,8 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         .fillna(geo_df[REGION_NAME_COL])
     )
 
+    geo_df["name"] = geo_df[REGION_NAME_COL]
+
     geo_df = geo_df[
         [
             "featurecla",
@@ -74,6 +76,7 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
             "LEVEL",
             # "TYPE",
             REGION_NAME_COL,
+            "name",
             # "ADM0_A3",
             # "GEOU_DIF",
             # "GEOUNIT",
@@ -272,11 +275,7 @@ def data_to_json(outfile: Path):
             g = group.copy()
 
             for col in g.columns:
-                if col == "code":
-                    continue
-
-                if col == "name":
-                    d[code][col] = g["name"].iloc[0]
+                if col in ["code", "name"]:
                     continue
 
                 d[code][jsonify(col)] = list(map(nan_to_none, g[col].tolist()))

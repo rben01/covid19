@@ -56585,6 +56585,7 @@
 "SUBREGION": "Melanesia",
 "code": "Fiji",
 "featurecla": "Admin-0 map unit",
+"name": "Fiji",
 "scalerank": 1
 },
 "geometry": {
@@ -56709,6 +56710,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Tanzania",
 "featurecla": "Admin-0 map unit",
+"name": "Tanzania",
 "scalerank": 1
 },
 "geometry": {
@@ -56943,6 +56945,7 @@
 "SUBREGION": "Northern Africa",
 "code": "W. Sahara",
 "featurecla": "Admin-0 map unit",
+"name": "W. Sahara",
 "scalerank": 1
 },
 "geometry": {
@@ -57081,6 +57084,7 @@
 "SUBREGION": "Northern America",
 "code": "Canada",
 "featurecla": "Admin-0 map unit",
+"name": "Canada",
 "scalerank": 1
 },
 "geometry": {
@@ -60401,6 +60405,7 @@
 "SUBREGION": "Northern America",
 "code": "United States",
 "featurecla": "Admin-0 map unit",
+"name": "United States",
 "scalerank": 1
 },
 "geometry": {
@@ -62253,6 +62258,7 @@
 "SUBREGION": "Central Asia",
 "code": "Kazakhstan",
 "featurecla": "Admin-0 map unit",
+"name": "Kazakhstan",
 "scalerank": 1
 },
 "geometry": {
@@ -62727,6 +62733,7 @@
 "SUBREGION": "Central Asia",
 "code": "Uzbekistan",
 "featurecla": "Admin-0 map unit",
+"name": "Uzbekistan",
 "scalerank": 1
 },
 "geometry": {
@@ -62969,6 +62976,7 @@
 "SUBREGION": "Melanesia",
 "code": "Papua New Guinea",
 "featurecla": "Admin-0 map unit",
+"name": "Papua New Guinea",
 "scalerank": 1
 },
 "geometry": {
@@ -63285,6 +63293,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Indonesia",
 "featurecla": "Admin-0 map unit",
+"name": "Indonesia",
 "scalerank": 1
 },
 "geometry": {
@@ -64361,6 +64370,7 @@
 "SUBREGION": "South America",
 "code": "Argentina",
 "featurecla": "Admin-0 map unit",
+"name": "Argentina",
 "scalerank": 1
 },
 "geometry": {
@@ -64877,6 +64887,7 @@
 "SUBREGION": "South America",
 "code": "Chile",
 "featurecla": "Admin-0 map unit",
+"name": "Chile",
 "scalerank": 1
 },
 "geometry": {
@@ -65365,6 +65376,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Dem. Rep. Congo",
 "featurecla": "Admin-0 map unit",
+"name": "Dem. Rep. Congo",
 "scalerank": 1
 },
 "geometry": {
@@ -65887,6 +65899,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Somalia",
 "featurecla": "Admin-0 map unit",
+"name": "Somalia",
 "scalerank": 1
 },
 "geometry": {
@@ -66061,6 +66074,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Kenya",
 "featurecla": "Admin-0 map unit",
+"name": "Kenya",
 "scalerank": 1
 },
 "geometry": {
@@ -66235,6 +66249,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Sudan",
 "featurecla": "Admin-0 map unit",
+"name": "Sudan",
 "scalerank": 1
 },
 "geometry": {
@@ -66585,6 +66600,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Chad",
 "featurecla": "Admin-0 map unit",
+"name": "Chad",
 "scalerank": 1
 },
 "geometry": {
@@ -66843,6 +66859,7 @@
 "SUBREGION": "Caribbean",
 "code": "Haiti",
 "featurecla": "Admin-0 map unit",
+"name": "Haiti",
 "scalerank": 1
 },
 "geometry": {
@@ -66953,6 +66970,7 @@
 "SUBREGION": "Caribbean",
 "code": "Dominican Republic",
 "featurecla": "Admin-0 map unit",
+"name": "Dominican Republic",
 "scalerank": 1
 },
 "geometry": {
@@ -67083,6 +67101,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Russia",
 "featurecla": "Admin-0 map unit",
+"name": "Russia",
 "scalerank": 1
 },
 "geometry": {
@@ -69663,6 +69682,7 @@
 "SUBREGION": "Caribbean",
 "code": "The Bahamas",
 "featurecla": "Admin-0 map unit",
+"name": "The Bahamas",
 "scalerank": 1
 },
 "geometry": {
@@ -69783,6 +69803,7 @@
 "SUBREGION": "South America",
 "code": "Falkland Islands",
 "featurecla": "Admin-0 map unit",
+"name": "Falkland Islands",
 "scalerank": 1
 },
 "geometry": {
@@ -69849,6 +69870,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Norway",
 "featurecla": "Admin-0 map unit",
+"name": "Norway",
 "scalerank": 1
 },
 "geometry": {
@@ -70037,6 +70059,7 @@
 "SUBREGION": "Northern America",
 "code": "Greenland",
 "featurecla": "Admin-0 map unit",
+"name": "Greenland",
 "scalerank": 1
 },
 "geometry": {
@@ -70591,6 +70614,7 @@
 "SUBREGION": "Seven seas (open ocean)",
 "code": "French Southern and Antarctic Lands",
 "featurecla": "Admin-0 map unit",
+"name": "French Southern and Antarctic Lands",
 "scalerank": 3
 },
 "geometry": {
@@ -70653,6 +70677,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "East Timor",
 "featurecla": "Admin-0 map unit",
+"name": "East Timor",
 "scalerank": 1
 },
 "geometry": {
@@ -70723,6 +70748,7 @@
 "SUBREGION": "Southern Africa",
 "code": "South Africa",
 "featurecla": "Admin-0 map unit",
+"name": "South Africa",
 "scalerank": 1
 },
 "geometry": {
@@ -71127,6 +71153,7 @@
 "SUBREGION": "Southern Africa",
 "code": "Lesotho",
 "featurecla": "Admin-0 map unit",
+"name": "Lesotho",
 "scalerank": 1
 },
 "geometry": {
@@ -71201,6 +71228,7 @@
 "SUBREGION": "Central America",
 "code": "Mexico",
 "featurecla": "Admin-0 map unit",
+"name": "Mexico",
 "scalerank": 1
 },
 "geometry": {
@@ -71907,6 +71935,7 @@
 "SUBREGION": "South America",
 "code": "Uruguay",
 "featurecla": "Admin-0 map unit",
+"name": "Uruguay",
 "scalerank": 1
 },
 "geometry": {
@@ -72017,6 +72046,7 @@
 "SUBREGION": "South America",
 "code": "Brazil",
 "featurecla": "Admin-0 map unit",
+"name": "Brazil",
 "scalerank": 1
 },
 "geometry": {
@@ -72855,6 +72885,7 @@
 "SUBREGION": "South America",
 "code": "Bolivia",
 "featurecla": "Admin-0 map unit",
+"name": "Bolivia",
 "scalerank": 1
 },
 "geometry": {
@@ -73121,6 +73152,7 @@
 "SUBREGION": "South America",
 "code": "Peru",
 "featurecla": "Admin-0 map unit",
+"name": "Peru",
 "scalerank": 1
 },
 "geometry": {
@@ -73451,6 +73483,7 @@
 "SUBREGION": "South America",
 "code": "Colombia",
 "featurecla": "Admin-0 map unit",
+"name": "Colombia",
 "scalerank": 1
 },
 "geometry": {
@@ -73877,6 +73910,7 @@
 "SUBREGION": "Central America",
 "code": "Panama",
 "featurecla": "Admin-0 map unit",
+"name": "Panama",
 "scalerank": 1
 },
 "geometry": {
@@ -74111,6 +74145,7 @@
 "SUBREGION": "Central America",
 "code": "Costa Rica",
 "featurecla": "Admin-0 map unit",
+"name": "Costa Rica",
 "scalerank": 1
 },
 "geometry": {
@@ -74281,6 +74316,7 @@
 "SUBREGION": "Central America",
 "code": "Nicaragua",
 "featurecla": "Admin-0 map unit",
+"name": "Nicaragua",
 "scalerank": 1
 },
 "geometry": {
@@ -74515,6 +74551,7 @@
 "SUBREGION": "Central America",
 "code": "Honduras",
 "featurecla": "Admin-0 map unit",
+"name": "Honduras",
 "scalerank": 1
 },
 "geometry": {
@@ -74769,6 +74806,7 @@
 "SUBREGION": "Central America",
 "code": "El Salvador",
 "featurecla": "Admin-0 map unit",
+"name": "El Salvador",
 "scalerank": 1
 },
 "geometry": {
@@ -74875,6 +74913,7 @@
 "SUBREGION": "Central America",
 "code": "Guatemala",
 "featurecla": "Admin-0 map unit",
+"name": "Guatemala",
 "scalerank": 1
 },
 "geometry": {
@@ -75041,6 +75080,7 @@
 "SUBREGION": "Central America",
 "code": "Belize",
 "featurecla": "Admin-0 map unit",
+"name": "Belize",
 "scalerank": 1
 },
 "geometry": {
@@ -75147,6 +75187,7 @@
 "SUBREGION": "South America",
 "code": "Venezuela",
 "featurecla": "Admin-0 map unit",
+"name": "Venezuela",
 "scalerank": 1
 },
 "geometry": {
@@ -75541,6 +75582,7 @@
 "SUBREGION": "South America",
 "code": "Guyana",
 "featurecla": "Admin-0 map unit",
+"name": "Guyana",
 "scalerank": 1
 },
 "geometry": {
@@ -75727,6 +75769,7 @@
 "SUBREGION": "South America",
 "code": "Suriname",
 "featurecla": "Admin-0 map unit",
+"name": "Suriname",
 "scalerank": 1
 },
 "geometry": {
@@ -75857,6 +75900,7 @@
 "SUBREGION": "South America",
 "code": "France",
 "featurecla": "Admin-0 map unit",
+"name": "France",
 "scalerank": 1
 },
 "geometry": {
@@ -75959,6 +76003,7 @@
 "SUBREGION": "South America",
 "code": "Ecuador",
 "featurecla": "Admin-0 map unit",
+"name": "Ecuador",
 "scalerank": 1
 },
 "geometry": {
@@ -76117,6 +76162,7 @@
 "SUBREGION": "Caribbean",
 "code": "Puerto Rico",
 "featurecla": "Admin-0 map unit",
+"name": "Puerto Rico",
 "scalerank": 1
 },
 "geometry": {
@@ -76179,6 +76225,7 @@
 "SUBREGION": "Caribbean",
 "code": "Jamaica",
 "featurecla": "Admin-0 map unit",
+"name": "Jamaica",
 "scalerank": 1
 },
 "geometry": {
@@ -76249,6 +76296,7 @@
 "SUBREGION": "Caribbean",
 "code": "Cuba",
 "featurecla": "Admin-0 map unit",
+"name": "Cuba",
 "scalerank": 1
 },
 "geometry": {
@@ -76443,6 +76491,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Zimbabwe",
 "featurecla": "Admin-0 map unit",
+"name": "Zimbabwe",
 "scalerank": 1
 },
 "geometry": {
@@ -76617,6 +76666,7 @@
 "SUBREGION": "Southern Africa",
 "code": "Botswana",
 "featurecla": "Admin-0 map unit",
+"name": "Botswana",
 "scalerank": 1
 },
 "geometry": {
@@ -76803,6 +76853,7 @@
 "SUBREGION": "Southern Africa",
 "code": "Namibia",
 "featurecla": "Admin-0 map unit",
+"name": "Namibia",
 "scalerank": 1
 },
 "geometry": {
@@ -77005,6 +77056,7 @@
 "SUBREGION": "Western Africa",
 "code": "Senegal",
 "featurecla": "Admin-0 map unit",
+"name": "Senegal",
 "scalerank": 1
 },
 "geometry": {
@@ -77207,6 +77259,7 @@
 "SUBREGION": "Western Africa",
 "code": "Mali",
 "featurecla": "Admin-0 map unit",
+"name": "Mali",
 "scalerank": 1
 },
 "geometry": {
@@ -77537,6 +77590,7 @@
 "SUBREGION": "Western Africa",
 "code": "Mauritania",
 "featurecla": "Admin-0 map unit",
+"name": "Mauritania",
 "scalerank": 1
 },
 "geometry": {
@@ -77719,6 +77773,7 @@
 "SUBREGION": "Western Africa",
 "code": "Benin",
 "featurecla": "Admin-0 map unit",
+"name": "Benin",
 "scalerank": 1
 },
 "geometry": {
@@ -77845,6 +77900,7 @@
 "SUBREGION": "Western Africa",
 "code": "Niger",
 "featurecla": "Admin-0 map unit",
+"name": "Niger",
 "scalerank": 1
 },
 "geometry": {
@@ -78103,6 +78159,7 @@
 "SUBREGION": "Western Africa",
 "code": "Nigeria",
 "featurecla": "Admin-0 map unit",
+"name": "Nigeria",
 "scalerank": 1
 },
 "geometry": {
@@ -78361,6 +78418,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Cameroon",
 "featurecla": "Admin-0 map unit",
+"name": "Cameroon",
 "scalerank": 1
 },
 "geometry": {
@@ -78631,6 +78689,7 @@
 "SUBREGION": "Western Africa",
 "code": "Togo",
 "featurecla": "Admin-0 map unit",
+"name": "Togo",
 "scalerank": 1
 },
 "geometry": {
@@ -78733,6 +78792,7 @@
 "SUBREGION": "Western Africa",
 "code": "Ghana",
 "featurecla": "Admin-0 map unit",
+"name": "Ghana",
 "scalerank": 1
 },
 "geometry": {
@@ -78859,6 +78919,7 @@
 "SUBREGION": "Western Africa",
 "code": "Ivory Coast",
 "featurecla": "Admin-0 map unit",
+"name": "Ivory Coast",
 "scalerank": 1
 },
 "geometry": {
@@ -79069,6 +79130,7 @@
 "SUBREGION": "Western Africa",
 "code": "Guinea",
 "featurecla": "Admin-0 map unit",
+"name": "Guinea",
 "scalerank": 1
 },
 "geometry": {
@@ -79375,6 +79437,7 @@
 "SUBREGION": "Western Africa",
 "code": "Guinea-Bissau",
 "featurecla": "Admin-0 map unit",
+"name": "Guinea-Bissau",
 "scalerank": 1
 },
 "geometry": {
@@ -79477,6 +79540,7 @@
 "SUBREGION": "Western Africa",
 "code": "Liberia",
 "featurecla": "Admin-0 map unit",
+"name": "Liberia",
 "scalerank": 1
 },
 "geometry": {
@@ -79611,6 +79675,7 @@
 "SUBREGION": "Western Africa",
 "code": "Sierra Leone",
 "featurecla": "Admin-0 map unit",
+"name": "Sierra Leone",
 "scalerank": 1
 },
 "geometry": {
@@ -79725,6 +79790,7 @@
 "SUBREGION": "Western Africa",
 "code": "Burkina Faso",
 "featurecla": "Admin-0 map unit",
+"name": "Burkina Faso",
 "scalerank": 1
 },
 "geometry": {
@@ -79907,6 +79973,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Central African Rep.",
 "featurecla": "Admin-0 map unit",
+"name": "Central African Rep.",
 "scalerank": 1
 },
 "geometry": {
@@ -80181,6 +80248,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Republic of the Congo",
 "featurecla": "Admin-0 map unit",
+"name": "Republic of the Congo",
 "scalerank": 1
 },
 "geometry": {
@@ -80403,6 +80471,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Gabon",
 "featurecla": "Admin-0 map unit",
+"name": "Gabon",
 "scalerank": 1
 },
 "geometry": {
@@ -80553,6 +80622,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Eq. Guinea",
 "featurecla": "Admin-0 map unit",
+"name": "Eq. Guinea",
 "scalerank": 1
 },
 "geometry": {
@@ -80607,6 +80677,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Zambia",
 "featurecla": "Admin-0 map unit",
+"name": "Zambia",
 "scalerank": 1
 },
 "geometry": {
@@ -80877,6 +80948,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Malawi",
 "featurecla": "Admin-0 map unit",
+"name": "Malawi",
 "scalerank": 1
 },
 "geometry": {
@@ -81015,6 +81087,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Mozambique",
 "featurecla": "Admin-0 map unit",
+"name": "Mozambique",
 "scalerank": 1
 },
 "geometry": {
@@ -81357,6 +81430,7 @@
 "SUBREGION": "Southern Africa",
 "code": "Eswatini",
 "featurecla": "Admin-0 map unit",
+"name": "Eswatini",
 "scalerank": 1
 },
 "geometry": {
@@ -81427,6 +81501,7 @@
 "SUBREGION": "Middle Africa",
 "code": "Angola",
 "featurecla": "Admin-0 map unit",
+"name": "Angola",
 "scalerank": 1
 },
 "geometry": {
@@ -81759,6 +81834,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Burundi",
 "featurecla": "Admin-0 map unit",
+"name": "Burundi",
 "scalerank": 1
 },
 "geometry": {
@@ -81837,6 +81913,7 @@
 "SUBREGION": "Western Asia",
 "code": "Israel",
 "featurecla": "Admin-0 map unit",
+"name": "Israel",
 "scalerank": 1
 },
 "geometry": {
@@ -81967,6 +82044,7 @@
 "SUBREGION": "Western Asia",
 "code": "Lebanon",
 "featurecla": "Admin-0 map unit",
+"name": "Lebanon",
 "scalerank": 1
 },
 "geometry": {
@@ -82037,6 +82115,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Madagascar",
 "featurecla": "Admin-0 map unit",
+"name": "Madagascar",
 "scalerank": 1
 },
 "geometry": {
@@ -82259,6 +82338,7 @@
 "SUBREGION": "Western Asia",
 "code": "Palestine",
 "featurecla": "Admin-0 map unit",
+"name": "Palestine",
 "scalerank": 1
 },
 "geometry": {
@@ -82321,6 +82401,7 @@
 "SUBREGION": "Western Africa",
 "code": "Gambia",
 "featurecla": "Admin-0 map unit",
+"name": "Gambia",
 "scalerank": 1
 },
 "geometry": {
@@ -82411,6 +82492,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Tunisia",
 "featurecla": "Admin-0 map unit",
+"name": "Tunisia",
 "scalerank": 1
 },
 "geometry": {
@@ -82561,6 +82643,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Algeria",
 "featurecla": "Admin-0 map unit",
+"name": "Algeria",
 "scalerank": 1
 },
 "geometry": {
@@ -82835,6 +82918,7 @@
 "SUBREGION": "Western Asia",
 "code": "Jordan",
 "featurecla": "Admin-0 map unit",
+"name": "Jordan",
 "scalerank": 1
 },
 "geometry": {
@@ -82937,6 +83021,7 @@
 "SUBREGION": "Western Asia",
 "code": "UAE",
 "featurecla": "Admin-0 map unit",
+"name": "UAE",
 "scalerank": 1
 },
 "geometry": {
@@ -83051,6 +83136,7 @@
 "SUBREGION": "Western Asia",
 "code": "Qatar",
 "featurecla": "Admin-0 map unit",
+"name": "Qatar",
 "scalerank": 1
 },
 "geometry": {
@@ -83113,6 +83199,7 @@
 "SUBREGION": "Western Asia",
 "code": "Kuwait",
 "featurecla": "Admin-0 map unit",
+"name": "Kuwait",
 "scalerank": 1
 },
 "geometry": {
@@ -83175,6 +83262,7 @@
 "SUBREGION": "Western Asia",
 "code": "Iraq",
 "featurecla": "Admin-0 map unit",
+"name": "Iraq",
 "scalerank": 1
 },
 "geometry": {
@@ -83321,6 +83409,7 @@
 "SUBREGION": "Western Asia",
 "code": "Oman",
 "featurecla": "Admin-0 map unit",
+"name": "Oman",
 "scalerank": 1
 },
 "geometry": {
@@ -83541,6 +83630,7 @@
 "SUBREGION": "Melanesia",
 "code": "Vanuatu",
 "featurecla": "Admin-0 map unit",
+"name": "Vanuatu",
 "scalerank": 1
 },
 "geometry": {
@@ -83621,6 +83711,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Cambodia",
 "featurecla": "Admin-0 map unit",
+"name": "Cambodia",
 "scalerank": 1
 },
 "geometry": {
@@ -83715,6 +83806,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Thailand",
 "featurecla": "Admin-0 map unit",
+"name": "Thailand",
 "scalerank": 1
 },
 "geometry": {
@@ -83997,6 +84089,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Laos",
 "featurecla": "Admin-0 map unit",
+"name": "Laos",
 "scalerank": 1
 },
 "geometry": {
@@ -84171,6 +84264,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Myanmar",
 "featurecla": "Admin-0 map unit",
+"name": "Myanmar",
 "scalerank": 1
 },
 "geometry": {
@@ -84477,6 +84571,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Vietnam",
 "featurecla": "Admin-0 map unit",
+"name": "Vietnam",
 "scalerank": 1
 },
 "geometry": {
@@ -84679,6 +84774,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "North Korea",
 "featurecla": "Admin-0 map unit",
+"name": "North Korea",
 "scalerank": 1
 },
 "geometry": {
@@ -84903,6 +84999,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "South Korea",
 "featurecla": "Admin-0 map unit",
+"name": "South Korea",
 "scalerank": 1
 },
 "geometry": {
@@ -85005,6 +85102,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "Mongolia",
 "featurecla": "Admin-0 map unit",
+"name": "Mongolia",
 "scalerank": 1
 },
 "geometry": {
@@ -85331,6 +85429,7 @@
 "SUBREGION": "Southern Asia",
 "code": "India",
 "featurecla": "Admin-0 map unit",
+"name": "India",
 "scalerank": 1
 },
 "geometry": {
@@ -85901,6 +86000,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Bangladesh",
 "featurecla": "Admin-0 map unit",
+"name": "Bangladesh",
 "scalerank": 1
 },
 "geometry": {
@@ -86071,6 +86171,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Bhutan",
 "featurecla": "Admin-0 map unit",
+"name": "Bhutan",
 "scalerank": 1
 },
 "geometry": {
@@ -86149,6 +86250,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Nepal",
 "featurecla": "Admin-0 map unit",
+"name": "Nepal",
 "scalerank": 1
 },
 "geometry": {
@@ -86267,6 +86369,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Pakistan",
 "featurecla": "Admin-0 map unit",
+"name": "Pakistan",
 "scalerank": 1
 },
 "geometry": {
@@ -86557,6 +86660,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Afghanistan",
 "featurecla": "Admin-0 map unit",
+"name": "Afghanistan",
 "scalerank": 1
 },
 "geometry": {
@@ -86859,6 +86963,7 @@
 "SUBREGION": "Central Asia",
 "code": "Tajikistan",
 "featurecla": "Admin-0 map unit",
+"name": "Tajikistan",
 "scalerank": 1
 },
 "geometry": {
@@ -87049,6 +87154,7 @@
 "SUBREGION": "Central Asia",
 "code": "Kyrgyzstan",
 "featurecla": "Admin-0 map unit",
+"name": "Kyrgyzstan",
 "scalerank": 1
 },
 "geometry": {
@@ -87215,6 +87321,7 @@
 "SUBREGION": "Central Asia",
 "code": "Turkmenistan",
 "featurecla": "Admin-0 map unit",
+"name": "Turkmenistan",
 "scalerank": 1
 },
 "geometry": {
@@ -87457,6 +87564,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Iran",
 "featurecla": "Admin-0 map unit",
+"name": "Iran",
 "scalerank": 1
 },
 "geometry": {
@@ -87787,6 +87895,7 @@
 "SUBREGION": "Western Asia",
 "code": "Syria",
 "featurecla": "Admin-0 map unit",
+"name": "Syria",
 "scalerank": 1
 },
 "geometry": {
@@ -87921,6 +88030,7 @@
 "SUBREGION": "Western Asia",
 "code": "Armenia",
 "featurecla": "Admin-0 map unit",
+"name": "Armenia",
 "scalerank": 1
 },
 "geometry": {
@@ -88027,6 +88137,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Norway",
 "featurecla": "Admin-0 map unit",
+"name": "Norway",
 "scalerank": 1
 },
 "geometry": {
@@ -88253,6 +88364,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Sweden",
 "featurecla": "Admin-0 map unit",
+"name": "Sweden",
 "scalerank": 1
 },
 "geometry": {
@@ -88439,6 +88551,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Belarus",
 "featurecla": "Admin-0 map unit",
+"name": "Belarus",
 "scalerank": 1
 },
 "geometry": {
@@ -88645,6 +88758,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Ukraine",
 "featurecla": "Admin-0 map unit",
+"name": "Ukraine",
 "scalerank": 1
 },
 "geometry": {
@@ -89043,6 +89157,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Poland",
 "featurecla": "Admin-0 map unit",
+"name": "Poland",
 "scalerank": 1
 },
 "geometry": {
@@ -89249,6 +89364,7 @@
 "SUBREGION": "Western Europe",
 "code": "Austria",
 "featurecla": "Admin-0 map unit",
+"name": "Austria",
 "scalerank": 1
 },
 "geometry": {
@@ -89423,6 +89539,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Hungary",
 "featurecla": "Admin-0 map unit",
+"name": "Hungary",
 "scalerank": 1
 },
 "geometry": {
@@ -89577,6 +89694,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Moldova",
 "featurecla": "Admin-0 map unit",
+"name": "Moldova",
 "scalerank": 1
 },
 "geometry": {
@@ -89711,6 +89829,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Romania",
 "featurecla": "Admin-0 map unit",
+"name": "Romania",
 "scalerank": 1
 },
 "geometry": {
@@ -89913,6 +90032,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Lithuania",
 "featurecla": "Admin-0 map unit",
+"name": "Lithuania",
 "scalerank": 1
 },
 "geometry": {
@@ -90015,6 +90135,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Latvia",
 "featurecla": "Admin-0 map unit",
+"name": "Latvia",
 "scalerank": 1
 },
 "geometry": {
@@ -90129,6 +90250,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Estonia",
 "featurecla": "Admin-0 map unit",
+"name": "Estonia",
 "scalerank": 1
 },
 "geometry": {
@@ -90231,6 +90353,7 @@
 "SUBREGION": "Western Europe",
 "code": "Germany",
 "featurecla": "Admin-0 map unit",
+"name": "Germany",
 "scalerank": 1
 },
 "geometry": {
@@ -90489,6 +90612,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Bulgaria",
 "featurecla": "Admin-0 map unit",
+"name": "Bulgaria",
 "scalerank": 1
 },
 "geometry": {
@@ -90627,6 +90751,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Greece",
 "featurecla": "Admin-0 map unit",
+"name": "Greece",
 "scalerank": 1
 },
 "geometry": {
@@ -90875,6 +91000,7 @@
 "SUBREGION": "Western Asia",
 "code": "Turkey",
 "featurecla": "Admin-0 map unit",
+"name": "Turkey",
 "scalerank": 1
 },
 "geometry": {
@@ -91179,6 +91305,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Albania",
 "featurecla": "Admin-0 map unit",
+"name": "Albania",
 "scalerank": 1
 },
 "geometry": {
@@ -91301,6 +91428,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Croatia",
 "featurecla": "Admin-0 map unit",
+"name": "Croatia",
 "scalerank": 1
 },
 "geometry": {
@@ -91499,6 +91627,7 @@
 "SUBREGION": "Western Europe",
 "code": "Switzerland",
 "featurecla": "Admin-0 map unit",
+"name": "Switzerland",
 "scalerank": 1
 },
 "geometry": {
@@ -91621,6 +91750,7 @@
 "SUBREGION": "Western Europe",
 "code": "Luxembourg",
 "featurecla": "Admin-0 map unit",
+"name": "Luxembourg",
 "scalerank": 1
 },
 "geometry": {
@@ -91675,6 +91805,7 @@
 "SUBREGION": "Western Europe",
 "code": "Belgium",
 "featurecla": "Admin-0 map unit",
+"name": "Belgium",
 "scalerank": 1
 },
 "geometry": {
@@ -91769,6 +91900,7 @@
 "SUBREGION": "Western Europe",
 "code": "Netherlands",
 "featurecla": "Admin-0 map unit",
+"name": "Netherlands",
 "scalerank": 1
 },
 "geometry": {
@@ -91855,6 +91987,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Portugal",
 "featurecla": "Admin-0 map unit",
+"name": "Portugal",
 "scalerank": 1
 },
 "geometry": {
@@ -92013,6 +92146,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Spain",
 "featurecla": "Admin-0 map unit",
+"name": "Spain",
 "scalerank": 1
 },
 "geometry": {
@@ -92243,6 +92377,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Ireland",
 "featurecla": "Admin-0 map unit",
+"name": "Ireland",
 "scalerank": 1
 },
 "geometry": {
@@ -92321,6 +92456,7 @@
 "SUBREGION": "Melanesia",
 "code": "New Caledonia",
 "featurecla": "Admin-0 map unit",
+"name": "New Caledonia",
 "scalerank": 1
 },
 "geometry": {
@@ -92399,6 +92535,7 @@
 "SUBREGION": "Melanesia",
 "code": "Solomon Islands",
 "featurecla": "Admin-0 map unit",
+"name": "Solomon Islands",
 "scalerank": 1
 },
 "geometry": {
@@ -92591,6 +92728,7 @@
 "SUBREGION": "Melanesia",
 "code": "Papua New Guinea",
 "featurecla": "Admin-0 map unit",
+"name": "Papua New Guinea",
 "scalerank": 1
 },
 "geometry": {
@@ -92661,6 +92799,7 @@
 "SUBREGION": "Australia and New Zealand",
 "code": "New Zealand",
 "featurecla": "Admin-0 map unit",
+"name": "New Zealand",
 "scalerank": 1
 },
 "geometry": {
@@ -92957,6 +93096,7 @@
 "SUBREGION": "Australia and New Zealand",
 "code": "Australia",
 "featurecla": "Admin-0 map unit",
+"name": "Australia",
 "scalerank": 1
 },
 "geometry": {
@@ -93953,6 +94093,7 @@
 "SUBREGION": "Southern Asia",
 "code": "Sri Lanka",
 "featurecla": "Admin-0 map unit",
+"name": "Sri Lanka",
 "scalerank": 1
 },
 "geometry": {
@@ -94019,6 +94160,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "China",
 "featurecla": "Admin-0 map unit",
+"name": "China",
 "scalerank": 1
 },
 "geometry": {
@@ -95011,6 +95153,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "Taiwan",
 "featurecla": "Admin-0 map unit",
+"name": "Taiwan",
 "scalerank": 1
 },
 "geometry": {
@@ -95073,6 +95216,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Italy",
 "featurecla": "Admin-0 map unit",
+"name": "Italy",
 "scalerank": 1
 },
 "geometry": {
@@ -95457,6 +95601,7 @@
 "SUBREGION": "Western Europe",
 "code": "France",
 "featurecla": "Admin-0 map unit",
+"name": "France",
 "scalerank": 1
 },
 "geometry": {
@@ -95709,6 +95854,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Denmark",
 "featurecla": "Admin-0 map unit",
+"name": "Denmark",
 "scalerank": 1
 },
 "geometry": {
@@ -95837,6 +95983,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Britain",
 "featurecla": "Admin-0 map unit",
+"name": "Britain",
 "scalerank": 1
 },
 "geometry": {
@@ -95895,6 +96042,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Britain",
 "featurecla": "Admin-0 map unit",
+"name": "Britain",
 "scalerank": 1
 },
 "geometry": {
@@ -96057,6 +96205,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Iceland",
 "featurecla": "Admin-0 map unit",
+"name": "Iceland",
 "scalerank": 1
 },
 "geometry": {
@@ -96163,6 +96312,7 @@
 "SUBREGION": "Western Asia",
 "code": "Azerbaijan",
 "featurecla": "Admin-0 map unit",
+"name": "Azerbaijan",
 "scalerank": 1
 },
 "geometry": {
@@ -96371,6 +96521,7 @@
 "SUBREGION": "Western Asia",
 "code": "Georgia",
 "featurecla": "Admin-0 map unit",
+"name": "Georgia",
 "scalerank": 1
 },
 "geometry": {
@@ -96493,6 +96644,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Philippines",
 "featurecla": "Admin-0 map unit",
+"name": "Philippines",
 "scalerank": 1
 },
 "geometry": {
@@ -96985,6 +97137,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Malaysia",
 "featurecla": "Admin-0 map unit",
+"name": "Malaysia",
 "scalerank": 1
 },
 "geometry": {
@@ -97265,6 +97418,7 @@
 "SUBREGION": "South-Eastern Asia",
 "code": "Brunei",
 "featurecla": "Admin-0 map unit",
+"name": "Brunei",
 "scalerank": 1
 },
 "geometry": {
@@ -97323,6 +97477,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Slovenia",
 "featurecla": "Admin-0 map unit",
+"name": "Slovenia",
 "scalerank": 1
 },
 "geometry": {
@@ -97421,6 +97576,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Finland",
 "featurecla": "Admin-0 map unit",
+"name": "Finland",
 "scalerank": 1
 },
 "geometry": {
@@ -97607,6 +97763,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Slovakia",
 "featurecla": "Admin-0 map unit",
+"name": "Slovakia",
 "scalerank": 1
 },
 "geometry": {
@@ -97765,6 +97922,7 @@
 "SUBREGION": "Eastern Europe",
 "code": "Czechia",
 "featurecla": "Admin-0 map unit",
+"name": "Czechia",
 "scalerank": 1
 },
 "geometry": {
@@ -97931,6 +98089,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Eritrea",
 "featurecla": "Admin-0 map unit",
+"name": "Eritrea",
 "scalerank": 1
 },
 "geometry": {
@@ -98069,6 +98228,7 @@
 "SUBREGION": "Eastern Asia",
 "code": "Japan",
 "featurecla": "Admin-0 map unit",
+"name": "Japan",
 "scalerank": 1
 },
 "geometry": {
@@ -98365,6 +98525,7 @@
 "SUBREGION": "South America",
 "code": "Paraguay",
 "featurecla": "Admin-0 map unit",
+"name": "Paraguay",
 "scalerank": 1
 },
 "geometry": {
@@ -98523,6 +98684,7 @@
 "SUBREGION": "Western Asia",
 "code": "Yemen",
 "featurecla": "Admin-0 map unit",
+"name": "Yemen",
 "scalerank": 1
 },
 "geometry": {
@@ -98725,6 +98887,7 @@
 "SUBREGION": "Western Asia",
 "code": "Saudi Arabia",
 "featurecla": "Admin-0 map unit",
+"name": "Saudi Arabia",
 "scalerank": 1
 },
 "geometry": {
@@ -99055,6 +99218,7 @@
 "SUBREGION": "Antarctica",
 "code": "Antarctica",
 "featurecla": "Admin-0 map unit",
+"name": "Antarctica",
 "scalerank": 1
 },
 "geometry": {
@@ -101755,6 +101919,7 @@
 "SUBREGION": "Western Asia",
 "code": "Northern Cyprus",
 "featurecla": "Admin-0 map unit",
+"name": "Northern Cyprus",
 "scalerank": 1
 },
 "geometry": {
@@ -101845,6 +102010,7 @@
 "SUBREGION": "Western Asia",
 "code": "Cyprus",
 "featurecla": "Admin-0 map unit",
+"name": "Cyprus",
 "scalerank": 1
 },
 "geometry": {
@@ -101931,6 +102097,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Morocco",
 "featurecla": "Admin-0 map unit",
+"name": "Morocco",
 "scalerank": 1
 },
 "geometry": {
@@ -102209,6 +102376,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Egypt",
 "featurecla": "Admin-0 map unit",
+"name": "Egypt",
 "scalerank": 1
 },
 "geometry": {
@@ -102411,6 +102579,7 @@
 "SUBREGION": "Northern Africa",
 "code": "Libya",
 "featurecla": "Admin-0 map unit",
+"name": "Libya",
 "scalerank": 1
 },
 "geometry": {
@@ -102661,6 +102830,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Ethiopia",
 "featurecla": "Admin-0 map unit",
+"name": "Ethiopia",
 "scalerank": 1
 },
 "geometry": {
@@ -102923,6 +103093,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Djibouti",
 "featurecla": "Admin-0 map unit",
+"name": "Djibouti",
 "scalerank": 1
 },
 "geometry": {
@@ -103009,6 +103180,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Somaliland",
 "featurecla": "Admin-0 map unit",
+"name": "Somaliland",
 "scalerank": 1
 },
 "geometry": {
@@ -103139,6 +103311,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Uganda",
 "featurecla": "Admin-0 map unit",
+"name": "Uganda",
 "scalerank": 1
 },
 "geometry": {
@@ -103277,6 +103450,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "Rwanda",
 "featurecla": "Admin-0 map unit",
+"name": "Rwanda",
 "scalerank": 1
 },
 "geometry": {
@@ -103359,6 +103533,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Bosnia and Herzegovina",
 "featurecla": "Admin-0 map unit",
+"name": "Bosnia and Herzegovina",
 "scalerank": 1
 },
 "geometry": {
@@ -103477,6 +103652,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Macedonia",
 "featurecla": "Admin-0 map unit",
+"name": "Macedonia",
 "scalerank": 1
 },
 "geometry": {
@@ -103575,6 +103751,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Republic of Serbia",
 "featurecla": "Admin-0 map unit",
+"name": "Republic of Serbia",
 "scalerank": 1
 },
 "geometry": {
@@ -103793,6 +103970,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Montenegro",
 "featurecla": "Admin-0 map unit",
+"name": "Montenegro",
 "scalerank": 1
 },
 "geometry": {
@@ -103891,6 +104069,7 @@
 "SUBREGION": "Southern Europe",
 "code": "Kosovo",
 "featurecla": "Admin-0 map unit",
+"name": "Kosovo",
 "scalerank": 1
 },
 "geometry": {
@@ -104001,6 +104180,7 @@
 "SUBREGION": "Caribbean",
 "code": "Trinidad and Tobago",
 "featurecla": "Admin-0 map unit",
+"name": "Trinidad and Tobago",
 "scalerank": 1
 },
 "geometry": {
@@ -104059,6 +104239,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Britain",
 "featurecla": "Admin-0 map unit",
+"name": "Britain",
 "scalerank": 1
 },
 "geometry": {
@@ -104141,6 +104322,7 @@
 "SUBREGION": "Northern Europe",
 "code": "Britain",
 "featurecla": "Admin-0 map unit",
+"name": "Britain",
 "scalerank": 1
 },
 "geometry": {
@@ -104263,6 +104445,7 @@
 "SUBREGION": "Eastern Africa",
 "code": "S. Sudan",
 "featurecla": "Admin-0 map unit",
+"name": "S. Sudan",
 "scalerank": 1
 },
 "geometry": {
