@@ -1,3 +1,4 @@
-.plot {
+svg.plot {
 	display: inline-block;
+	padding: 1em;
 }
