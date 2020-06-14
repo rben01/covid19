@@ -266,10 +266,12 @@ def data_to_json(outfile: Path):
                     continue
 
                 d[code][jsonify(col)] = list(map(nan_to_none, g[col].tolist()))
-
-    for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
-        with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
-            f.write(df.to_json(indent=0))
+    with (DATA_DIR / "geo_data.json").open("w") as f:
+        geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
+        json.dump(geojson, f, indent=0)
+    # for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
+    #     with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
+    #         f.write(df.to_json(indent=0))
 
     if outfile is not None:
         with outfile.open("w") as f:
