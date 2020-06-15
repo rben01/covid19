@@ -134,8 +134,6 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex?: numb
 	const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
 	plotGroup.selectAll(".date-span").text(dateStr);
 
-	console.log(dateKey, trueDate);
-
 	plotGroup
 		.selectAll(".plot-container")
 		.each(function ({
@@ -367,7 +365,6 @@ const sliders = sliderRow
 	.attr("max", 1)
 	.property("value", 1)
 	.on("input", function (d: PlotInfo) {
-		console.log("h");
 		const plotGroup = plotGroups.filter((p: PlotInfo) => p.scope === d.scope);
 		const dateIndex = +this.value;
 		updateMaps({ plotGroup, dateIndex });
