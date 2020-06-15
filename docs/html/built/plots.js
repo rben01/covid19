@@ -44,9 +44,12 @@ function assignData({ allCovidData, allGeoData, }) {
         });
     });
 }
-function updateMaps({ plotGroup, date }) {
+function updateMaps({ plotGroup, date, dateIndex, }) {
     const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
-    const dateIndex = Math.round((dateStrParser(date).getTime() - dateStrParser(minDate).getTime()) / MS_PER_DAY);
+    if (typeof dateIndex === "undefined") {
+        dateIndex = Math.round((dateStrParser(date).getTime() - dateStrParser(minDate).getTime()) /
+            MS_PER_DAY);
+    }
     plotGroup.selectAll(".date-slider").property("value", dateIndex);
     const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(date));
     plotGroup.selectAll(".date-span").text(dateStr);
@@ -94,22 +97,8 @@ function updateMaps({ plotGroup, date }) {
             .style("left", `${+d3.event.pageX + 10}px`))
             .on("mouseout", () => tooltip.style("visibility", "hidden"));
     });
-    // if (!thisDidInitiate) {
-    // 	console.log(
-    // 		plotGroups
-    // 			.filter(({ scope: s }: { scope: Scope }) => s === scope)
-    // 			.selectAll("input")
-    // 			.filter(({ caseType: c }: { caseType: CaseType }) => c === caseType),
-    // 		dateIndex,
-    // 	);
-    // 	plotGroups
-    // 		.filter(({ scope: s }: { scope: Scope }) => s === scope)
-    // 		.selectAll("input")
-    // 		.filter(({ caseType: c }: { caseType: CaseType }) => c === caseType)
-    // 		.property("value", dateIndex);
-    // }
 }
-const numberFormatters = { int: d3.format(",~r"), float: d3.format(",.2~f") };
+const numberFormatters = { int: d3.format(",~r"), float: d3.format(",.2f") };
 const tooltip = d3.select("body").append("div").attr("id", "tooltip");
 function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
     const scope = plotGroup.datum().scope;
@@ -122,6 +111,9 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         plotAesthetics.legend.height) /
         2;
     const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.date;
+    const firstDay = dateStrParser(minDate);
+    const lastDay = dateStrParser(maxDate);
+    const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
     plotGroup.selectAll(".plot-container").each(function () {
         const plotContainer = d3.select(this);
         const caseType = plotContainer.datum().caseType;
@@ -200,35 +192,15 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("font-size", 24)
             .attr("font-family", "sans-serif")
             .attr("fill", "black");
-        const timeParse = d3.timeParse("%Y-%m-%d");
-        const firstDay = timeParse(minDate);
-        const lastDay = timeParse(maxDate);
-        const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
-        sliders
-            .filter((d) => d.scope === scope)
-            .each(function () {
+        plotContainer.selectAll(".date-slider").each(function () {
             this.min = 0;
             this.max = daysElapsed;
             this.step = 1;
             this.value = daysElapsed;
         });
     });
-    updateMaps({ plotGroup, date: maxDate });
+    updateMaps({ plotGroup, date: maxDate, dateIndex: daysElapsed });
 }
-const plotStateData = (() => {
-    const data = [];
-    let i = 0;
-    ["usa", "world"].forEach((scope) => {
-        ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].forEach((caseType) => {
-            data.push({
-                scope,
-                caseType,
-            });
-            i += 1;
-        });
-    });
-    return data;
-})();
 const plotGroups = d3
     .select("#content")
     .selectAll()
@@ -258,22 +230,16 @@ const sliders = sliderRow
     .attr("min", 0)
     .attr("max", 1)
     .property("value", 1)
-    .style("width", "300px")
     .on("input", function (d) {
     const plotGroup = plotGroups.filter((p) => p.scope === d.scope);
     const dateIndex = +this.value;
     const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
     const date = getDateNDaysAfter(minDate, dateIndex);
-    updateMaps({ plotGroup, date });
+    updateMaps({ plotGroup, date, dateIndex });
 });
-const dateSpans = sliderRow
-    .append("span")
-    .data(plotStateData)
-    .classed("date-span", true)
-    .style("float", "right")
-    .style("padding-right", "3em");
+const dateSpans = sliderRow.append("span").classed("date-span", true);
 const buttonsRow = plotDivs.append("div").append("span");
-buttonsRow.append("button").data(plotStateData).style("width", "50px");
+buttonsRow.append("button").classed("play-button", true);
 // Create gradient
 (() => {
     const defs = svgs.append("defs");

@@ -17,6 +17,15 @@ body {
 	padding: 2px;
 }
 
+span.date-span {
+	float: right;
+	padding-right: 3em;
+}
+
+button.play-button {
+	width: 50px;
+}
+
 svg.plot {
 	display: inline-block;
 }
@@ -80,4 +89,8 @@ input[type="range"]::-ms-thumb {
 	border-radius: 20px;
 	background: #ffffff;
 	cursor: pointer;
+}
+
+input.date-slider {
+	width: 60%;
 }
