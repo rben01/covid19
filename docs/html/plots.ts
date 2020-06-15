@@ -124,28 +124,17 @@ function assignData({
 	});
 }
 
-function updateMaps({
-	plotGroup,
-	date,
-	dateIndex,
-}: {
-	plotGroup: any;
-	date: DateString;
-	dateIndex?: number;
-}) {
-	const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
-
-	if (typeof dateIndex === "undefined") {
-		dateIndex = Math.round(
-			(dateStrParser(date).getTime() - dateStrParser(minDate).getTime()) /
-				MS_PER_DAY,
-		);
-	}
-
+function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex?: number }) {
 	plotGroup.selectAll(".date-slider").property("value", dateIndex);
 
-	const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(date));
+	const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
+	const dateKey = getDateNDaysAfter(minDate, dateIndex);
+
+	const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
+	const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
 	plotGroup.selectAll(".date-span").text(dateStr);
+
+	console.log(dateKey, trueDate);
 
 	plotGroup
 		.selectAll(".plot-container")
@@ -171,7 +160,7 @@ function updateMaps({
 					if (typeof d.covidData === "undefined") {
 						return plotAesthetics.colors.missing;
 					}
-					const index = d.covidData.date[date];
+					const index = d.covidData.date[dateKey];
 					if (typeof index === "undefined") {
 						return plotAesthetics.colors.missing;
 					}
@@ -190,7 +179,7 @@ function updateMaps({
 							return noDataStr;
 						}
 
-						const index = d.covidData.date[date];
+						const index = d.covidData.date[dateKey];
 						if (typeof index === "undefined") {
 							return noDataStr;
 						}
@@ -198,7 +187,7 @@ function updateMaps({
 						return formatter(d.covidData[caseType][index]);
 					})();
 
-					tooltip.html(`${date}<br>${d.properties.name}<br>${caseCount}`);
+					tooltip.html(`${dateKey}<br>${d.properties.name}<br>${caseCount}`);
 					return tooltip.style("visibility", "visible");
 				})
 				.on("mousemove", () =>
@@ -340,7 +329,7 @@ function initializeChoropleth({
 		});
 	});
 
-	updateMaps({ plotGroup, date: maxDate, dateIndex: daysElapsed });
+	updateMaps({ plotGroup, dateIndex: daysElapsed });
 }
 
 const plotGroups = d3
@@ -378,11 +367,10 @@ const sliders = sliderRow
 	.attr("max", 1)
 	.property("value", 1)
 	.on("input", function (d: PlotInfo) {
+		console.log("h");
 		const plotGroup = plotGroups.filter((p: PlotInfo) => p.scope === d.scope);
 		const dateIndex = +this.value;
-		const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
-		const date = getDateNDaysAfter(minDate, dateIndex);
-		updateMaps({ plotGroup, date, dateIndex });
+		updateMaps({ plotGroup, dateIndex });
 	});
 
 const dateSpans = sliderRow.append("span").classed("date-span", true);
