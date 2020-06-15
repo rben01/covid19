@@ -1,10 +1,12 @@
+const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze({
-    width: { usa: 500, world: 650 },
+    width: { usa: 500, world: 600 },
     height: { usa: 350, world: 400 },
     colors: {
-        scale: d3.interpolateCividis,
+        scale: (t) => d3.interpolateCividis(1 - t),
         nSteps: 101,
         missing: "#ccc",
+        zero: "#ddc",
     },
     legend: {
         padLeft: 20,
@@ -26,6 +28,14 @@ const plotAesthetics = Object.freeze({
         return mw;
     },
 });
+function isPerCapita(caseType) {
+    return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
+}
+const dateStrParser = d3.timeParse("%Y-%m-%d");
+const dateFormatter = d3.timeFormat("%Y-%m-%d");
+function getDateNDaysAfter(startDate, n) {
+    return dateFormatter(new Date(dateStrParser(startDate).getTime() + n * MS_PER_DAY));
+}
 function assignData({ allCovidData, allGeoData, }) {
     ["usa", "world"].forEach(key => {
         const scopedGeoData = allGeoData[key];
@@ -34,153 +44,236 @@ function assignData({ allCovidData, allGeoData, }) {
         });
     });
 }
-function updateMap({ svg, date }) {
-    const plotState = svg.datum();
-    const { caseType, scopedCovidData } = plotState;
-    const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
-    const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
-    svg.selectAll("path")
-        .attr("fill", (d) => {
-        if (typeof d.covidData === "undefined") {
-            return plotAesthetics.colors.missing;
-        }
-        const i = d.covidData.date.indexOf(date);
-        if (i < 0) {
-            return plotAesthetics.colors.missing;
-        }
-        return plotAesthetics.colors.scale(colorScale(d.covidData[caseType][i]));
-    })
-        .on("mouseover", function (d) {
-        const noDataStr = "~No data~";
-        const caseCount = (() => {
+function updateMaps({ plotGroup, date }) {
+    const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
+    const dateIndex = Math.round((dateStrParser(date).getTime() - dateStrParser(minDate).getTime()) / MS_PER_DAY);
+    plotGroup.selectAll(".date-slider").property("value", dateIndex);
+    const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(date));
+    plotGroup.selectAll(".date-span").text(dateStr);
+    plotGroup
+        .selectAll(".plot-container")
+        .each(function ({ caseType, vmin, vmax, }) {
+        const plotContainer = d3.select(this);
+        const formatter = isPerCapita(caseType)
+            ? numberFormatters.float
+            : numberFormatters.int;
+        const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
+        const svg = plotContainer.selectAll("svg");
+        svg.selectAll("path")
+            .attr("fill", (d) => {
             if (typeof d.covidData === "undefined") {
-                return noDataStr;
+                return plotAesthetics.colors.missing;
             }
-            const i = d.covidData.date.indexOf(date);
-            if (i < 0) {
-                return noDataStr;
+            const index = d.covidData.date[date];
+            if (typeof index === "undefined") {
+                return plotAesthetics.colors.missing;
             }
-            return numberFormatter(d.covidData[caseType][i]);
-        })();
-        tooltip.html(`${date}<br>${d.properties.name}<br>${caseCount}`);
-        return tooltip.style("visibility", "visible");
-    })
-        .on("mousemove", function () {
-        return tooltip
-            .style("top", `${+d3.event.pageY - 10}px`)
-            .style("left", `${+d3.event.pageX + 10}px`);
-    })
-        .on("mouseout", function () {
-        return tooltip.style("visibility", "hidden");
+            const value = d.covidData[caseType][index];
+            if (value < vmin) {
+                return plotAesthetics.colors.zero;
+            }
+            return plotAesthetics.colors.scale(colorScale(value));
+        })
+            .on("mouseover", (d) => {
+            const noDataStr = "~No data~";
+            const caseCount = (() => {
+                if (typeof d.covidData === "undefined") {
+                    return noDataStr;
+                }
+                const index = d.covidData.date[date];
+                if (typeof index === "undefined") {
+                    return noDataStr;
+                }
+                return formatter(d.covidData[caseType][index]);
+            })();
+            tooltip.html(`${date}<br>${d.properties.name}<br>${caseCount}`);
+            return tooltip.style("visibility", "visible");
+        })
+            .on("mousemove", () => tooltip
+            .style("top", `${+d3.event.pageY - 30}px`)
+            .style("left", `${+d3.event.pageX + 10}px`))
+            .on("mouseout", () => tooltip.style("visibility", "hidden"));
     });
+    // if (!thisDidInitiate) {
+    // 	console.log(
+    // 		plotGroups
+    // 			.filter(({ scope: s }: { scope: Scope }) => s === scope)
+    // 			.selectAll("input")
+    // 			.filter(({ caseType: c }: { caseType: CaseType }) => c === caseType),
+    // 		dateIndex,
+    // 	);
+    // 	plotGroups
+    // 		.filter(({ scope: s }: { scope: Scope }) => s === scope)
+    // 		.selectAll("input")
+    // 		.filter(({ caseType: c }: { caseType: CaseType }) => c === caseType)
+    // 		.property("value", dateIndex);
+    // }
 }
-const numberFormatter = d3.formatPrefix(",.2~s", 1e3);
-const tooltip = d3
-    .select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "100")
-    .style("visibility", "hidden")
-    .style("background", "#ffff")
-    .style("color", "#111")
-    .style("border-radius", "1px")
-    .style("border-width", "1px")
-    .style("border-color", "#111")
-    .style("border-style", "solid")
-    .style("font-family", "sans-serif")
-    .style("font-size", "12px")
-    .style("padding", "2px");
-function initializeMap({ svg, allCovidData, allGeoData, scope, date, caseType, }) {
+const numberFormatters = { int: d3.format(",~r"), float: d3.format(",.2~f") };
+const tooltip = d3.select("body").append("div").attr("id", "tooltip");
+function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
+    const scope = plotGroup.datum().scope;
     const scopedCovidData = allCovidData[scope];
     const scopedGeoData = allGeoData[scope];
-    const projection = (scope === "usa"
-        ? d3.geoAlbersUsa()
-        : d3.geoNaturalEarth1()).fitExtent([
-        [0, plotAesthetics.title.height],
-        [plotAesthetics.mapWidth[scope], plotAesthetics.height[scope]],
-    ], scopedGeoData);
-    const path = d3.geoPath(projection);
-    const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
-    svg.datum({ caseType, scopedCovidData });
-    svg.selectAll("path")
-        .data(scopedGeoData.features)
-        .join("path")
-        .attr("d", path)
-        .attr("stroke", "#fff8")
-        .attr("stroke-width", 1);
-    updateMap({ svg, date });
+    plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
     const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
     const legendTransY = (plotAesthetics.title.height +
         plotAesthetics.height[scope] -
         plotAesthetics.legend.height) /
         2;
-    const legend = svg
-        .append("g")
-        .attr("transform", `translate(${legendTransX},${legendTransY})`);
-    const { barWidth, height: barHeight } = plotAesthetics.legend;
-    legend
-        .append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", barWidth)
-        .attr("height", barHeight)
-        .attr("fill", `url(#${plotAesthetics.legend.gradientID})`);
-    const legendScale = d3
-        .scaleLog()
-        .nice()
-        .base(10)
-        .domain([vmin, vmax])
-        .range([barHeight, 0]);
-    legendScale.ticks(8).forEach((y) => {
-        const ys = legendScale(y);
-        legend
-            .append("line")
-            .attr("x1", (barWidth * 2) / 3)
-            .attr("x2", barWidth)
-            .attr("y1", ys)
-            .attr("y2", ys)
-            .attr("stroke", "white")
+    const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.date;
+    plotGroup.selectAll(".plot-container").each(function () {
+        const plotContainer = d3.select(this);
+        const caseType = plotContainer.datum().caseType;
+        const svg = plotContainer.selectAll("svg");
+        const projection = (scope === "usa"
+            ? d3.geoAlbersUsa()
+            : d3.geoNaturalEarth1()).fitExtent([
+            [0, plotAesthetics.title.height],
+            [plotAesthetics.mapWidth[scope], plotAesthetics.height[scope]],
+        ], scopedGeoData);
+        const path = d3.geoPath(projection);
+        svg.selectAll("path")
+            .data(scopedGeoData.features)
+            .join("path")
+            .attr("d", path)
+            .attr("stroke", "#fff8")
             .attr("stroke-width", 1);
-    });
-    const fmtStr = caseType.includes("per_capita") ? "~g" : "~s";
-    const formatter = legendScale.tickFormat(7, fmtStr);
-    legendScale.ticks(7).forEach((y) => {
+        const legend = svg
+            .append("g")
+            .attr("transform", `translate(${legendTransX},${legendTransY})`);
+        const { barWidth, height: barHeight } = plotAesthetics.legend;
         legend
-            .append("text")
-            .attr("x", barWidth + 4)
-            .attr("y", legendScale(y))
-            .text(`${formatter(y)}`)
-            .attr("fill", "black")
-            .attr("font-size", 12)
-            .attr("font-family", "sans-serif")
+            .append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", barWidth)
+            .attr("height", barHeight)
+            .attr("fill", `url(#${plotAesthetics.legend.gradientID})`);
+        const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
+        plotContainer.datum({ ...plotContainer.datum(), vmin, vmax });
+        const legendScale = d3
+            .scaleLog()
+            .nice()
+            .base(10)
+            .domain([vmin, vmax])
+            .range([barHeight, 0]);
+        legendScale.ticks(8).forEach((y) => {
+            const ys = legendScale(y);
+            legend
+                .append("line")
+                .attr("x1", (barWidth * 2) / 3)
+                .attr("x2", barWidth)
+                .attr("y1", ys)
+                .attr("y2", ys)
+                .attr("stroke", "white")
+                .attr("stroke-width", 1);
+        });
+        const fmtStr = isPerCapita(caseType) ? "~g" : "~s";
+        const tickFormatter = legendScale.tickFormat(7, fmtStr);
+        legendScale.ticks(7).forEach((y) => {
+            legend
+                .append("text")
+                .attr("x", barWidth + 4)
+                .attr("y", legendScale(y))
+                .text(`${tickFormatter(y)}`)
+                .attr("fill", "black")
+                .attr("font-size", 12)
+                .attr("font-family", "sans-serif")
+                .attr("text-anchor", "left")
+                .attr("alignment-baseline", "middle");
+        });
+        let caseTypeStr = caseType;
+        let suffixStr = "";
+        if (isPerCapita(caseTypeStr)) {
+            caseTypeStr = caseTypeStr.replace("_per_capita", "");
+            suffixStr = " Per 100,000 People";
+        }
+        caseTypeStr = caseTypeStr.replace(/^./, (c) => c.toUpperCase());
+        const titleStr = `Total ${caseTypeStr}${suffixStr}`;
+        svg.append("text")
+            .attr("x", 20)
+            .attr("y", plotAesthetics.title.height)
             .attr("text-anchor", "left")
-            .attr("alignment-baseline", "middle");
+            .attr("alignment-baseline", "top")
+            .text(titleStr)
+            .attr("font-size", 24)
+            .attr("font-family", "sans-serif")
+            .attr("fill", "black");
+        const timeParse = d3.timeParse("%Y-%m-%d");
+        const firstDay = timeParse(minDate);
+        const lastDay = timeParse(maxDate);
+        const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
+        sliders
+            .filter((d) => d.scope === scope)
+            .each(function () {
+            this.min = 0;
+            this.max = daysElapsed;
+            this.step = 1;
+            this.value = daysElapsed;
+        });
     });
-    let caseTypeStr = caseType.replace(/^./, c => c.toUpperCase());
-    let suffixStr = "";
-    if (caseTypeStr.includes("_per_capita")) {
-        caseTypeStr = caseTypeStr.replace("_per_capita", "");
-        suffixStr = " Per 100,000 People";
-    }
-    const titleStr = `Total ${caseTypeStr}${suffixStr}`;
-    svg.append("text")
-        .attr("x", 20)
-        .attr("y", plotAesthetics.title.height)
-        .attr("text-anchor", "left")
-        .attr("alignment-baseline", "top")
-        .text(titleStr)
-        .attr("font-size", 24)
-        .attr("font-family", "sans-serif")
-        .attr("fill", "black");
+    updateMaps({ plotGroup, date: maxDate });
 }
-const svgs = d3
-    .selectAll(".plot")
-    .attr("width", function () {
-    return plotAesthetics.width[this.getAttribute("_scope")];
+const plotStateData = (() => {
+    const data = [];
+    let i = 0;
+    ["usa", "world"].forEach((scope) => {
+        ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].forEach((caseType) => {
+            data.push({
+                scope,
+                caseType,
+            });
+            i += 1;
+        });
+    });
+    return data;
+})();
+const plotGroups = d3
+    .select("#content")
+    .selectAll()
+    .data([{ scope: "usa" }, { scope: "world" }])
+    .join("div")
+    .classed("plot-scope-group", true);
+const plotDivs = plotGroups
+    .selectAll()
+    .data(({ scope }) => {
+    const data = [];
+    ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].forEach((caseType) => {
+        data.push({ scope, caseType });
+    });
+    return data;
 })
-    .attr("height", function () {
-    return plotAesthetics.height[this.getAttribute("_scope")];
+    .join("div")
+    .classed("plot-container", true);
+const svgs = plotDivs
+    .append("svg")
+    .attr("width", (d) => plotAesthetics.width[d.scope])
+    .attr("height", (d) => plotAesthetics.height[d.scope]);
+const sliderRow = plotDivs.append("div").append("span");
+const sliders = sliderRow
+    .append("input")
+    .classed("date-slider", true)
+    .attr("type", "range")
+    .attr("min", 0)
+    .attr("max", 1)
+    .property("value", 1)
+    .style("width", "300px")
+    .on("input", function (d) {
+    const plotGroup = plotGroups.filter((p) => p.scope === d.scope);
+    const dateIndex = +this.value;
+    const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
+    const date = getDateNDaysAfter(minDate, dateIndex);
+    updateMaps({ plotGroup, date });
 });
+const dateSpans = sliderRow
+    .append("span")
+    .data(plotStateData)
+    .classed("date-span", true)
+    .style("float", "right")
+    .style("padding-right", "3em");
+const buttonsRow = plotDivs.append("div").append("span");
+buttonsRow.append("button").data(plotStateData).style("width", "50px");
 // Create gradient
 (() => {
     const defs = svgs.append("defs");
@@ -191,7 +284,7 @@ const svgs = d3
         .attr("x2", "0%")
         .attr("y1", "100%")
         .attr("y2", "0%");
-    d3.range(plotAesthetics.colors.nSteps).forEach(i => {
+    d3.range(plotAesthetics.colors.nSteps).forEach((i) => {
         const percent = (100 * i) / (plotAesthetics.colors.nSteps - 1);
         const proptn = percent / 100;
         verticalLegendGradient
@@ -210,15 +303,12 @@ Promise.all([
     const allCovidData = objects[0];
     const allGeoData = objects[1];
     assignData({ allCovidData, allGeoData });
-    svgs.each(function () {
-        const svg = d3.select(this);
-        initializeMap({
-            svg,
+    plotGroups.each(function () {
+        const plotGroup = d3.select(this);
+        initializeChoropleth({
+            plotGroup,
             allCovidData,
             allGeoData,
-            scope: svg.attr("_scope"),
-            date: allCovidData.usa.agg.date.max,
-            caseType: svg.attr("_case_type"),
         });
     });
 });
