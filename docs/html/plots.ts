@@ -4,7 +4,7 @@ type DateString = string;
 type CaseType = "cases" | "cases_per_capita" | "deaths" | "deaths_per_capita";
 type Scope = "usa" | "world";
 
-const SCOPES = ["usa", "world"];
+const SCOPES = ["usa"];
 
 interface AllGeoData {
 	usa: ScopedGeoData;
@@ -131,6 +131,7 @@ function isPerCapita(caseType: CaseType) {
 
 const dateStrParser = d3.timeParse("%Y-%m-%d");
 const dateFormatter = d3.timeFormat("%Y-%m-%d");
+const tooltipDateFormatter = d3.timeFormat("%b %-d");
 function getDateNDaysAfter(startDate: DateString, n: number): string {
 	return dateFormatter(new Date(dateStrParser(startDate).getTime() + n * MS_PER_DAY));
 }
@@ -170,13 +171,15 @@ function getFormatter(caseType: CaseType) {
 	return isPerCapita(caseType) ? numberFormatters.float : numberFormatters.int;
 }
 
-function updateTooltip() {
+type Visibility = "visible" | "hidden" | "nochange";
+function updateTooltip({ visibility }: { visibility: Visibility }) {
 	const { feature, dateKey, caseType } = tooltip.datum();
-	// console.log(feature, dateKey, caseType);
 
 	if (typeof feature === "undefined") {
 		return;
 	}
+
+	const dateStr = tooltipDateFormatter(dateStrParser(dateKey).getTime() - MS_PER_DAY);
 
 	const location = feature.properties.name;
 
@@ -195,8 +198,10 @@ function updateTooltip() {
 		return formatter(feature.covidData[caseType][index]);
 	})();
 
-	tooltip.html(`${dateKey}<br>${location}<br>${countStr}`);
-	return tooltip.style("visibility", "visible");
+	tooltip.html(`${dateStr}<br>${location}<br>${countStr}`);
+	if (visibility !== "nochange") {
+		tooltip.style("visibility", visibility);
+	}
 }
 
 let mouseMoved = false;
@@ -215,7 +220,7 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 	plotGroup.selectAll(".date-span").text(dateStr);
 
 	tooltip.datum({ ...tooltip.datum(), dateKey });
-	updateTooltip();
+	updateTooltip({ visibility: "nochange" });
 
 	plotGroup
 		.selectAll(".plot-container")
@@ -238,7 +243,7 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 
 			mouseActions.mouseover = (d: Feature) => {
 				tooltip.datum({ ...tooltip.datum(), feature: d, caseType });
-				updateTooltip();
+				updateTooltip({ visibility: "visible" });
 			};
 			mouseActions.mousemove = () => {
 				if (!mouseMoved) {
@@ -247,7 +252,7 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 						...tooltip.datum(),
 						dateKey: getDateNDaysAfter(minDate, dateIndex),
 					});
-					updateTooltip();
+					updateTooltip({ visibility: "visible" });
 				}
 
 				mouseMoved = true;
@@ -534,7 +539,6 @@ function initializeChoropleth({
 		});
 	});
 
-	console.log(daysElapsed);
 	updateMaps({ plotGroup, dateIndex: daysElapsed });
 }
 
@@ -586,12 +590,12 @@ const sliders = sliderRows
 	.property("value", 1)
 	.on("input", function (d: PlotInfo) {
 		const dateIndex = +this.value;
-		console.log(dateIndex);
 		updateMaps({ plotGroup: d.plotGroup, dateIndex });
 	});
 
 class PlaybackInfo {
 	static speeds = [0.25, 0.5, 1, 2];
+	static defaultSpeed = 1;
 
 	timer: number;
 	isPlaying: Boolean;
@@ -604,12 +608,12 @@ class PlaybackInfo {
 	}
 
 	get currentIntervalMS(): number {
-		return this.baseIntervalMS * PlaybackInfo.speeds[this.selectedIndex];
+		return this.baseIntervalMS / PlaybackInfo.speeds[this.selectedIndex];
 	}
 
 	constructor() {
 		this.isPlaying = false;
-		this.selectedIndex = PlaybackInfo.speeds.indexOf(1);
+		this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
 	}
 }
 // Create buttons
@@ -623,83 +627,112 @@ class PlaybackInfo {
 			.append("span")
 			.classed("button-container", true);
 
-		const speedButtonsSpans = buttonsRows
-			.selectAll()
-			.data(() => [{ selected: 1 }])
-			.join("span")
-			.classed("speed-buttons-span", true);
-		const playButtons = speedButtonsSpans
+		const speedButtonSpans = buttonsRows
 			.selectAll()
 			.data(() => [new PlaybackInfo()])
-			.join("button")
+			.join("span")
+			.classed("speed-buttons-span", true);
+
+		const playButtons = speedButtonSpans
+			.append("button")
 			.classed("play-button", true)
 			.text("Play");
-		const sliders = plotGroup.selectAll(".date-slider");
-		playButtons.on("click", function (playbackInfo: PlaybackInfo) {
-			let plotContainer: Node = this;
-			while (
-				plotContainer &&
-				!d3.select(plotContainer).classed("plot-container")
-			) {
-				plotContainer = plotContainer.parentNode;
-			}
-			const caseType = d3.select(plotContainer).datum().caseType;
 
+		const sliders = plotGroup.selectAll(".date-slider");
+		const sliderNode = sliders.node();
+
+		function haltPlayback(playbackInfo: PlaybackInfo) {
+			playbackInfo.isPlaying = false;
+			clearInterval(playbackInfo.timer);
+			const now = new Date();
+			const elapsedTimeMS = now.getTime() - playbackInfo.timerStartDate.getTime();
+			playbackInfo.timerElapsedTimeProptn +=
+				elapsedTimeMS / playbackInfo.currentIntervalMS;
+		}
+
+		function startPlayback(playbackInfo: PlaybackInfo) {
+			if (sliderNode.value === sliderNode.max) {
+				updateMaps({ plotGroup, dateIndex: 0 });
+				// A number indistinguishable from 0 (except to a computer)
+				playbackInfo.timerElapsedTimeProptn = 0.0000001;
+			}
+
+			playbackInfo.isPlaying = true;
+			function updateDate() {
+				playbackInfo.timerStartDate = new Date();
+				playbackInfo.timerElapsedTimeProptn = 0;
+
+				const dateIndex = parseFloat(sliderNode.value);
+				if (dateIndex < parseFloat(sliderNode.max)) {
+					updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
+				} else {
+					clearInterval(playbackInfo.timer);
+					playbackInfo.isPlaying = false;
+					playButtons.text("Restart");
+				}
+			}
+
+			playbackInfo.timerStartDate = new Date();
+
+			const timeRemainingProptn = 1 - playbackInfo.timerElapsedTimeProptn;
+
+			const initialIntervalMS =
+				timeRemainingProptn === 1
+					? 0
+					: timeRemainingProptn * playbackInfo.currentIntervalMS;
+			playbackInfo.timer = setTimeout(() => {
+				updateDate();
+				playbackInfo.timer = setInterval(
+					updateDate,
+					playbackInfo.currentIntervalMS,
+				);
+			}, initialIntervalMS);
+		}
+
+		function onPlaybackButtonClick(playbackInfo: PlaybackInfo) {
 			if (playbackInfo.isPlaying) {
 				playButtons.text("Play");
-
-				playbackInfo.isPlaying = false;
-				clearInterval(playbackInfo.timer);
-				const now = new Date();
-				const elapsedTimeMS =
-					now.getTime() - playbackInfo.timerStartDate.getTime();
-				playbackInfo.timerElapsedTimeProptn +=
-					elapsedTimeMS / playbackInfo.currentIntervalMS;
-				console.log("e", elapsedTimeMS, playbackInfo.timerElapsedTimeProptn);
+				haltPlayback(playbackInfo);
 			} else {
 				playButtons.text("Pause");
-
-				playbackInfo.isPlaying = true;
-				function updateDate() {
-					playbackInfo.timerStartDate = new Date();
-					playbackInfo.timerElapsedTimeProptn = 0;
-
-					const slider = sliders.node();
-					const dateIndex = parseFloat(slider.value);
-					if (dateIndex < parseFloat(slider.max)) {
-						const nextDateIndex = dateIndex + 1;
-						sliders.each(function () {
-							this.value = nextDateIndex;
-							updateMaps({ plotGroup, dateIndex: nextDateIndex });
-						});
-					}
-				}
-
-				playbackInfo.timerStartDate = new Date();
-
-				const timeRemainingProptn = 1 - playbackInfo.timerElapsedTimeProptn;
-				console.log("r", timeRemainingProptn);
-
-				const initialIntervalMS =
-					timeRemainingProptn === 1
-						? 0
-						: timeRemainingProptn * playbackInfo.currentIntervalMS;
-				console.log("i", initialIntervalMS);
-				playbackInfo.timer = setTimeout(() => {
-					updateDate();
-					playbackInfo.timer = setInterval(
-						updateDate,
-						playbackInfo.currentIntervalMS,
-					);
-				}, initialIntervalMS);
+				startPlayback(playbackInfo);
 			}
+		}
+		playButtons.on("click", function (playbackInfo: PlaybackInfo) {
+			onPlaybackButtonClick(playbackInfo);
 		});
-		[0.5, 1, 2, 4].forEach(speed => {
-			const button = speedButtonsSpans
-				.append("button")
-				.classed("speed-button", true);
-			button.text(`${speed}x`);
-			button.property("disabled", speed === 1);
+		const speedButtons = speedButtonSpans
+			.selectAll()
+			.data((d: PlaybackInfo) => {
+				return PlaybackInfo.speeds.map(speed => {
+					return { speed, playbackInfo: d };
+				});
+			})
+			.join("button")
+			.classed("speed-button", true)
+			.text(({ speed }: { speed: number }) => `${speed}x`)
+			.property(
+				"disabled",
+				({ speed }: { speed: number }) => speed === PlaybackInfo.defaultSpeed,
+			);
+
+		speedButtons.on("click", function (
+			{
+				speed,
+				playbackInfo,
+			}: {
+				speed: number;
+				playbackInfo: PlaybackInfo;
+			},
+			i: number,
+		) {
+			// Order matters here; calculations in haltPlayback require the old value of selectedIndex
+			haltPlayback(playbackInfo);
+			playbackInfo.selectedIndex = i;
+			speedButtons.each(function (d: any) {
+				d3.select(this).property("disabled", d.speed === speed);
+			});
+			startPlayback(playbackInfo);
 		});
 	});
 })();
