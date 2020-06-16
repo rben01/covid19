@@ -67,6 +67,15 @@ const mouseActions = {
     mouseout: null,
     info: { prevFeature: null },
 };
+function moveTooltipAbsolute(x, y) {
+    tooltip.style("top", `${+y - 30}px`).style("left", `${+x + 10}px`);
+}
+function moveTooltipRelative(dx, dy) {
+    const top = parseFloat(tooltip.style("top"));
+    const left = parseFloat(tooltip.style("left"));
+    console.log(top, left, tooltip.style("top"), tooltip.style("left"));
+    tooltip.style("top", `${top + dy}px`).style("top", `${left + dx}px`);
+}
 function updateMaps({ plotGroup, dateIndex }) {
     plotGroup.selectAll(".date-slider").property("value", dateIndex);
     const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
@@ -103,9 +112,10 @@ function updateMaps({ plotGroup, dateIndex }) {
             tooltip.html(`${dateKey}<br>${d.properties.name}<br>${caseCount}`);
             return tooltip.style("visibility", "visible");
         };
-        mouseActions.mousemove = () => tooltip
-            .style("top", `${+d3.event.pageY - 30}px`)
-            .style("left", `${+d3.event.pageX + 10}px`);
+        mouseActions.mousemove = () => {
+            tooltip.style("visibility", "visible");
+            moveTooltipAbsolute(d3.event.pageX, d3.event.pageY);
+        };
         mouseActions.mouseout = () => {
             tooltip.style("visibility", "hidden");
             mouseActions.info.prevFeature = null;
@@ -219,9 +229,31 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         [0, 0],
         [plotAesthetics.width[scope], plotAesthetics.height[scope]],
     ])
+        // .filter(function () {
+        // 	return d3.event.type === "wheel";
+        // })
         .on("start", function () {
-        brushState.mousePos = d3.mous(this);
+        brushState.mousePos = d3.mouse(this);
+        tooltip.style("visibility", "hidden");
+    })
+        .on("zoom", function () {
+        const transform = d3.event.transform;
+        // moveTooltipRelative(transform.x, transform.y);
+        d3.select(this).selectAll(".map").attr("transform", transform);
+        plotGroup
+            .selectAll(".state-boundary")
+            .attr("stroke-width", plotAesthetics.map.borderWidth / transform.k);
+    })
+        .on("end", function () {
+        // tooltip.style("visibility", "visible");
     });
+    // .filter(function () {
+    // 	console.log(d3.event.type);
+    // 	return (
+    // 		d3.event.type === "mousedown" ||
+    // 		(d3.event.ctrlKey && d3.event.type === "wheel")
+    // 	);
+    // });
     // https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
     let idleTimeout = null;
     const idleDelay = 350;
@@ -398,10 +430,11 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("stroke", "#fff8")
             .attr("stroke-width", plotAesthetics.map.borderWidth)
             .attr("pointer-events", "all");
-        mapContainer.append("g").classed("brush", true).call(brush);
-        mapContainer.select(".brush").on("mousemove mousedown", function () {
-            dispatchMouseToMap(d3.event, "mousemove");
-        });
+        // mapContainer.append("g").classed("brush", true).call(brush);
+        mapContainer.call(zoom);
+        // mapContainer.select(".brush").on("mousemove mousedown", function () {
+        // 	dispatchMouseToMap(d3.event, "mousemove");
+        // });
         const legend = svg
             .append("g")
             .attr("transform", `translate(${legendTransX} ${legendTransY})`);
