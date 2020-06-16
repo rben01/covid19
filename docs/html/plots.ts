@@ -85,6 +85,7 @@ const plotAesthetics = Object.freeze(
 				borderWidth: 1,
 				originX: NaN,
 				originY: NaN,
+				zoomTransition: d3.transition().duration(500),
 			},
 			legend: {
 				padLeft: 20,
@@ -334,23 +335,31 @@ function initializeChoropleth({
 	const scopedCovidData: ScopedCovidData = allCovidData[scope];
 	const scopedGeoData: ScopedGeoData = allGeoData[scope];
 
-	const projection = (scope === "usa"
-		? d3.geoAlbersUsa()
-		: d3.geoNaturalEarth1()
-	).fitExtent(
-		[
-			[0, 0],
-			[plotAesthetics.mapWidth[scope], plotAesthetics.mapHeight[scope]],
-		],
-		scopedGeoData,
-	);
-	const origProjectionInfo = {
-		scale: projection.scale(),
-		translate: projection.translate(),
-	};
+	const projectionExtent = [
+		[0, 0],
+		[plotAesthetics.mapWidth[scope], plotAesthetics.mapHeight[scope]],
+	];
+	const projection = (scope === "usa" ? d3.geoAlbersUsa() : d3.geoNaturalEarth1())
+		.fitExtent(projectionExtent, scopedGeoData)
+		.precision(0.001);
+
+	const initialPrecision = projection.precision();
+
 	const path = d3.geoPath(projection);
 
-	const dragState = { distSq: 0, mousePos: 0 };
+	const brushState = {
+		distSq: 0,
+		originX: NaN,
+		originY: NaN,
+		mousePos: 0,
+		brushIsMoving: false,
+		extent: {
+			x1: 0,
+			y1: 0,
+			x2: plotAesthetics.mapWidth[scope],
+			y2: plotAesthetics.mapHeight[scope],
+		},
+	};
 	const zoom = d3
 		.zoom()
 		.scaleExtent([1, 10])
@@ -359,7 +368,7 @@ function initializeChoropleth({
 			[plotAesthetics.width[scope], plotAesthetics.height[scope]],
 		])
 		.on("start", function () {
-			dragState.mousePos = d3.mous(this);
+			brushState.mousePos = d3.mous(this);
 		});
 
 	// https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
@@ -374,157 +383,141 @@ function initializeChoropleth({
 			[0, 0],
 			[plotAesthetics.mapWidth[scope], plotAesthetics.mapHeight[scope]],
 		])
+		.on("start", function () {
+			if (brushState.brushIsMoving) {
+				return;
+			}
 
+			console.log("brushstart");
+			mouseActions.mouseout();
+			const [[x1, y1]] = d3.event.selection;
+			brushState.originX = x1;
+			brushState.originY = y1;
+		})
+		.on("brush", function () {
+			if (brushState.brushIsMoving) {
+				return;
+			}
+
+			console.log("brushbrush");
+			const [mouseX, mouseY] = d3.mouse(this);
+			const { originX, originY } = brushState;
+			brushState.distSq += d3.event.dx * d3.event.dx + d3.event.dy * d3.event.dy;
+
+			let [[x1, y1], [x2, y2]] = d3.event.selection;
+			let width = x2 - x1;
+			let height = y2 - y1;
+			const brushedAspectRatio = width / height;
+
+			if (brushedAspectRatio > aspectRatio) {
+				height = width / aspectRatio;
+				if (mouseY < originY) {
+					y1 = y2 - height;
+				} else {
+					y2 = y1 + height;
+				}
+			} else if (brushedAspectRatio < aspectRatio) {
+				width = height * aspectRatio;
+				if (mouseX < originX) {
+					x1 = x2 - width;
+				} else {
+					x2 = x1 + width;
+				}
+			}
+
+			brushState.brushIsMoving = true;
+			brush.move(d3.select(this), [
+				[x1, y1],
+				[x2, y2],
+			]);
+			brushState.brushIsMoving = false;
+		})
 		.on("end", function () {
+			if (brushState.brushIsMoving) {
+				return;
+			}
+
 			const s = d3.event.selection;
-			dragState.distSq = 0;
+			brushState.distSq = 0;
 
-			// tooltip.style("visibility", "hidden");
-
-			console.log(s);
 			if (!s) {
+				console.log(s, idleTimeout);
 				if (!idleTimeout) {
 					idleTimeout = setTimeout(idled, idleDelay);
-					return idleTimeout;
+					return;
 				}
-				projection.scale(origProjectionInfo.scale);
-				projection.translate(origProjectionInfo.translate);
+				projection.fitExtent(projectionExtent, scopedGeoData);
+				plotGroup
+					.selectAll(".state-boundary")
+					.transition(plotAesthetics.map.zoomTransition)
+					.attr("d", path);
 			} else {
-				const [[x1, y1], [x2, y2]] = s;
-				const [lon1, lat1] = projection.invert([x1, y1]);
-				const [lon2, lat2] = projection.invert([x2, y2]);
-				const cx = (lon1 + lon2) / 2;
-				const cy = (lat1 + lat2) / 2;
-				console.log(cx, cy);
+				// const {
+				// 	x1: extentX1i,
+				// 	y1: extentY1i,
+				// 	x2: extentX2i,
+				// 	y2: extentY2i,
+				// } = brushState.extent;
+
+				// const [[extentLon1i, extentLat1i], [extentLon2i, extentLat2i]] = [
+				// 	[extentX1i, extentY1i],
+				// 	[extentX2i, extentY2i],
+				// ].map(projection.invert);
+
+				const [[extentLon1f, extentLat1f], [extentLon2f, extentLat2f]] = s.map(
+					projection.invert,
+				);
+
+				const lon1 = extentLon1f;
+				const lat1 = extentLat1f;
+				const lon2 = extentLon2f;
+				const lat2 = extentLat2f;
+
+				const dummyGeoJSON = {
+					type: "Polygon",
+					coordinates: [
+						[
+							[lon1, lat1],
+							[lon2, lat1],
+							[lon2, lat2],
+							[lon1, lat2],
+						],
+					],
+				};
+
+				// projection.precision(0.05);
+				const states = plotGroup.selectAll(".state-boundary");
+				// states.attr("d", path);
+				projection.fitExtent(projectionExtent, dummyGeoJSON);
+				states.attr("d", path);
+
+				// const t = plotGroup
+				// 	.selectAll(".state-boundary")
+				// 	.transition()
+				// 	.duration(1000);
+				// console.log(t);
+				// t.attr("d", path);
+				// console.log("done");
+
+				// const t = plotGroup
+				// 	.selectAll(".state-boundary")
+				// 	.transition(plotAesthetics.map.zoomTransition)
+				// 	.attr("d", path)
+				// 	.transition(plotAesthetics.map.zoomTransition)
+				// 	.attr("d", path);
+
+				// projection.precision(initialPrecision);
+				// t.transition(plotAesthetics.map.zoomTransition).attr("d", path);
 			}
-			return 1;
+			brushState.brushIsMoving = true;
+			brush.clear(d3.select(this));
+			brushState.brushIsMoving = false;
 		});
 
 	plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
 
 	const aspectRatio =
 		plotAesthetics.mapWidth[scope] / plotAesthetics.mapHeight[scope];
-	const drag = d3
-		.drag()
-		.on("start", function () {
-			dragState.distSq = 0;
-
-			const { x, y } = d3.event;
-			const canvas = d3.select(this);
-			canvas
-				.selectAll()
-				.data([{ originX: x, originY: y }])
-				.join("rect")
-				.attr("id", "drag-box")
-				.attr("stroke", "#ccc")
-				.attr("stroke-width", 3)
-				.attr("fill", "#0002")
-				.attr("x", x)
-				.attr("y", y);
-
-			tooltip.style("visibility", "hidden");
-			const states = canvas.selectAll(".state-boundary");
-			Object.keys(mouseActions).forEach(action => {
-				states.on(action, null);
-			});
-		})
-		.on("drag", function () {
-			dragState.distSq += d3.event.dx * d3.event.dx + d3.event.dy * d3.event.dy;
-
-			const rect = d3.select(this).selectAll("#drag-box");
-			const { originX, originY } = rect.datum();
-			let { x: dragX, y: dragY } = d3.event;
-
-			const { x, y, width, height } = getDragBox({
-				dragX,
-				dragY,
-				originX,
-				originY,
-				aspectRatio,
-				scope,
-			});
-
-			rect.attr("x", x).attr("width", width).attr("y", y).attr("height", height);
-		})
-		.on("end", function () {
-			const canvases = plotGroup.selectAll(".main-plot-area");
-			const rect = canvases.selectAll("#drag-box");
-			const { originX, originY } = rect.datum();
-			let { x: dragX, y: dragY } = d3.event;
-
-			rect.remove();
-
-			const mapContainer = canvases.selectAll(".map-container");
-
-			const map = mapContainer.selectAll(".map");
-			const states = map.selectAll(".state-boundary");
-			Object.entries(mouseActions).forEach(([action, f]) => {
-				states.on(action, f);
-			});
-
-			// If we didn't drag far, don't do any transformation
-			if (dragState.distSq < 10) {
-				return;
-			}
-
-			// Calculate transform
-			const { tx, ty } = mapContainer.datum();
-			const { x: x1, y: y1, width, height } = getDragBox({
-				dragX,
-				dragY,
-				originX,
-				originY,
-				aspectRatio,
-				scope,
-			});
-
-			const x2 = x1 + width;
-			const y2 = y1 + height;
-
-			const currentTransform = map.node().transform.baseVal.consolidate().matrix;
-			const {
-				a: prevScaleX,
-				d: prevScaleY,
-				e: prevTranslateX,
-				f: prevTranslateY,
-			} = currentTransform;
-
-			const prevWidth = plotAesthetics.mapWidth[scope] * prevScaleX;
-			const prevHeight = plotAesthetics.mapHeight[scope] * prevScaleY;
-
-			const scaleX = prevWidth / width;
-			const scaleY = prevHeight / height;
-
-			const translateX =
-				((prevTranslateX + tx) / prevScaleX - tx) * scaleX - (x1 - tx) * scaleX;
-			const translateY =
-				(prevTranslateY / prevScaleY) * scaleY - (y1 - ty) * scaleY;
-			//(y1 * (prevTranslateY + prevScaledHeight) - y2 * prevTranslateY) /
-			//	height;
-
-			console.log({
-				x1,
-				y1,
-				x2,
-				y2,
-				width,
-				height,
-				prevScaleX,
-				prevScaleY,
-				prevTranslateX,
-				prevTranslateY,
-				scaleX,
-				scaleY,
-				translateX,
-				translateY,
-			});
-
-			map.attr(
-				"transform",
-				`matrix(${scaleX} 0 0 ${scaleY} ${translateX} ${translateY})`,
-			);
-			states.attr("stroke-width", plotAesthetics.map.borderWidth / scaleX);
-		});
 
 	const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
 	const legendTransY =
