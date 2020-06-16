@@ -64,40 +64,61 @@ interface PlotInfo {
 	scope: Scope;
 	caseType: CaseType;
 	scopedCovidData?: ScopedCovidData;
+	plotGroup?: any;
 }
 
 const MS_PER_DAY = 86400 * 1000;
 
-const plotAesthetics = Object.freeze({
-	width: { usa: 500, world: 600 },
-	height: { usa: 350, world: 400 },
-	colors: {
-		scale: (t: number) => d3.interpolateCividis(1 - t),
-		nSteps: 101,
-		missing: "#ccc",
-		zero: "#ddc",
-	},
-	legend: {
-		padLeft: 20,
-		barWidth: 15,
-		padRight: 40,
-		height: 275,
-		gradientID: "verticalLegendGradient",
-	},
-	title: {
-		height: 40,
-	},
+const plotAesthetics = Object.freeze(
+	(() => {
+		const pa = {
+			width: { usa: 500, world: 600 },
+			height: { usa: 350, world: 400 },
+			colors: {
+				scale: (t: number) => d3.interpolateCividis(1 - t),
+				nSteps: 101,
+				missing: "#ccc",
+				zero: "#ddc",
+			},
+			map: {
+				pad: 10,
+				borderWidth: 1,
+				originX: null,
+				originY: null,
+			},
+			legend: {
+				padLeft: 20,
+				barWidth: 15,
+				padRight: 40,
+				height: 275,
+				gradientID: "verticalLegendGradient",
+			},
+			title: {
+				height: 40,
+			},
 
-	get mapWidth() {
-		const legend = this.legend;
-		const mw = {};
-		Object.keys(this.width).forEach((scope: Scope) => {
-			const width = this.width[scope];
-			mw[scope] = width - (legend.padLeft + legend.barWidth + legend.padRight);
+			mapWidth: null,
+			mapHeight: null,
+		};
+
+		pa.map.originX = pa.map.pad;
+		pa.map.originY = pa.title.height + pa.map.pad;
+
+		pa.mapWidth = {};
+		Object.keys(pa.width).forEach((scope: Scope) => {
+			pa.mapWidth[scope] =
+				pa.width[scope] -
+				pa.map.originX -
+				(pa.legend.padLeft + pa.legend.barWidth + pa.legend.padRight);
 		});
-		return mw;
-	},
-});
+
+		pa.mapHeight = {};
+		Object.keys(pa.height).forEach((scope: Scope) => {
+			pa.mapHeight[scope] = pa.height[scope] - pa.map.originY - pa.map.pad;
+		});
+		return pa;
+	})(),
+);
 
 function isPerCapita(caseType: CaseType) {
 	return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
@@ -124,7 +145,17 @@ function assignData({
 	});
 }
 
-function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex?: number }) {
+const mouseActions: {
+	mouseover: (d: Feature) => void;
+	mousemove: (d: Feature) => void;
+	mouseout: (d: Feature) => void;
+} = {
+	mouseover: null,
+	mousemove: null,
+	mouseout: null,
+};
+
+function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: number }) {
 	plotGroup.selectAll(".date-slider").property("value", dateIndex);
 
 	const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
@@ -138,21 +169,48 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex?: numb
 		.selectAll(".plot-container")
 		.each(function ({
 			caseType,
-			vmin,
-			vmax,
+			plotGroup,
 		}: {
 			caseType: CaseType;
-			vmin: number;
-			vmax: number;
+			plotGroup: any;
 		}) {
 			const plotContainer = d3.select(this);
 			const formatter = isPerCapita(caseType)
 				? numberFormatters.float
 				: numberFormatters.int;
 
+			const {
+				min_nonzero: vmin,
+				max: vmax,
+			} = plotGroup.datum().scopedCovidData.agg[caseType];
 			const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
 
-			const svg = plotContainer.selectAll("svg");
+			const svg = plotContainer.selectAll("svg").selectAll("g");
+
+			mouseActions.mouseover = (d: Feature) => {
+				const noDataStr = "~No data~";
+
+				const caseCount = (() => {
+					if (typeof d.covidData === "undefined") {
+						return noDataStr;
+					}
+
+					const index = d.covidData.date[dateKey];
+					if (typeof index === "undefined") {
+						return noDataStr;
+					}
+
+					return formatter(d.covidData[caseType][index]);
+				})();
+
+				tooltip.html(`${dateKey}<br>${d.properties.name}<br>${caseCount}`);
+				return tooltip.style("visibility", "visible");
+			};
+			mouseActions.mousemove = () =>
+				tooltip
+					.style("top", `${+d3.event.pageY - 30}px`)
+					.style("left", `${+d3.event.pageX + 10}px`);
+			mouseActions.mouseout = () => tooltip.style("visibility", "hidden");
 			svg.selectAll("path")
 				.attr("fill", (d: Feature) => {
 					if (typeof d.covidData === "undefined") {
@@ -169,37 +227,58 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex?: numb
 					}
 					return plotAesthetics.colors.scale(colorScale(value));
 				})
-				.on("mouseover", (d: Feature) => {
-					const noDataStr = "~No data~";
-
-					const caseCount = (() => {
-						if (typeof d.covidData === "undefined") {
-							return noDataStr;
-						}
-
-						const index = d.covidData.date[dateKey];
-						if (typeof index === "undefined") {
-							return noDataStr;
-						}
-
-						return formatter(d.covidData[caseType][index]);
-					})();
-
-					tooltip.html(`${dateKey}<br>${d.properties.name}<br>${caseCount}`);
-					return tooltip.style("visibility", "visible");
-				})
-				.on("mousemove", () =>
-					tooltip
-						.style("top", `${+d3.event.pageY - 30}px`)
-						.style("left", `${+d3.event.pageX + 10}px`),
-				)
-				.on("mouseout", () => tooltip.style("visibility", "hidden"));
+				.classed("state-boundary", true)
+				.on("mouseover", mouseActions.mouseover)
+				.on("mousemove", mouseActions.mousemove)
+				.on("mouseout", mouseActions.mouseout);
 		});
 }
 
 const numberFormatters = { int: d3.format(",~r"), float: d3.format(",.2f") };
 
 const tooltip = d3.select("body").append("div").attr("id", "tooltip");
+
+function getDragBox({
+	dragX,
+	dragY,
+	originX,
+	originY,
+	aspectRatio,
+	scope,
+}: {
+	dragX: number;
+	dragY: number;
+	originX: number;
+	originY: number;
+	aspectRatio: number;
+	scope: Scope;
+}) {
+	let x = dragX;
+	let y = dragY;
+	let width = Math.abs(x - originX);
+	let height = Math.abs(y - originY);
+	const givenAspectRatio = width / height;
+
+	if (givenAspectRatio > aspectRatio) {
+		height = width / aspectRatio;
+		if (y < originY) {
+			y = originY - height;
+		}
+	} else if (givenAspectRatio < aspectRatio) {
+		width = height * aspectRatio;
+		if (x < originX) {
+			x = originX - width;
+		}
+	}
+
+	return {
+		x: Math.min(x, originX),
+		y: Math.min(y, originY),
+		width,
+		height,
+		scaleFactor: plotAesthetics.mapWidth[scope] / width,
+	};
+}
 
 function initializeChoropleth({
 	plotGroup,
@@ -216,6 +295,130 @@ function initializeChoropleth({
 
 	plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
 
+	const projection = (scope === "usa"
+		? d3.geoAlbersUsa()
+		: d3.geoNaturalEarth1()
+	).fitExtent(
+		[
+			[0, plotAesthetics.title.height + plotAesthetics.map.pad],
+			[plotAesthetics.mapWidth[scope], plotAesthetics.height[scope]],
+		],
+		scopedGeoData,
+	);
+
+	const zoom = d3
+		.zoom()
+		.scaleExtent([1, 10])
+		.translateExtent([
+			[0, 0],
+			[plotAesthetics.width[scope], plotAesthetics.height[scope]],
+		]);
+
+	const dragState = { distSq: 0 };
+	const aspectRatio =
+		plotAesthetics.mapWidth[scope] / plotAesthetics.mapHeight[scope];
+	const drag = d3
+		.drag()
+		.on("start", function () {
+			dragState.distSq = 0;
+
+			const { x, y } = d3.event;
+			const canvas = d3.select(this);
+			canvas
+				.selectAll()
+				.data([{ originX: x, originY: y }])
+				.join("rect")
+				.attr("id", "drag-box")
+				.attr("stroke", "#ccc")
+				.attr("stroke-width", 3)
+				.attr("fill", "#0002")
+				.attr("x", x)
+				.attr("y", y);
+
+			tooltip.style("visibility", "hidden");
+			const states = canvas.selectAll(".state-boundary");
+			Object.keys(mouseActions).forEach(action => {
+				states.on(action, null);
+			});
+		})
+		.on("drag", function () {
+			dragState.distSq += d3.event.dx * d3.event.dx + d3.event.dy * d3.event.dy;
+
+			const rect = d3.select(this).selectAll("#drag-box");
+			const { originX, originY } = rect.datum();
+			let { x: dragX, y: dragY } = d3.event;
+
+			const { x, y, width, height } = getDragBox({
+				dragX,
+				dragY,
+				originX,
+				originY,
+				aspectRatio,
+				scope,
+			});
+
+			rect.attr("x", x).attr("width", width).attr("y", y).attr("height", height);
+		})
+		.on("end", function () {
+			const canvases = plotGroup.selectAll(".main-plot-area");
+			const rect = canvases.selectAll("#drag-box");
+			const { originX, originY } = rect.datum();
+			let { x: dragX, y: dragY } = d3.event;
+
+			rect.remove();
+
+			const map = canvases.selectAll(".map-container");
+			const states = map.selectAll(".state-boundary");
+			Object.entries(mouseActions).forEach(([action, f]) => {
+				states.on(action, f);
+			});
+
+			// If we didn't drag far, don't do any transformation
+			if (dragState.distSq < 10) {
+				return;
+			}
+
+			// Calculate transform
+			const { x: x1, y: y1, width, height, scaleFactor } = getDragBox({
+				dragX,
+				dragY,
+				originX,
+				originY,
+				aspectRatio,
+				scope,
+			});
+
+			const x2 = x1 + width;
+			const y2 = y1 + height;
+
+			const currentTransform = map.attr("transform") || "matrix(1 0 0 1 0 0)";
+			const reMatch = currentTransform.match(/-?\d+\.?\d*/g);
+			const prevScaleX = +reMatch[0];
+			const prevScaleY = +reMatch[3];
+			const prevTranslateX = +reMatch[4];
+			const prevTranslateY = +reMatch[5];
+
+			console.log(prevScaleX, prevScaleY, prevTranslateX, prevTranslateY);
+
+			const prevScaledWidth = plotAesthetics.width[scope] * prevScaleX;
+			const prevScaledHeight = plotAesthetics.height[scope] * prevScaleY;
+
+			const scaleX = prevScaledWidth / (x2 - x1);
+			const scaleY = prevScaledHeight / (y2 - y1);
+
+			const translateX =
+				prevTranslateX * prevScaleY - x1 * (prevScaledWidth / (x2 - x1));
+			const translateY =
+				prevTranslateY * prevScaleX - y1 * (prevScaledHeight / (y2 - y1));
+
+			map.attr(
+				"transform",
+				`matrix(${scaleX} 0 0 ${scaleY} ${translateX} ${translateY})`,
+			);
+			console.log(map.attr("transform"));
+			states.attr("stroke-width", plotAesthetics.map.borderWidth / scaleFactor);
+		});
+
 	const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
 	const legendTransY =
 		(plotAesthetics.title.height +
@@ -231,25 +434,20 @@ function initializeChoropleth({
 		const plotContainer = d3.select(this);
 		const caseType = plotContainer.datum().caseType;
 		const svg = plotContainer.selectAll("svg");
+		const mainPlotArea = svg.selectAll("g.main-plot-area");
+		mainPlotArea.call(drag);
 
-		const projection = (scope === "usa"
-			? d3.geoAlbersUsa()
-			: d3.geoNaturalEarth1()
-		).fitExtent(
-			[
-				[0, plotAesthetics.title.height],
-				[plotAesthetics.mapWidth[scope], plotAesthetics.height[scope]],
-			],
-			scopedGeoData,
-		);
+		const canvas = mainPlotArea.append("g").classed("map-container", true);
+
 		const path = d3.geoPath(projection);
 
-		svg.selectAll("path")
+		canvas
+			.selectAll("path")
 			.data(scopedGeoData.features)
 			.join("path")
 			.attr("d", path)
 			.attr("stroke", "#fff8")
-			.attr("stroke-width", 1);
+			.attr("stroke-width", plotAesthetics.map.borderWidth);
 
 		const legend = svg
 			.append("g")
@@ -265,7 +463,6 @@ function initializeChoropleth({
 			.attr("fill", `url(#${plotAesthetics.legend.gradientID})`);
 
 		const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
-		plotContainer.datum({ ...plotContainer.datum(), vmin, vmax });
 		const legendScale = d3
 			.scaleLog()
 			.nice()
@@ -333,67 +530,86 @@ function initializeChoropleth({
 const plotGroups = d3
 	.select("#content")
 	.selectAll()
-	.data([{ scope: "usa" }, { scope: "world" }])
+	.data([{ scope: "usa" }])
 	.join("div")
 	.classed("plot-scope-group", true);
 
 const plotDivs = plotGroups
 	.selectAll()
-	.data(({ scope }: { scope: Scope }) => {
-		const data = [];
-		["cases", "cases_per_capita", "deaths", "deaths_per_capita"].forEach(
-			(caseType: CaseType) => {
-				data.push({ scope, caseType });
-			},
+	.data(function ({ scope }: { scope: Scope }) {
+		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
+			(caseType: CaseType) => ({
+				scope,
+				caseType,
+				plotGroup: d3.select(this),
+			}),
 		);
-		return data;
 	})
 	.join("div")
 	.classed("plot-container", true);
 
 const svgs = plotDivs
 	.append("svg")
+	.classed("plot", true)
 	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.scope])
 	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.scope]);
 
-const sliderRow = plotDivs.append("div").append("span");
-const sliders = sliderRow
+const sliderRows = plotDivs.append("div").append("span");
+const dateSpans = sliderRows.append("span").classed("date-span", true);
+const sliders = sliderRows
+	.selectAll()
+	.data(function ({ scope }: { scope: Scope }) {
+		return [{ plotGroup: plotGroups.filter((p: PlotInfo) => p.scope === scope) }];
+	})
+	.enter()
 	.append("input")
 	.classed("date-slider", true)
 	.attr("type", "range")
+	// Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
 	.attr("min", 0)
 	.attr("max", 1)
 	.property("value", 1)
 	.on("input", function (d: PlotInfo) {
-		const plotGroup = plotGroups.filter((p: PlotInfo) => p.scope === d.scope);
 		const dateIndex = +this.value;
-		updateMaps({ plotGroup, dateIndex });
+		updateMaps({ plotGroup: d.plotGroup, dateIndex });
 	});
-
-const dateSpans = sliderRow.append("span").classed("date-span", true);
 
 const buttonsRow = plotDivs.append("div").append("span");
 buttonsRow.append("button").classed("play-button", true);
 
-// Create gradient
+// Create defs: gradient and clipPath
 (() => {
-	const defs = svgs.append("defs");
-	const verticalLegendGradient = defs
-		.append("linearGradient")
-		.attr("id", plotAesthetics.legend.gradientID)
-		.attr("x1", "0%")
-		.attr("x2", "0%")
-		.attr("y1", "100%")
-		.attr("y2", "0%");
-	d3.range(plotAesthetics.colors.nSteps).forEach((i: number) => {
-		const percent = (100 * i) / (plotAesthetics.colors.nSteps - 1);
-		const proptn = percent / 100;
+	plotGroups.each(function ({ scope }: { scope: Scope }) {
+		const svgs = d3.select(this).selectAll("svg");
+		const defs = svgs.append("defs");
+		const verticalLegendGradient = defs
+			.append("linearGradient")
+			.attr("id", plotAesthetics.legend.gradientID)
+			.attr("x1", "0%")
+			.attr("x2", "0%")
+			.attr("y1", "100%")
+			.attr("y2", "0%");
+		d3.range(plotAesthetics.colors.nSteps).forEach((i: number) => {
+			const percent = (100 * i) / (plotAesthetics.colors.nSteps - 1);
+			const proptn = percent / 100;
 
-		verticalLegendGradient
-			.append("stop")
-			.attr("offset", `${percent}%`)
-			.attr("stop-color", plotAesthetics.colors.scale(proptn))
-			.attr("stop-opacity", 1);
+			verticalLegendGradient
+				.append("stop")
+				.attr("offset", `${percent}%`)
+				.attr("stop-color", plotAesthetics.colors.scale(proptn))
+				.attr("stop-opacity", 1);
+		});
+
+		const canvases = svgs.append("g").classed("main-plot-area", true);
+		const clipPathID = `plot-clip-${scope}`;
+		defs.append("clipPath")
+			.attr("id", clipPathID)
+			.append("rect")
+			.attr("x", plotAesthetics.map.originX)
+			.attr("y", plotAesthetics.map.originY)
+			.attr("width", plotAesthetics.mapWidth[scope])
+			.attr("height", plotAesthetics.mapHeight[scope]);
+		canvases.attr("clip-path", `url(#${clipPathID})`);
 	});
 })();
 

@@ -17,17 +17,14 @@ body {
 	padding: 2px;
 }
 
-span.date-span {
-	float: right;
-	padding-right: 3em;
-}
-
 button.play-button {
 	width: 50px;
 }
 
 svg.plot {
-	display: inline-block;
+	border-width: 1px;
+	border-color: #ccc;
+	border-style: solid;
 }
 
 div.plot-container {
@@ -45,7 +42,7 @@ input[type="range"] {
 	border-radius: 2px;
 	/* margin-top: 25px; */
 	position: relative;
-	bottom: 4px;
+	bottom: 0px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -93,4 +90,6 @@ input[type="range"]::-ms-thumb {
 
 input.date-slider {
 	width: 60%;
+	float: right;
+	margin-right: 5em;
 }
