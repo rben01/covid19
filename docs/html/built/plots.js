@@ -1,4 +1,4 @@
-const SCOPES = ["usa", "wordl"];
+const SCOPES = ["usa", "world"];
 const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze((() => {
     const pa = {
@@ -405,10 +405,13 @@ let PlaybackInfo = /** @class */ (() => {
 })();
 // Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-    const sliderRows = plotContainers.append("div").append("span");
-    sliderRows.append("span").classed("date-span", true);
     plotGroups.each(function () {
         const plotGroup = d3.select(this);
+        const sliderRows = plotGroup
+            .selectAll(".plot-container")
+            .append("div")
+            .append("span");
+        sliderRows.append("span").classed("date-span", true);
         sliderRows
             .selectAll()
             .data(() => [{ plotGroup }])

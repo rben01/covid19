@@ -596,11 +596,13 @@ class PlaybackInfo {
 }
 // Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-	const sliderRows = plotContainers.append("div").append("span");
-	sliderRows.append("span").classed("date-span", true);
-
 	plotGroups.each(function () {
 		const plotGroup = d3.select(this);
+		const sliderRows = plotGroup
+			.selectAll(".plot-container")
+			.append("div")
+			.append("span");
+		sliderRows.append("span").classed("date-span", true);
 		sliderRows
 			.selectAll()
 			.data(() => [{ plotGroup }])
