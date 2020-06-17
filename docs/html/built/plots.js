@@ -3,7 +3,7 @@ const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze((() => {
     const pa = {
         width: { usa: 600, world: 600 },
-        height: { usa: 425, world: 425 },
+        height: { usa: 425, world: 350 },
         colors: {
             scale: (t) => d3.interpolateCividis(1 - t),
             nSteps: 101,
@@ -22,7 +22,7 @@ const plotAesthetics = Object.freeze((() => {
             padLeft: 20,
             barWidth: 15,
             padRight: 20,
-            height: 350,
+            height: { usa: 350, world: 275 },
             gradientID: "verticalLegendGradient",
         },
         title: {
@@ -210,7 +210,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
     ];
     const projection = (scope === "usa"
         ? d3.geoAlbersUsa()
-        : d3.geoNaturalEarth1()).fitExtent(projectionExtent, scopedGeoData);
+        : d3.geoCylindricalStereographic()).fitExtent(projectionExtent, scopedGeoData);
     const path = d3.geoPath(projection);
     const zoom = d3
         .zoom()
@@ -266,11 +266,10 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         idleTimeout = null;
     };
     plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
-    const aspectRatio = plotAesthetics.mapWidth[scope] / plotAesthetics.mapHeight[scope];
     const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
     const legendTransY = (plotAesthetics.title.height +
         plotAesthetics.height[scope] -
-        plotAesthetics.legend.height) /
+        plotAesthetics.legend.height[scope]) /
         2;
     const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.date;
     const firstDay = dateStrParser(minDate);
@@ -326,7 +325,8 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         const legend = svg
             .append("g")
             .attr("transform", `translate(${legendTransX} ${legendTransY})`);
-        const { barWidth, height: barHeight } = plotAesthetics.legend;
+        const { barWidth, height: barHeights } = plotAesthetics.legend;
+        const barHeight = barHeights[scope];
         legend
             .append("rect")
             .attr("x", 0)

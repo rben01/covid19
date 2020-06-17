@@ -231,6 +231,7 @@ def data_to_json(outfile: Path):
             {
                 "Bosnia": "Bosnia and Herzegovina",
                 "Georgia (country)": "Georgia",
+                "North Macedonia": "Macedonia",
                 "S. Sudan": "South Sudan",
             }
         )
