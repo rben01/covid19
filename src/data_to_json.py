@@ -63,6 +63,8 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         .fillna(geo_df[CODE])
     )
 
+    geo_df = geo_df[geo_df[CODE] != "Antarctica"]
+
     geo_df["name"] = geo_df[CODE]
 
     geo_df = geo_df[
