@@ -334,6 +334,8 @@ function dispatchMouseToMap(event, type) {
 		// }, 5);
 	}
 }
+
+let graphHasBegunZooming = false;
 function initializeChoropleth({
 	plotGroup,
 	allCovidData,
@@ -378,7 +380,39 @@ function initializeChoropleth({
 		.on("zoom", function () {
 			tooltip.style("visibility", "hidden");
 			const transform = d3.event.transform;
-			plotGroup.selectAll(".map").attr("transform", transform);
+
+			d3.select(this).selectAll(".map").attr("transform", transform);
+
+			const mapContainer = this;
+			// Apply zoom to other map containers in plotGroup, making sure not to let them try to zoom this map container again! (else an infinite loop will occur)
+			if (!graphHasBegunZooming) {
+				// Holy race condition Batman (JS is single threaded so it's fine; graphHasBegunZooming = false can't run before all the other zooms have been applied)
+				graphHasBegunZooming = true;
+				plotGroup
+					.selectAll(".map-container")
+					.filter(function () {
+						return this !== mapContainer;
+					})
+					.each(function () {
+						zoom.transform(d3.select(this), transform);
+					});
+				graphHasBegunZooming = false;
+			}
+
+			// const mapContainer = this;
+			// plotGroup.selectAll(".map").each(function () {
+			// 	console.log(this, d3.event.sourceEvent);
+			// 	if (d3.event.sourceEvent.target == this) {
+			// 		d3.select(this).call(zoom.transform, transform);
+			// 	} else {
+			// 		d3.select(mapContainer)
+			// 			.selectAll(".map")
+			// 			.attr("transform", transform);
+			// 	}
+			// });
+
+			// plotGroup.selectAll(".map").attr("transform", transform);
+			// 	.each(function () {});
 			plotGroup
 				.selectAll(".state-boundary")
 				.attr("stroke-width", plotAesthetics.map.borderWidth / transform.k);
