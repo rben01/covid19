@@ -219,6 +219,10 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 	const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
 	plotGroup.selectAll(".date-span").text(dateStr);
 
+	if (!plotGroup.datum().playbackInfo.isPlaying) {
+		plotGroup.selectAll(".play-button").text("Play");
+	}
+
 	tooltip.datum({ ...tooltip.datum(), dateKey });
 	updateTooltip({ visibility: "nochange" });
 
@@ -356,10 +360,10 @@ function initializeChoropleth({
 			plotAesthetics.mapHeight[scope] - plotAesthetics.map.pad,
 		],
 	];
-	const projection = (scope === "usa"
-		? d3.geoAlbersUsa()
-		: d3.geoCylindricalStereographic()
-	).fitExtent(projectionExtent, scopedGeoData);
+	const projection = (scope === "usa" ? d3.geoAlbersUsa() : d3.geoTimes()).fitExtent(
+		projectionExtent,
+		scopedGeoData,
+	);
 
 	const path = d3.geoPath(projection);
 
@@ -684,21 +688,26 @@ class PlaybackInfo {
 		}
 
 		function startPlayback(playbackInfo: PlaybackInfo) {
+			playbackInfo.isPlaying = true;
+
 			if (sliderNode.value === sliderNode.max) {
 				updateMaps({ plotGroup, dateIndex: 0 });
 				// A number indistinguishable from 0 (except to a computer)
 				playbackInfo.timerElapsedTimeProptn = 0.0000001;
 			}
 
-			playbackInfo.isPlaying = true;
 			function updateDate() {
 				playbackInfo.timerStartDate = new Date();
 				playbackInfo.timerElapsedTimeProptn = 0;
 
+				const maxDateIndex = parseFloat(sliderNode.max);
 				const dateIndex = parseFloat(sliderNode.value);
-				if (dateIndex < parseFloat(sliderNode.max)) {
+				if (dateIndex < maxDateIndex) {
 					updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
-				} else {
+				}
+
+				// If it's the last date, end the timer (don't wait for the date to be one past the end; just end it when it hits the end)
+				if (dateIndex >= maxDateIndex - 1) {
 					clearInterval(playbackInfo.timer);
 					playbackInfo.isPlaying = false;
 					playButtons.text("Restart");
@@ -724,11 +733,11 @@ class PlaybackInfo {
 
 		function onPlaybackButtonClick(playbackInfo: PlaybackInfo) {
 			if (playbackInfo.isPlaying) {
-				playButtons.text("Play");
 				haltPlayback(playbackInfo);
+				playButtons.text("Play");
 			} else {
-				playButtons.text("Pause");
 				startPlayback(playbackInfo);
+				playButtons.text("Pause");
 			}
 		}
 
