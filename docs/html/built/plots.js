@@ -372,7 +372,7 @@ const plotGroups = d3
 }))
     .join("div")
     .classed("plot-scope-group", true);
-const plotDivs = plotGroups
+const plotContainers = plotGroups
     .selectAll()
     .data(function ({ scope }) {
     return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map((caseType) => ({
@@ -383,30 +383,11 @@ const plotDivs = plotGroups
 })
     .join("div")
     .classed("plot-container", true);
-const svgs = plotDivs
+const svgs = plotContainers
     .append("svg")
     .classed("plot", true)
     .attr("width", (d) => plotAesthetics.width[d.scope])
     .attr("height", (d) => plotAesthetics.height[d.scope]);
-const sliderRows = plotDivs.append("div").append("span");
-const dateSpans = sliderRows.append("span").classed("date-span", true);
-const sliders = sliderRows
-    .selectAll()
-    .data(function ({ scope }) {
-    return [{ plotGroup: plotGroups.filter((p) => p.scope === scope) }];
-})
-    .enter()
-    .append("input")
-    .classed("date-slider", true)
-    .attr("type", "range")
-    // Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
-    .attr("min", 0)
-    .attr("max", 1)
-    .property("value", 1)
-    .on("input", function (d) {
-    const dateIndex = +this.value;
-    updateMaps({ plotGroup: d.plotGroup, dateIndex });
-});
 let PlaybackInfo = /** @class */ (() => {
     class PlaybackInfo {
         constructor() {
@@ -424,23 +405,41 @@ let PlaybackInfo = /** @class */ (() => {
     PlaybackInfo.defaultSpeed = 1;
     return PlaybackInfo;
 })();
-// Create buttons
+// Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-    plotGroups.each(function ({ scope }) {
+    const sliderRows = plotContainers.append("div").append("span");
+    sliderRows.append("span").classed("date-span", true);
+    plotGroups.each(function () {
         const plotGroup = d3.select(this);
+        sliderRows
+            .selectAll()
+            .data(() => [{ plotGroup }])
+            .join("input")
+            .classed("date-slider", true)
+            .attr("type", "range")
+            // Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
+            .attr("min", 0)
+            .attr("max", 1)
+            .property("value", 1)
+            .on("input", function (d) {
+            const dateIndex = +this.value;
+            updateMaps({ plotGroup: d.plotGroup, dateIndex });
+        });
+        const playbackInfo = new PlaybackInfo();
+        plotGroup.datum({ ...plotGroup.datum(), playbackInfo });
         const buttonsRows = plotGroup
             .selectAll(".plot-container")
             .append("div")
             .classed("button-row", true)
             .append("span")
             .classed("button-container", true);
-        const speedButtonSpans = buttonsRows
-            .selectAll()
-            .data(() => [new PlaybackInfo()])
-            .join("span")
+        const buttonSpans = buttonsRows
+            .append("span")
             .classed("speed-buttons-span", true);
-        const playButtons = speedButtonSpans
-            .append("button")
+        const playButtons = buttonSpans
+            .selectAll()
+            .data(() => [playbackInfo])
+            .join("button")
             .classed("play-button", true)
             .text("Play");
         const sliders = plotGroup.selectAll(".date-slider");
@@ -464,6 +463,7 @@ let PlaybackInfo = /** @class */ (() => {
                 playbackInfo.timerStartDate = new Date();
                 playbackInfo.timerElapsedTimeProptn = 0;
                 const dateIndex = parseFloat(sliderNode.value);
+                console.log(dateIndex);
                 if (dateIndex < parseFloat(sliderNode.max)) {
                     updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
                 }
@@ -496,13 +496,11 @@ let PlaybackInfo = /** @class */ (() => {
         playButtons.on("click", function (playbackInfo) {
             onPlaybackButtonClick(playbackInfo);
         });
-        const speedButtons = speedButtonSpans
+        const speedButtons = buttonSpans
             .selectAll()
-            .data((d) => {
-            return PlaybackInfo.speeds.map(speed => {
-                return { speed, playbackInfo: d };
-            });
-        })
+            .data(() => PlaybackInfo.speeds.map(speed => {
+            return { speed, playbackInfo };
+        }))
             .join("button")
             .classed("speed-button", true)
             .text(({ speed }) => `${speed}x`)

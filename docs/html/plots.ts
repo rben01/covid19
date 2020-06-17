@@ -553,7 +553,7 @@ const plotGroups = d3
 	.join("div")
 	.classed("plot-scope-group", true);
 
-const plotDivs = plotGroups
+const plotContainers = plotGroups
 	.selectAll()
 	.data(function ({ scope }: { scope: Scope }) {
 		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
@@ -567,31 +567,11 @@ const plotDivs = plotGroups
 	.join("div")
 	.classed("plot-container", true);
 
-const svgs = plotDivs
+const svgs = plotContainers
 	.append("svg")
 	.classed("plot", true)
 	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.scope])
 	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.scope]);
-
-const sliderRows = plotDivs.append("div").append("span");
-const dateSpans = sliderRows.append("span").classed("date-span", true);
-const sliders = sliderRows
-	.selectAll()
-	.data(function ({ scope }: { scope: Scope }) {
-		return [{ plotGroup: plotGroups.filter((p: PlotInfo) => p.scope === scope) }];
-	})
-	.enter()
-	.append("input")
-	.classed("date-slider", true)
-	.attr("type", "range")
-	// Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
-	.attr("min", 0)
-	.attr("max", 1)
-	.property("value", 1)
-	.on("input", function (d: PlotInfo) {
-		const dateIndex = +this.value;
-		updateMaps({ plotGroup: d.plotGroup, dateIndex });
-	});
 
 class PlaybackInfo {
 	static speeds = [0.25, 0.5, 1, 2];
@@ -616,10 +596,31 @@ class PlaybackInfo {
 		this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
 	}
 }
-// Create buttons
+// Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-	plotGroups.each(function ({ scope }: { scope: Scope }) {
+	const sliderRows = plotContainers.append("div").append("span");
+	sliderRows.append("span").classed("date-span", true);
+
+	plotGroups.each(function () {
 		const plotGroup = d3.select(this);
+		sliderRows
+			.selectAll()
+			.data(() => [{ plotGroup }])
+			.join("input")
+			.classed("date-slider", true)
+			.attr("type", "range")
+			// Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
+			.attr("min", 0)
+			.attr("max", 1)
+			.property("value", 1)
+			.on("input", function (d: PlotInfo) {
+				const dateIndex = +this.value;
+				updateMaps({ plotGroup: d.plotGroup, dateIndex });
+			});
+
+		const playbackInfo = new PlaybackInfo();
+		plotGroup.datum({ ...plotGroup.datum(), playbackInfo });
+
 		const buttonsRows = plotGroup
 			.selectAll(".plot-container")
 			.append("div")
@@ -627,14 +628,14 @@ class PlaybackInfo {
 			.append("span")
 			.classed("button-container", true);
 
-		const speedButtonSpans = buttonsRows
-			.selectAll()
-			.data(() => [new PlaybackInfo()])
-			.join("span")
+		const buttonSpans = buttonsRows
+			.append("span")
 			.classed("speed-buttons-span", true);
 
-		const playButtons = speedButtonSpans
-			.append("button")
+		const playButtons = buttonSpans
+			.selectAll()
+			.data(() => [playbackInfo])
+			.join("button")
 			.classed("play-button", true)
 			.text("Play");
 
@@ -663,6 +664,7 @@ class PlaybackInfo {
 				playbackInfo.timerElapsedTimeProptn = 0;
 
 				const dateIndex = parseFloat(sliderNode.value);
+				console.log(dateIndex);
 				if (dateIndex < parseFloat(sliderNode.max)) {
 					updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
 				} else {
@@ -698,16 +700,17 @@ class PlaybackInfo {
 				startPlayback(playbackInfo);
 			}
 		}
+
 		playButtons.on("click", function (playbackInfo: PlaybackInfo) {
 			onPlaybackButtonClick(playbackInfo);
 		});
-		const speedButtons = speedButtonSpans
+		const speedButtons = buttonSpans
 			.selectAll()
-			.data((d: PlaybackInfo) => {
-				return PlaybackInfo.speeds.map(speed => {
-					return { speed, playbackInfo: d };
-				});
-			})
+			.data(() =>
+				PlaybackInfo.speeds.map(speed => {
+					return { speed, playbackInfo };
+				}),
+			)
 			.join("button")
 			.classed("speed-button", true)
 			.text(({ speed }: { speed: number }) => `${speed}x`)
