@@ -399,7 +399,7 @@ let PlaybackInfo = /** @class */ (() => {
             return this.baseIntervalMS / PlaybackInfo.speeds[this.selectedIndex];
         }
     }
-    PlaybackInfo.speeds = [0.25, 0.5, 1, 2];
+    PlaybackInfo.speeds = [0.25, 0.5, 1, 2, 4];
     PlaybackInfo.defaultSpeed = 1;
     return PlaybackInfo;
 })();

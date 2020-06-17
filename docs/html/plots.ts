@@ -572,7 +572,7 @@ const svgs = plotContainers
 	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.scope]);
 
 class PlaybackInfo {
-	static speeds = [0.25, 0.5, 1, 2];
+	static speeds = [0.25, 0.5, 1, 2, 4];
 	static defaultSpeed = 1;
 
 	timer: number;
