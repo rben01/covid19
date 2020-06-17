@@ -103749,9 +103749,9 @@
 "REGION_UN": "Europe",
 "REGION_WB": "Europe & Central Asia",
 "SUBREGION": "Southern Europe",
-"code": "Republic of Serbia",
+"code": "Serbia",
 "featurecla": "Admin-0 map unit",
-"name": "Republic of Serbia",
+"name": "Serbia",
 "scalerank": 1
 },
 "geometry": {
@@ -104443,9 +104443,9 @@
 "REGION_UN": "Africa",
 "REGION_WB": "Sub-Saharan Africa",
 "SUBREGION": "Eastern Africa",
-"code": "S. Sudan",
+"code": "South Sudan",
 "featurecla": "Admin-0 map unit",
-"name": "S. Sudan",
+"name": "South Sudan",
 "scalerank": 1
 },
 "geometry": {

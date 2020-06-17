@@ -51,8 +51,8 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
                 "Democratic Republic of the Congo": "Dem. Rep. Congo",
                 "Equatorial Guinea": "Eq. Guinea",
                 "eSwatini": "Eswatini",
-                "Georgia (Country)": "Georgia (country)",
-                "South Sudan": "S. Sudan",
+                "Georgia (Country)": "Georgia",
+                "Republic of Serbia": "Serbia",
                 "United Arab Emirates": "UAE",
                 "United Kingdom": "Britain",
                 "United Republic of Tanzania": "Tanzania",
@@ -228,14 +228,8 @@ def data_to_json(outfile: Path):
         .map(
             {
                 "Bosnia": "Bosnia and Herzegovina",
-                "Britain": "United Kingdom",
-                "Central African Rep.": "Central African Republic",
-                "Czechia": "Czech Republic",
-                "Eswatini": "Swaziland",
                 "Georgia (country)": "Georgia",
                 "S. Sudan": "South Sudan",
-                "The Bahamas": "Bahamas",
-                "W. Sahara": "Western Sahara",
             }
         )
         .fillna(countries_df[Columns.COUNTRY])
