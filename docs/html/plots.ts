@@ -4,7 +4,7 @@ type DateString = string;
 type CaseType = "cases" | "cases_per_capita" | "deaths" | "deaths_per_capita";
 type Scope = "usa" | "world";
 
-const SCOPES = ["usa"];
+const SCOPES = ["usa", "world"];
 
 interface AllGeoData {
 	usa: ScopedGeoData;
@@ -372,9 +372,7 @@ function initializeChoropleth({
 			return (
 				d3.event.type !== "dblclick" &&
 				(d3.event.type !== "wheel" || d3.event.ctrlKey) &&
-				(!d3.event.touches ||
-					d3.event.touches.length === 1 ||
-					d3.event.touches.length === 2)
+				(!d3.event.touches || d3.event.touches.length === 2)
 			);
 		})
 		.on("zoom", function () {
@@ -664,7 +662,6 @@ class PlaybackInfo {
 				playbackInfo.timerElapsedTimeProptn = 0;
 
 				const dateIndex = parseFloat(sliderNode.value);
-				console.log(dateIndex);
 				if (dateIndex < parseFloat(sliderNode.max)) {
 					updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
 				} else {
@@ -729,13 +726,19 @@ class PlaybackInfo {
 			},
 			i: number,
 		) {
+			const wasPlaying = playbackInfo.isPlaying;
 			// Order matters here; calculations in haltPlayback require the old value of selectedIndex
-			haltPlayback(playbackInfo);
+			if (wasPlaying) {
+				haltPlayback(playbackInfo);
+			}
 			playbackInfo.selectedIndex = i;
 			speedButtons.each(function (d: any) {
 				d3.select(this).property("disabled", d.speed === speed);
 			});
-			startPlayback(playbackInfo);
+			console.log(wasPlaying);
+			if (wasPlaying) {
+				startPlayback(playbackInfo);
+			}
 		});
 	});
 })();
