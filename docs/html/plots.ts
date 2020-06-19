@@ -97,7 +97,7 @@ const plotAesthetics = Object.freeze(
 	(() => {
 		const pa = {
 			width: { usa: 500, world: 500 },
-			height: { usa: 375, world: 300 },
+			height: { usa: 325, world: 300 },
 			colors: {
 				scale: (t: number) => d3.interpolateCividis(1 - t),
 				nSteps: 101,
@@ -116,7 +116,7 @@ const plotAesthetics = Object.freeze(
 				padLeft: 20,
 				barWidth: 15,
 				padRight: 20,
-				height: { usa: 310, world: 230 },
+				height: { usa: 240, world: 230 },
 				gradientID: "verticalLegendGradient",
 			},
 			title: {

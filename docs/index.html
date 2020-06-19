@@ -2635,6 +2635,10 @@ video {
 		color: #3e6cb1 !important;
 		text-decoration: underline;
 	}
+
+	#content {
+		max-width: none;
+	}
 </style>
 </head>
 <body class="article toc2 toc-left">
@@ -2875,13 +2879,10 @@ Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8.
 Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.<br>
 On desktop, zoom by holding the control key and scrolling over the graph.
-Once you&#8217;ve zoomed in, you can drag to pan.
-Reset the view by double-clicking on the graph.
+Once you&#8217;ve zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
-Along the bottoms are tools to control playback.
-In a given grid-plot, the date slider can be dragged to view a specific date.
-Hovering your cursor over a region will show its data for the selected date.
-In addition, the play/pause button will step through date by date until it reaches the end.</p>
+Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
+Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.</p>
 </div>
 </div>
 <div class="sect2">
@@ -3028,7 +3029,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-18 23:47:35 -0400
+Last updated 2020-06-19 00:17:07 -0400
 </div>
 </div>
 <script type="text/javascript" src="./html/built/plots.js"></script>

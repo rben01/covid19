@@ -249,13 +249,10 @@ Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
 Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant. +
 On desktop, zoom by holding the control key and scrolling over the graph.
-Once you've zoomed in, you can drag to pan.
-Reset the view by double-clicking on the graph.
+Once you've zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
-Along the bottoms are tools to control playback.
-In a given grid-plot, the date slider can be dragged to view a specific date.
-Hovering your cursor over a region will show its data for the selected date.
-In addition, the play/pause button will step through date by date until it reaches the end.
+Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
+Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.
 
 === Interactive Plots
 
