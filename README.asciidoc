@@ -17,7 +17,7 @@
 :toclevels: 4
 :hide-uri-scheme:
 :stylesheet: ./styles/clean.css
-:!linkcss:
+:linkcss:
 :icons: font
 :data-table-path: data/data_table.csv
 :raw-gh-content-url: link:https://raw.githubusercontent.com/rben01/covid19/master
@@ -254,7 +254,7 @@ On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
 Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.
 
-=== Interactive Plots
+==== Plots
 
 ++++
 <div id="map-plots"></div>

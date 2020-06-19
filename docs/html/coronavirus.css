@@ -53,7 +53,9 @@ span.button-container {
 }
 
 .speed-button {
-	width: 4em;
+	text-align: center;
+	padding: 10px auto;
+	margin: 0px;
 	height: 2.5em;
 }
 
