@@ -96,8 +96,8 @@ const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze(
 	(() => {
 		const pa = {
-			width: { usa: 600, world: 600 },
-			height: { usa: 425, world: 350 },
+			width: { usa: 500, world: 500 },
+			height: { usa: 375, world: 300 },
 			colors: {
 				scale: (t: number) => d3.interpolateCividis(1 - t),
 				nSteps: 101,
@@ -116,7 +116,7 @@ const plotAesthetics = Object.freeze(
 				padLeft: 20,
 				barWidth: 15,
 				padRight: 20,
-				height: { usa: 350, world: 275 },
+				height: { usa: 310, world: 230 },
 				gradientID: "verticalLegendGradient",
 			},
 			title: {
