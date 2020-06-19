@@ -453,7 +453,7 @@ function initializeChoropleth({
 		.filter(function () {
 			return (
 				d3.event.type !== "dblclick" &&
-				(d3.event.type !== "wheel" || d3.event.ctrlKey) &&
+				(d3.event.type !== "wheel" || d3.event.shiftKey) &&
 				(!d3.event.touches || d3.event.touches.length === 2)
 			);
 		})

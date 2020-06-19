@@ -248,7 +248,7 @@ Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
 Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant. +
-On desktop, zoom by holding the control key and scrolling over the graph.
+On desktop, zoom by holding the shift key and scrolling over the graph.
 Once you've zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
