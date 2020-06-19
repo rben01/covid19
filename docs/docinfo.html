@@ -1,126 +1,75 @@
-<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
-<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
-
-<script src="usa_states_diff_interactive_autoload.js"></script>
-<script src="usa_states_total_interactive_autoload.js"></script>
-
-<!--
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"
-  integrity="sha384-JpP8FXbgAZLkfur7LiK3j9AGBhHNIvF742meBJrjO2ShJDhCG2I1uVvW+0DUtrmc"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"
-  integrity="sha384-xZlADit0Q04ISQEdKg2k3L4W9AwQBAuDs9nJL9fM/WwzL1tEU9VPNezOFX0nLEAz"></script> -->
-
-<script>
-  function setPlaybackSpeed(player_id, speed) {
-    const vdiv = document.getElementById(player_id)
-    const video = vdiv.getElementsByClassName("content")[0].getElementsByTagName("video")[0]
-    video.playbackRate = speed
-  }
-</script>
+<meta charset="UTF-8" />
+<script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+<script
+	type="text/javascript"
+	src="https://d3js.org/d3-geo-projection.v2.min.js"
+></script>
+<link rel="stylesheet" type="text/css" href="./html/coronavirus.css" />
+<link
+	rel="stylesheet"
+	type="text/css"
+	href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+/>
+<link
+	rel="stylesheet"
+	type="text/css"
+	href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css"
+/>
 
 <style>
-  .admonitionblock td.icon [class^="fa icon-"] {
-    font-size: 2.25em;
-  }
+	.admonitionblock td.icon [class^="fa icon-"] {
+		font-size: 2.25em;
+	}
 
-  .admonitionblock .fa.icon-tip::before {
-    color: rgb(73, 72, 70) !important;
-  }
+	.admonitionblock .fa.icon-tip::before {
+		color: rgb(73, 72, 70) !important;
+	}
 
-  body {
-    font-family: "Noto Sans", sans-serif !important;
-  }
+	body {
+		font-family: "Noto Sans", sans-serif !important;
+	}
 
-  .table-bullet {
-    display: inline-block;
-    transform: translateY(5px);
-  }
+	.table-bullet {
+		display: inline-block;
+		transform: translateY(5px);
+	}
 
-  div.ulist.compact li p {
-    margin-bottom: .13em;
-    padding-bottom: 0px;
-  }
+	div.ulist.compact li p {
+		margin-bottom: 0.13em;
+		padding-bottom: 0px;
+	}
 
-  br {
-    content: "";
-    margin: 1em;
-    display: block;
-    font-size: 20%;
-  }
+	br {
+		content: "";
+		margin: 1em;
+		display: block;
+		font-size: 20%;
+	}
 
-  a {
-    text-decoration: none;
-  }
+	a {
+		text-decoration: none;
+	}
 
-  a:hover {
-    cursor: auto;
-    text-decoration: underline;
-  }
+	a:hover {
+		cursor: auto;
+		text-decoration: underline;
+	}
 
-  #toc a:hover {
-    text-decoration: underline;
-  }
+	#toc a:hover {
+		text-decoration: underline;
+	}
 
-  a.no-underline:hover {
-    text-decoration: none;
-  }
+	a.no-underline:hover {
+		text-decoration: none;
+	}
 
-  a.prominent-link:hover {
-    color: #3e6cb1 !important;
-    text-decoration: underline;
-  }
+	a.prominent-link:hover {
+		color: #3e6cb1 !important;
+		text-decoration: underline;
+	}
 
-  a.no-underline:hover+a.prominent-link {
-    color: #3e6cb1 !important;
-    text-decoration: underline;
-  }
-
-  @media screen and (max-width: 4in) {
-    .bk-root {
-      display: none;
-    }
-
-    .insufficient-width-warning {
-      display: inherit;
-    }
-  }
-
-  @media screen and (min-width: 4.0000000001in) {
-    .bk-root {
-      display: inherit;
-    }
-
-    .insufficient-width-warning {
-      display: none;
-    }
-
-  }
-
-  .mobile-vertical-spacer {
-    height: 1in;
-  }
-
-  /*
-  .interactive-graph-container {
-    max-width: 90%;
-  }
-  */
-
-  @media screen and (max-width: 4in) {
-    .mobile-vertical-spacer {
-      display: none;
-    }
-  }
-
-  @media screen and (min-width: 4.0000000001in) and (max-width: 6in) {
-    .mobile-vertical-spacer {
-      display: inherit;
-    }
-  }
-
-  @media screen and (min-width: 6.0000000001in) {
-    .mobile-vertical-spacer {
-      display: none;
-    }
-  }
+	a.no-underline:hover + a.prominent-link {
+		color: #3e6cb1 !important;
+		text-decoration: underline;
+	}
 </style>

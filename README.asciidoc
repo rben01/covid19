@@ -77,7 +77,6 @@ ifndef::env-github[]
 :bullet-cfr-notes: icon:heartbeat[{bullet-opts}]
 :bullet-gridlines: icon:hashtag[{bullet-opts}]
 endif::[]
-:timeline-video-dir: {fig-dir}/Geo/BokehInteractiveStatic
 // Icons for sections
 :icon-setup: 🛠
 :icon-data: 💾
@@ -249,82 +248,23 @@ Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
 Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant. +
-Each grid-plot has tools in the top right to pan, zoom, and reset the view.
+On desktop, zoom by holding the control key and scrolling over the graph.
+Once you've zoomed in, you can drag to pan.
+Reset the view by double-clicking on the graph.
+On mobile, use two fingers to zoom and pan.
 Along the bottoms are tools to control playback.
 In a given grid-plot, the date slider can be dragged to view a specific date.
 Hovering your cursor over a region will show its data for the selected date.
 In addition, the play/pause button will step through date by date until it reaches the end.
 
-[NOTE]
---
-The interactive timelines take quite a while to load.
-If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
-If you think your device is big enough and nothing is loading below, try refreshing the page.
-You can also view these timelines as non-interactive videos here: +
-link:{timeline-video-dir}/countries_total_interactive.mp4[1. World/Cumulative], link:{timeline-video-dir}/countries_diff_interactive.mp4[2. World/Daily Differences], link:{timeline-video-dir}/usa_states_total_interactive.mp4[3. USA/Cumulative], link:{timeline-video-dir}/usa_states_diff_interactive.mp4[4. USA/Daily Differences].
---
+=== Interactive Plots
 
-[[timeline-interactive-world]]
-==== {icon-world} World
-
-[[timeline-interactive-world-cummulative]]
-===== {icon-interactive-cumulative} Cumulative
-[IMPORTANT,role="insufficient-width-warning"]
---
-{insufficient-width-warning}
---
-[subs=attributes]
 ++++
-<div class='interactive-graph-container'>
-include::countries_total_interactive_div_tag.html[]
-{post-interactive-graph-div}
-</div>
+<div id="map-plots"></div>
 ++++
 
-[[timeline-interactive-world-dod-diff]]
-===== {icon-interactive-day-diff} Increase per Day
-[IMPORTANT,role="insufficient-width-warning"]
---
-{insufficient-width-warning}
---
-[subs=attributes]
-++++
-<div class='interactive-graph-container'>
-include::countries_diff_interactive_div_tag.html[]
-{post-interactive-graph-div}
-</div>
-++++
 
-[[timeline-interactive-usa-states]]
-==== {icon-usa} U.S. States
-
-[[timeline-interactive-usa-states-cummulative]]
-===== {icon-interactive-cumulative} Cumulative
-[IMPORTANT,role="insufficient-width-warning"]
---
-{insufficient-width-warning}
---
-[subs=attributes]
-++++
-<div class='interactive-graph-container'>
-include::usa_states_total_interactive_div_tag.html[]
-{post-interactive-graph-div}
-</div>
-++++
-
-[[timeline-interactive-usa-states-dod-diff]]
-===== {icon-interactive-day-diff} Increase per Day
-[IMPORTANT,role="insufficient-width-warning"]
---
-{insufficient-width-warning}
---
-[subs=attributes]
-++++
-<div class='interactive-graph-container'>
-include::usa_states_diff_interactive_div_tag.html[]
-{post-interactive-graph-div}
-</div>
-++++
+== Graphs
 
 [[graphs-line]]
 === {icon-line-graphs} Line Charts
@@ -333,7 +273,7 @@ include::usa_states_diff_interactive_div_tag.html[]
 ==== {icon-reading-graphs} Reading the Line Charts
 
 [[date-explanation-note]]{bullet-start-date} Interpreting the Dates on the X-Axis::
-The dates on the graphs' x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
+The dates on the graphs`' x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
 For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
 On the last day, there will be less than 24 hours of collected data, so the vertical line over `today` at `current time` represents the data collected from midnight (this morning) to now.
 

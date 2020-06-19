@@ -56,22 +56,26 @@ interface Aggregated<T> {
 type AggNumber = Aggregated<number>;
 type AggDate = Aggregated<DateString>;
 
-interface DataGroup {
-	cases: number[];
-	cases_per_capita: number[];
-	deaths: number[];
-	deaths_per_capita: number[];
-}
-
 interface ScopedCovidData {
 	agg: {
-		[key: string]: DataGroup & {
+		[key: string]: {
+			cases: AggNumber;
+			cases_per_capita: AggNumber;
+			deaths: AggNumber;
+			deaths_per_capita: AggNumber;
 			date: AggDate;
 		};
 	};
 	data: {
 		[key: string]: LocationCovidData;
 	};
+}
+
+interface DataGroup {
+	cases: number[];
+	cases_per_capita: number[];
+	deaths: number[];
+	deaths_per_capita: number[];
 }
 
 interface LocationCovidData extends DataGroup {
@@ -181,10 +185,14 @@ function assignData({
 				};
 
 				for (let [caseType, data] of Object.entries(dodd)) {
-					for (let i = 1; i < Object.keys(covidData.date).length; ++i) {
+					for (let i = 0; i < Object.keys(covidData.date).length; ++i) {
 						const diff =
 							covidData[caseType][i] - covidData[caseType][i - 1];
-						data.push(diff);
+						if (!diff) {
+							data.push(0);
+						} else {
+							data.push(diff);
+						}
 					}
 				}
 
@@ -214,9 +222,52 @@ function getFormatter(caseType: CaseType) {
 	return isPerCapita(caseType) ? numberFormatters.float : numberFormatters.int;
 }
 
-type Visibility = "visible" | "hidden" | "nochange";
-function updateTooltip({ visibility }: { visibility: Visibility }) {
-	const { feature, dateKey, caseType } = tooltip.datum();
+function getDataOnDate({
+	feature,
+	count,
+	dateKey,
+	caseType,
+	smoothAvgDays,
+}: {
+	feature: Feature;
+	count: CountMethod;
+	dateKey: DateString;
+	caseType: CaseType;
+	smoothAvgDays: number;
+}): number {
+	if (typeof feature.covidData === "undefined") {
+		return null;
+	}
+
+	const data: DataGroup =
+		count === "dodd" ? feature.covidData.day_over_day_diffs : feature.covidData;
+
+	const index = feature.covidData.date[dateKey];
+	if (typeof index === "undefined") {
+		return null;
+	}
+
+	let value: number;
+	if (count === "dodd" && smoothAvgDays >= 2) {
+		let sum = 0;
+		for (let i = index; i > index - smoothAvgDays; --i) {
+			const x = data[caseType][i];
+			sum += x;
+			// if (feature.properties.code === "NY") {
+			// 	console.log(dateKey, i, sum, x);
+			// }
+		}
+		value = sum / smoothAvgDays;
+	} else {
+		value = data[caseType][index];
+	}
+
+	return value;
+}
+
+type TooltipVisibility = "visible" | "hidden" | "nochange";
+function updateTooltip({ visibility }: { visibility: TooltipVisibility }) {
+	const { feature, count, dateKey, caseType } = tooltip.datum();
 
 	if (typeof feature === "undefined") {
 		return;
@@ -226,20 +277,16 @@ function updateTooltip({ visibility }: { visibility: Visibility }) {
 
 	const location = feature.properties.name;
 
-	const countStr = (() => {
-		const noDataStr = "~No data~";
-		if (typeof feature.covidData === "undefined") {
-			return noDataStr;
-		}
+	const value = getDataOnDate({
+		feature,
+		count,
+		dateKey,
+		caseType,
+		smoothAvgDays: null,
+	});
 
-		const index = feature.covidData.date[dateKey];
-		if (typeof index === "undefined") {
-			return noDataStr;
-		}
-
-		const formatter = getFormatter(caseType);
-		return formatter(feature.covidData[caseType][index]);
-	})();
+	const formatter = getFormatter(caseType);
+	const countStr = value === null ? "~No data~" : formatter(value);
 
 	tooltip.html(`${dateStr}<br>${location}<br>${countStr}`);
 	if (visibility !== "nochange") {
@@ -265,7 +312,7 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 		.property("value", dateIndex)
 		.node();
 
-	const minDate = scopedCovidData.agg[count].date.min_nonzero;
+	const minDate = scopedCovidData.agg.net.date.min_nonzero;
 	const dateKey = getDateNDaysAfter(minDate, dateIndex);
 
 	const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
@@ -281,25 +328,18 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 
 	plotGroup
 		.selectAll(".plot-container")
-		.each(function ({
-			caseType,
-			plotGroup,
-		}: {
-			caseType: CaseType;
-			plotGroup: any;
-		}) {
+		.each(function ({ caseType }: { caseType: CaseType }) {
 			const plotContainer = d3.select(this);
 
-			const {
-				min_nonzero: vmin,
-				max: vmax,
-			} = plotGroup.datum().scopedCovidData.agg[caseType];
+			const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[count][
+				caseType
+			];
 			const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
 
 			const svg = plotContainer.selectAll("svg").selectAll(".map");
 
 			mouseActions.mouseover = (d: Feature) => {
-				tooltip.datum({ ...tooltip.datum(), feature: d, caseType });
+				tooltip.datum({ ...tooltip.datum(), feature: d, caseType, count });
 				updateTooltip({ visibility: "visible" });
 			};
 			mouseActions.mousemove = () => {
@@ -324,26 +364,23 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 
 			const p = svg
 				.selectAll("path")
-				.attr("fill", (d: Feature) => {
-					if (typeof d.covidData === "undefined") {
+				.attr("fill", (feature: Feature) => {
+					const value = getDataOnDate({
+						feature,
+						count,
+						dateKey,
+						caseType,
+						smoothAvgDays: null,
+					});
+
+					if (value === null || value < vmin) {
 						return plotAesthetics.colors.missing;
 					}
 
-					const data: DataGroup =
-						count === "dodd" ? d.covidData.day_over_day_diffs : d.covidData;
-
-					const index = d.covidData.date[dateKey];
-					if (typeof index === "undefined") {
-						return plotAesthetics.colors.missing;
-					}
-
-					const value = data[caseType][index];
-					if (value < vmin) {
+					if (value === 0) {
 						return plotAesthetics.colors.zero;
 					}
-					if (count === "dodd") {
-						console.log(data, index, caseType, value);
-					}
+
 					return plotAesthetics.colors.scale(colorScale(value));
 				})
 				.classed("state-boundary", true);
@@ -359,9 +396,15 @@ const numberFormatters = { int: d3.format(",~r"), float: d3.format(",.2f") };
 const tooltip: {
 	datum: (d?: {
 		feature?: Feature;
+		count?: CountMethod;
 		dateKey?: DateString;
 		caseType?: CaseType;
-	}) => { feature: Feature; dateKey: DateString; caseType: CaseType };
+	}) => {
+		feature: Feature;
+		count: CountMethod;
+		dateKey: DateString;
+		caseType: CaseType;
+	};
 	style: any;
 	attr: any;
 	html: any;
@@ -370,34 +413,7 @@ const tooltip: {
 	.selectAll()
 	.data([{ dateKey: null, location: null, countStr: null }])
 	.join("div")
-	.attr("id", "tooltip");
-
-// https://bl.ocks.org/mthh/8f97dda227d21163773b0a714a573856
-function dispatchMouseToMap(event, type) {
-	const { pageX, pageY, clientX, clientY } = event;
-	const elems = document.elementsFromPoint(pageX, pageY);
-	const elem = elems.find(e => d3.select(e).classed("state-boundary"));
-
-	if (elem) {
-		d3.select(elem).each((d: any) => mouseActions.mouseover(d));
-		const new_click_event = new MouseEvent(type, {
-			pageX: pageX,
-			pageY: pageY,
-			clientX: clientX,
-			clientY: clientY,
-			bubbles: true,
-			cancelable: true,
-			view: window,
-		} as any);
-		elem.dispatchEvent(new_click_event);
-	} else {
-		mouseActions.mouseout();
-		// clearTimeout(t);
-		// t = setTimeout(() => {
-		// 	svg.select(".tooltip").style("display", "none");
-		// }, 5);
-	}
-}
+	.attr("id", "map-tooltip");
 
 let graphHasBegunZooming = false;
 function initializeChoropleth({
@@ -497,7 +513,8 @@ function initializeChoropleth({
 			plotAesthetics.height[location] -
 			plotAesthetics.legend.height[location]) /
 		2;
-	const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg[count].date;
+
+	const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.net.date;
 	const firstDay = dateStrParser(minDate);
 	const lastDay = dateStrParser(maxDate);
 	const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
@@ -608,6 +625,7 @@ function initializeChoropleth({
 				.attr("alignment-baseline", "middle");
 		});
 
+		const prefixStr = count === "dodd" ? "New Daily" : "Total";
 		let caseTypeStr = caseType;
 		let suffixStr = "";
 		if (isPerCapita(caseTypeStr)) {
@@ -616,7 +634,7 @@ function initializeChoropleth({
 		}
 		caseTypeStr = caseTypeStr.replace(/^./, (c: string) => c.toUpperCase());
 
-		const titleStr = `Total ${caseTypeStr}${suffixStr}`;
+		const titleStr = `${prefixStr} ${caseTypeStr}${suffixStr}`;
 		svg.append("text")
 			.attr("x", 20)
 			.attr("y", plotAesthetics.title.height)
@@ -638,7 +656,7 @@ function initializeChoropleth({
 }
 
 const plotGroups = d3
-	.select("#content")
+	.select("#map-plots")
 	.selectAll()
 	.data(
 		SCOPES.map(scope => {
@@ -868,7 +886,7 @@ class PlaybackInfo {
 		});
 
 		const canvases = svgs.append("g").classed("main-plot-area", true);
-		const clipPathID = `plot-clip-${scope}`;
+		const clipPathID = `plot-clip-${scope.location}-${scope.count}`;
 		defs.append("clipPath")
 			.attr("id", clipPathID)
 			.append("rect")

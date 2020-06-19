@@ -272,7 +272,7 @@ def data_to_json(outfile: Path):
 
             data[df_name]["agg"]["net"][jsonify(ct)]["min_nonzero"] = min_val
 
-        dodd_diffs = df[CASE_TYPES].diff()
+        dodd_diffs = df[CASE_TYPES].diff().fillna(0)
         for ct in CASE_TYPES:
             dodd_diffs.loc[dodd_diffs[ct] < 0, ct] = 0
         data[df_name]["agg"]["dodd"] = (

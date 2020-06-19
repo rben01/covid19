@@ -83,9 +83,14 @@ function assignData({ allCovidData, allGeoData, }) {
                     deaths_per_capita: [],
                 };
                 for (let [caseType, data] of Object.entries(dodd)) {
-                    for (let i = 1; i < Object.keys(covidData.date).length; ++i) {
+                    for (let i = 0; i < Object.keys(covidData.date).length; ++i) {
                         const diff = covidData[caseType][i] - covidData[caseType][i - 1];
-                        data.push(diff);
+                        if (!diff) {
+                            data.push(0);
+                        }
+                        else {
+                            data.push(diff);
+                        }
                     }
                 }
                 return dodd;
@@ -105,25 +110,48 @@ function moveTooltipTo(x, y) {
 function getFormatter(caseType) {
     return isPerCapita(caseType) ? numberFormatters.float : numberFormatters.int;
 }
+function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
+    if (typeof feature.covidData === "undefined") {
+        return null;
+    }
+    const data = count === "dodd" ? feature.covidData.day_over_day_diffs : feature.covidData;
+    const index = feature.covidData.date[dateKey];
+    if (typeof index === "undefined") {
+        return null;
+    }
+    let value;
+    if (count === "dodd" && smoothAvgDays >= 2) {
+        let sum = 0;
+        for (let i = index; i > index - smoothAvgDays; --i) {
+            const x = data[caseType][i];
+            sum += x;
+            // if (feature.properties.code === "NY") {
+            // 	console.log(dateKey, i, sum, x);
+            // }
+        }
+        value = sum / smoothAvgDays;
+    }
+    else {
+        value = data[caseType][index];
+    }
+    return value;
+}
 function updateTooltip({ visibility }) {
-    const { feature, dateKey, caseType } = tooltip.datum();
+    const { feature, count, dateKey, caseType } = tooltip.datum();
     if (typeof feature === "undefined") {
         return;
     }
     const dateStr = tooltipDateFormatter(dateStrParser(dateKey).getTime() - MS_PER_DAY);
     const location = feature.properties.name;
-    const countStr = (() => {
-        const noDataStr = "~No data~";
-        if (typeof feature.covidData === "undefined") {
-            return noDataStr;
-        }
-        const index = feature.covidData.date[dateKey];
-        if (typeof index === "undefined") {
-            return noDataStr;
-        }
-        const formatter = getFormatter(caseType);
-        return formatter(feature.covidData[caseType][index]);
-    })();
+    const value = getDataOnDate({
+        feature,
+        count,
+        dateKey,
+        caseType,
+        smoothAvgDays: null,
+    });
+    const formatter = getFormatter(caseType);
+    const countStr = value === null ? "~No data~" : formatter(value);
     tooltip.html(`${dateStr}<br>${location}<br>${countStr}`);
     if (visibility !== "nochange") {
         tooltip.style("visibility", visibility);
@@ -136,7 +164,7 @@ function updateMaps({ plotGroup, dateIndex }) {
         .selectAll(".date-slider")
         .property("value", dateIndex)
         .node();
-    const minDate = scopedCovidData.agg[count].date.min_nonzero;
+    const minDate = scopedCovidData.agg.net.date.min_nonzero;
     const dateKey = getDateNDaysAfter(minDate, dateIndex);
     const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
     const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
@@ -148,13 +176,13 @@ function updateMaps({ plotGroup, dateIndex }) {
     updateTooltip({ visibility: "nochange" });
     plotGroup
         .selectAll(".plot-container")
-        .each(function ({ caseType, plotGroup, }) {
+        .each(function ({ caseType }) {
         const plotContainer = d3.select(this);
-        const { min_nonzero: vmin, max: vmax, } = plotGroup.datum().scopedCovidData.agg[caseType];
+        const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[count][caseType];
         const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
         const svg = plotContainer.selectAll("svg").selectAll(".map");
         mouseActions.mouseover = (d) => {
-            tooltip.datum({ ...tooltip.datum(), feature: d, caseType });
+            tooltip.datum({ ...tooltip.datum(), feature: d, caseType, count });
             updateTooltip({ visibility: "visible" });
         };
         mouseActions.mousemove = () => {
@@ -176,21 +204,19 @@ function updateMaps({ plotGroup, dateIndex }) {
         };
         const p = svg
             .selectAll("path")
-            .attr("fill", (d) => {
-            if (typeof d.covidData === "undefined") {
+            .attr("fill", (feature) => {
+            const value = getDataOnDate({
+                feature,
+                count,
+                dateKey,
+                caseType,
+                smoothAvgDays: null,
+            });
+            if (value === null || value < vmin) {
                 return plotAesthetics.colors.missing;
             }
-            const data = count === "dodd" ? d.covidData.day_over_day_diffs : d.covidData;
-            const index = d.covidData.date[dateKey];
-            if (typeof index === "undefined") {
-                return plotAesthetics.colors.missing;
-            }
-            const value = data[caseType][index];
-            if (value < vmin) {
+            if (value === 0) {
                 return plotAesthetics.colors.zero;
-            }
-            if (count === "dodd") {
-                console.log(data, index, caseType, value);
             }
             return plotAesthetics.colors.scale(colorScale(value));
         })
@@ -206,33 +232,7 @@ const tooltip = d3
     .selectAll()
     .data([{ dateKey: null, location: null, countStr: null }])
     .join("div")
-    .attr("id", "tooltip");
-// https://bl.ocks.org/mthh/8f97dda227d21163773b0a714a573856
-function dispatchMouseToMap(event, type) {
-    const { pageX, pageY, clientX, clientY } = event;
-    const elems = document.elementsFromPoint(pageX, pageY);
-    const elem = elems.find(e => d3.select(e).classed("state-boundary"));
-    if (elem) {
-        d3.select(elem).each((d) => mouseActions.mouseover(d));
-        const new_click_event = new MouseEvent(type, {
-            pageX: pageX,
-            pageY: pageY,
-            clientX: clientX,
-            clientY: clientY,
-            bubbles: true,
-            cancelable: true,
-            view: window,
-        });
-        elem.dispatchEvent(new_click_event);
-    }
-    else {
-        mouseActions.mouseout();
-        // clearTimeout(t);
-        // t = setTimeout(() => {
-        // 	svg.select(".tooltip").style("display", "none");
-        // }, 5);
-    }
-}
+    .attr("id", "map-tooltip");
 let graphHasBegunZooming = false;
 function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
     const { location, count } = plotGroup.datum();
@@ -308,7 +308,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         plotAesthetics.height[location] -
         plotAesthetics.legend.height[location]) /
         2;
-    const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg[count].date;
+    const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.net.date;
     const firstDay = dateStrParser(minDate);
     const lastDay = dateStrParser(maxDate);
     const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
@@ -403,6 +403,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
                 .attr("text-anchor", "left")
                 .attr("alignment-baseline", "middle");
         });
+        const prefixStr = count === "dodd" ? "New Daily" : "Total";
         let caseTypeStr = caseType;
         let suffixStr = "";
         if (isPerCapita(caseTypeStr)) {
@@ -410,7 +411,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             suffixStr = " Per 100,000 People";
         }
         caseTypeStr = caseTypeStr.replace(/^./, (c) => c.toUpperCase());
-        const titleStr = `Total ${caseTypeStr}${suffixStr}`;
+        const titleStr = `${prefixStr} ${caseTypeStr}${suffixStr}`;
         svg.append("text")
             .attr("x", 20)
             .attr("y", plotAesthetics.title.height)
@@ -429,7 +430,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
     updateMaps({ plotGroup, dateIndex: daysElapsed });
 }
 const plotGroups = d3
-    .select("#content")
+    .select("#map-plots")
     .selectAll()
     .data(SCOPES.map(scope => {
     return scope;
@@ -608,7 +609,7 @@ let PlaybackInfo = /** @class */ (() => {
                 .attr("stop-opacity", 1);
         });
         const canvases = svgs.append("g").classed("main-plot-area", true);
-        const clipPathID = `plot-clip-${scope}`;
+        const clipPathID = `plot-clip-${scope.location}-${scope.count}`;
         defs.append("clipPath")
             .attr("id", clipPathID)
             .append("rect")
