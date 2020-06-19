@@ -16,11 +16,6 @@ if __name__ == "__main__":
 
     if IN_A_TERMINAL:
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--create-data-table",
-            action="store_true",
-            help="Save data used in graphs to a file",
-        )
         graph_group = parser.add_mutually_exclusive_group()
         graph_group.add_argument(
             "--no-graphs", action="store_true", help="Don't create graphs",
@@ -29,36 +24,6 @@ if __name__ == "__main__":
             "--force-graphs",
             action="store_true",
             help="Unconditionally create graphs (even when there's no new data)",
-        )
-
-        timeline_group = parser.add_mutually_exclusive_group()
-        timeline_group.add_argument(
-            "--no-timeline",
-            action="store_true",
-            help="Don't create the video timelines of case progression",
-        )
-        timeline_group.add_argument(
-            "--force-timeline",
-            action="store_true",
-            help=(
-                "Unconditionally create the video timelines of case progression"
-                + " (even when there's no new data)"
-            ),
-        )
-
-        interactive_group = parser.add_mutually_exclusive_group()
-        interactive_group.add_argument(
-            "--no-interactive",
-            action="store_true",
-            help="Don't create the interactive USA timeline",
-        )
-        interactive_group.add_argument(
-            "--force-interactive",
-            action="store_true",
-            help=(
-                "Unconditionally create the USA interactive timeline "
-                + "(even when there's no new data)"
-            ),
         )
 
         data_group = parser.add_mutually_exclusive_group()
@@ -96,6 +61,7 @@ from constants import (  # noqa E402
     Paths,
     Select,
 )
+from data_to_json import data_to_json
 from typing_extensions import Literal  # noqa E402
 
 DATA_TABLE_PATH = Paths.DATA_TABLE
@@ -402,15 +368,6 @@ def is_new_data(df: pd.DataFrame) -> bool:
 
     existing_data = read_data_table(as_text=True)
 
-    # for li, (el, nl) in enumerate(
-    #     zip(existing_data.splitlines(), new_data.splitlines())
-    # ):
-    #     if el != nl:
-    #         print(li)
-    #         print(el)
-    #         print(nl)
-    #         print()
-
     return new_data != existing_data
 
 
@@ -472,27 +429,6 @@ def _do_static_plots(df: pd.DataFrame):
     )
 
 
-def _do_interactive(df: pd.DataFrame, *, make_video: bool):
-    from plot_timeline_interactive import (
-        make_usa_daybyday_diff_interactive_timeline,
-        make_usa_daybyday_total_interactive_timeline,
-        make_countries_daybyday_diff_interactive_timeline,
-        make_countries_daybyday_total_interactive_timeline,
-    )
-
-    video_kwargs = {"should_make_video": make_video}
-
-    states_df = get_usa_states_df(df)
-    make_usa_daybyday_diff_interactive_timeline(states_df, **video_kwargs)
-    make_usa_daybyday_total_interactive_timeline(states_df, **video_kwargs)
-
-    countries_df = get_countries_df(df, include_china=True)
-    make_countries_daybyday_diff_interactive_timeline(countries_df, **video_kwargs)
-    make_countries_daybyday_total_interactive_timeline(countries_df, **video_kwargs)
-
-    print("Created interactive")
-
-
 def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
     """Run everything, optionally performing tasks based on flags in `namespace`
 
@@ -513,13 +449,8 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
     if namespace is None:
         namespace = argparse.Namespace()
         namespace.refresh = False
-        namespace.create_data_table = False
         namespace.no_graphs = False
         namespace.force_graphs = False
-        namespace.no_timeline = False
-        namespace.force_timeline = False
-        namespace.no_interactive = False
-        namespace.force_interactive = False
 
     for k, v in kwargs.items():
         setattr(namespace, k, v)
@@ -532,18 +463,13 @@ def main(namespace: argparse.Namespace = None, **kwargs) -> pd.DataFrame:
         if namespace.force_graphs:
             _do_static_plots(df)
 
-        if namespace.force_interactive:
-            _do_interactive(df, make_video=namespace.force_timeline)
     else:
         print("Got new data")
-        if namespace.create_data_table:
-            save_as_data_table(df)
+        save_as_data_table(df)
+        data_to_json()
 
         if not namespace.no_graphs:
             _do_static_plots(df)
-
-        if not namespace.no_interactive:
-            _do_interactive(df, make_video=not namespace.no_timeline)
 
     return df
 

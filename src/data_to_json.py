@@ -209,7 +209,7 @@ def jsonify(s):
     return s.lower().replace(" ", "_").replace("cap.", "capita")
 
 
-def data_to_json(outfile: Path):
+def _data_to_json(outfile: Path):
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
     for c in df:
         if "per cap." in c.lower():
@@ -316,5 +316,9 @@ def data_to_json(outfile: Path):
     return data
 
 
-data_to_json(outfile=DATA_DIR / "covid_data.json")
-None
+def data_to_json():
+    _data_to_json(outfile=DATA_DIR / "covid_data.json")
+
+
+if __name__ == "__main__":
+    data_to_json()
