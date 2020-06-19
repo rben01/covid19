@@ -258,9 +258,10 @@ def data_to_json(outfile: Path):
         agg_stats: pd.DataFrame = df[[Columns.DATE, *CASE_TYPES]].agg(
             agg_methods
         ).rename(columns=jsonify)
-        data[df_name]["agg"] = agg_stats.to_dict("dict")
+        data[df_name]["agg"] = {}
+        data[df_name]["agg"]["net"] = agg_stats.to_dict("dict")
 
-        data[df_name]["agg"][jsonify(Columns.DATE)]["min_nonzero"] = df.loc[
+        data[df_name]["agg"]["net"][jsonify(Columns.DATE)]["min_nonzero"] = df.loc[
             df[CaseTypes.CONFIRMED] > 0, Columns.DATE
         ].min()
 
@@ -269,7 +270,20 @@ def data_to_json(outfile: Path):
             if int(min_val) == min_val:
                 min_val = int(min_val)
 
-            data[df_name]["agg"][jsonify(ct)]["min_nonzero"] = min_val
+            data[df_name]["agg"]["net"][jsonify(ct)]["min_nonzero"] = min_val
+
+        dodd_diffs = df[CASE_TYPES].diff()
+        for ct in CASE_TYPES:
+            dodd_diffs.loc[dodd_diffs[ct] < 0, ct] = 0
+        data[df_name]["agg"]["dodd"] = (
+            dodd_diffs.agg(agg_methods).rename(columns=jsonify).to_dict("dict")
+        )
+        for ct in CASE_TYPES:
+            min_val = dodd_diffs.loc[dodd_diffs[ct] > 0, ct].min()
+            if int(min_val) == min_val:
+                min_val = int(min_val)
+
+            data[df_name]["agg"]["dodd"][jsonify(ct)]["min_nonzero"] = min_val
 
         data[df_name]["data"] = {}
         d = data[df_name]["data"]

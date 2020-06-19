@@ -1,4 +1,14 @@
-const SCOPES = ["usa", "world"];
+const WORLD_LOCATIONS = ["usa", "world"];
+const COUNT_METHODS = ["dodd", "net"];
+const SCOPES = (() => {
+    const scopes = [];
+    COUNT_METHODS.forEach((count) => {
+        WORLD_LOCATIONS.forEach((location) => {
+            scopes.push({ location, count });
+        });
+    });
+    return scopes;
+})();
 const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze((() => {
     const pa = {
@@ -57,10 +67,29 @@ function getDateNDaysAfter(startDate, n) {
     return dateFormatter(new Date(dateStrParser(startDate).getTime() + n * MS_PER_DAY));
 }
 function assignData({ allCovidData, allGeoData, }) {
-    SCOPES.forEach(key => {
-        const scopedGeoData = allGeoData[key];
+    WORLD_LOCATIONS.forEach(location => {
+        const scopedGeoData = allGeoData[location];
         scopedGeoData.features.forEach(feature => {
-            feature.covidData = allCovidData[key].data[feature.properties.code];
+            const covidData = allCovidData[location].data[feature.properties.code];
+            feature.covidData = covidData;
+            if (typeof covidData === "undefined") {
+                return;
+            }
+            feature.covidData.day_over_day_diffs = (() => {
+                const dodd = {
+                    cases: [],
+                    cases_per_capita: [],
+                    deaths: [],
+                    deaths_per_capita: [],
+                };
+                for (let [caseType, data] of Object.entries(dodd)) {
+                    for (let i = 1; i < Object.keys(covidData.date).length; ++i) {
+                        const diff = covidData[caseType][i] - covidData[caseType][i - 1];
+                        data.push(diff);
+                    }
+                }
+                return dodd;
+            })();
         });
     });
 }
@@ -102,16 +131,17 @@ function updateTooltip({ visibility }) {
 }
 let mouseMoved = false;
 function updateMaps({ plotGroup, dateIndex }) {
+    const { count, scopedCovidData, playbackInfo, } = plotGroup.datum();
     const sliderNode = plotGroup
         .selectAll(".date-slider")
         .property("value", dateIndex)
         .node();
-    const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
+    const minDate = scopedCovidData.agg[count].date.min_nonzero;
     const dateKey = getDateNDaysAfter(minDate, dateIndex);
     const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
     const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
     plotGroup.selectAll(".date-span").text(dateStr);
-    if (!plotGroup.datum().playbackInfo.isPlaying) {
+    if (!playbackInfo.isPlaying) {
         plotGroup.selectAll(".play-button").text("Play");
     }
     tooltip.datum({ ...tooltip.datum(), dateKey });
@@ -150,13 +180,17 @@ function updateMaps({ plotGroup, dateIndex }) {
             if (typeof d.covidData === "undefined") {
                 return plotAesthetics.colors.missing;
             }
+            const data = count === "dodd" ? d.covidData.day_over_day_diffs : d.covidData;
             const index = d.covidData.date[dateKey];
             if (typeof index === "undefined") {
                 return plotAesthetics.colors.missing;
             }
-            const value = d.covidData[caseType][index];
+            const value = data[caseType][index];
             if (value < vmin) {
                 return plotAesthetics.colors.zero;
+            }
+            if (count === "dodd") {
+                console.log(data, index, caseType, value);
             }
             return plotAesthetics.colors.scale(colorScale(value));
         })
@@ -201,24 +235,26 @@ function dispatchMouseToMap(event, type) {
 }
 let graphHasBegunZooming = false;
 function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
-    const scope = plotGroup.datum().scope;
-    const scopedCovidData = allCovidData[scope];
-    const scopedGeoData = allGeoData[scope];
+    const { location, count } = plotGroup.datum();
+    const scopedCovidData = allCovidData[location];
+    const scopedGeoData = allGeoData[location];
     const projectionExtent = [
         [0, 0],
         [
-            plotAesthetics.mapWidth[scope] - plotAesthetics.map.pad,
-            plotAesthetics.mapHeight[scope] - plotAesthetics.map.pad,
+            plotAesthetics.mapWidth[location] - plotAesthetics.map.pad,
+            plotAesthetics.mapHeight[location] - plotAesthetics.map.pad,
         ],
     ];
-    const projection = (scope === "usa" ? d3.geoAlbersUsa() : d3.geoTimes()).fitExtent(projectionExtent, scopedGeoData);
+    const projection = (location === "usa"
+        ? d3.geoAlbersUsa()
+        : d3.geoTimes()).fitExtent(projectionExtent, scopedGeoData);
     const path = d3.geoPath(projection);
     const zoom = d3
         .zoom()
-        .scaleExtent([1, plotAesthetics.map.maxZoom[scope]])
+        .scaleExtent([1, plotAesthetics.map.maxZoom[location]])
         .translateExtent([
         [0, 0],
-        [plotAesthetics.width[scope], plotAesthetics.height[scope]],
+        [plotAesthetics.width[location], plotAesthetics.height[location]],
     ])
         .filter(function () {
         return (d3.event.type !== "dblclick" &&
@@ -267,12 +303,12 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         idleTimeout = null;
     };
     plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
-    const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
+    const legendTransX = plotAesthetics.mapWidth[location] + plotAesthetics.legend.padLeft;
     const legendTransY = (plotAesthetics.title.height +
-        plotAesthetics.height[scope] -
-        plotAesthetics.legend.height[scope]) /
+        plotAesthetics.height[location] -
+        plotAesthetics.legend.height[location]) /
         2;
-    const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.date;
+    const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg[count].date;
     const firstDay = dateStrParser(minDate);
     const lastDay = dateStrParser(maxDate);
     const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
@@ -297,8 +333,8 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .append("rect")
             .attr("x", 0)
             .attr("y", 0)
-            .attr("width", plotAesthetics.mapWidth[scope])
-            .attr("height", plotAesthetics.mapHeight[scope])
+            .attr("width", plotAesthetics.mapWidth[location])
+            .attr("height", plotAesthetics.mapHeight[location])
             .attr("fill-opacity", 0)
             .attr("stroke", "#ccc")
             .attr("stroke-width", 1);
@@ -327,7 +363,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .append("g")
             .attr("transform", `translate(${legendTransX} ${legendTransY})`);
         const { barWidth, height: barHeights } = plotAesthetics.legend;
-        const barHeight = barHeights[scope];
+        const barHeight = barHeights[location];
         legend
             .append("rect")
             .attr("x", 0)
@@ -335,7 +371,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("width", barWidth)
             .attr("height", barHeight)
             .attr("fill", `url(#${plotAesthetics.legend.gradientID})`);
-        const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
+        const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[count][caseType];
         const legendScale = d3
             .scaleLog()
             .nice()
@@ -396,15 +432,15 @@ const plotGroups = d3
     .select("#content")
     .selectAll()
     .data(SCOPES.map(scope => {
-    return { scope };
+    return scope;
 }))
     .join("div")
     .classed("plot-scope-group", true);
 const plotContainers = plotGroups
     .selectAll()
-    .data(function ({ scope }) {
+    .data(function (scope) {
     return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map((caseType) => ({
-        scope,
+        ...scope,
         caseType,
         plotGroup: d3.select(this),
     }));
@@ -414,8 +450,8 @@ const plotContainers = plotGroups
 const svgs = plotContainers
     .append("svg")
     .classed("plot", true)
-    .attr("width", (d) => plotAesthetics.width[d.scope])
-    .attr("height", (d) => plotAesthetics.height[d.scope]);
+    .attr("width", (d) => plotAesthetics.width[d.location])
+    .attr("height", (d) => plotAesthetics.height[d.location]);
 let PlaybackInfo = /** @class */ (() => {
     class PlaybackInfo {
         constructor() {
@@ -485,6 +521,7 @@ let PlaybackInfo = /** @class */ (() => {
         }
         function startPlayback(playbackInfo) {
             playbackInfo.isPlaying = true;
+            const maxDateIndex = parseFloat(sliderNode.max);
             if (sliderNode.value === sliderNode.max) {
                 updateMaps({ plotGroup, dateIndex: 0 });
                 // A number indistinguishable from 0 (except to a computer)
@@ -493,7 +530,6 @@ let PlaybackInfo = /** @class */ (() => {
             function updateDate() {
                 playbackInfo.timerStartDate = new Date();
                 playbackInfo.timerElapsedTimeProptn = 0;
-                const maxDateIndex = parseFloat(sliderNode.max);
                 const dateIndex = parseFloat(sliderNode.value);
                 if (dateIndex < maxDateIndex) {
                     updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
@@ -515,7 +551,7 @@ let PlaybackInfo = /** @class */ (() => {
                 playbackInfo.timer = setInterval(updateDate, playbackInfo.currentIntervalMS);
             }, initialIntervalMS);
         }
-        function onPlaybackButtonClick(playbackInfo) {
+        playButtons.on("click", function (playbackInfo) {
             if (playbackInfo.isPlaying) {
                 haltPlayback(playbackInfo);
                 playButtons.text("Play");
@@ -524,9 +560,6 @@ let PlaybackInfo = /** @class */ (() => {
                 startPlayback(playbackInfo);
                 playButtons.text("Pause");
             }
-        }
-        playButtons.on("click", function (playbackInfo) {
-            onPlaybackButtonClick(playbackInfo);
         });
         const speedButtons = buttonSpans
             .selectAll()
@@ -547,7 +580,6 @@ let PlaybackInfo = /** @class */ (() => {
             speedButtons.each(function (d) {
                 d3.select(this).property("disabled", d.speed === speed);
             });
-            console.log(wasPlaying);
             if (wasPlaying) {
                 startPlayback(playbackInfo);
             }
@@ -556,7 +588,7 @@ let PlaybackInfo = /** @class */ (() => {
 })();
 // Create defs: gradient and clipPath
 (() => {
-    plotGroups.each(function ({ scope }) {
+    plotGroups.each(function (scope) {
         const svgs = d3.select(this).selectAll("svg");
         const defs = svgs.append("defs");
         const verticalLegendGradient = defs
@@ -582,8 +614,8 @@ let PlaybackInfo = /** @class */ (() => {
             .append("rect")
             .attr("x", plotAesthetics.map.originX)
             .attr("y", plotAesthetics.map.originY)
-            .attr("width", plotAesthetics.mapWidth[scope])
-            .attr("height", plotAesthetics.mapHeight[scope]);
+            .attr("width", plotAesthetics.mapWidth[scope.location])
+            .attr("height", plotAesthetics.mapHeight[scope.location]);
         canvases.attr("clip-path", `url(#${clipPathID})`);
     });
 })();

@@ -2,9 +2,26 @@ declare const d3: any;
 
 type DateString = string;
 type CaseType = "cases" | "cases_per_capita" | "deaths" | "deaths_per_capita";
-type Scope = "usa" | "world";
+type WorldLocation = "usa" | "world";
+type CountMethod = "net" | "dodd";
+interface Scope {
+	location: WorldLocation;
+	count: CountMethod;
+}
+// type Scope = { location: "usa"; count: "net" } | { location: "world"; count: "net" };
+type ScopeLocation = string;
 
-const SCOPES = ["usa", "world"];
+const WORLD_LOCATIONS: WorldLocation[] = ["usa", "world"];
+const COUNT_METHODS: CountMethod[] = ["dodd", "net"];
+const SCOPES: Scope[] = (() => {
+	const scopes: Scope[] = [];
+	COUNT_METHODS.forEach((count: CountMethod) => {
+		WORLD_LOCATIONS.forEach((location: WorldLocation) => {
+			scopes.push({ location, count });
+		});
+	});
+	return scopes;
+})();
 
 interface AllGeoData {
 	usa: ScopedGeoData;
@@ -39,31 +56,32 @@ interface Aggregated<T> {
 type AggNumber = Aggregated<number>;
 type AggDate = Aggregated<DateString>;
 
-interface ScopedCovidData {
-	agg: {
-		cases: AggNumber;
-		cases_per_capita: AggNumber;
-		deaths: AggNumber;
-		deaths_per_capita: AggNumber;
-		date: AggDate;
-	};
-	data: {
-		[key: string]: {
-			[key: string]: LocationCovidData;
-		};
-	};
-}
-
-interface LocationCovidData {
-	date: string[];
+interface DataGroup {
 	cases: number[];
 	cases_per_capita: number[];
 	deaths: number[];
 	deaths_per_capita: number[];
 }
 
+interface ScopedCovidData {
+	agg: {
+		[key: string]: DataGroup & {
+			date: AggDate;
+		};
+	};
+	data: {
+		[key: string]: LocationCovidData;
+	};
+}
+
+interface LocationCovidData extends DataGroup {
+	date: { [key: string]: number };
+	day_over_day_diffs: DataGroup;
+}
+
 interface PlotInfo {
-	scope: Scope;
+	location: WorldLocation;
+	count: CountMethod;
 	caseType: CaseType;
 	scopedCovidData?: ScopedCovidData;
 	plotGroup?: any;
@@ -109,7 +127,7 @@ const plotAesthetics = Object.freeze(
 		pa.map.originY = pa.title.height + pa.map.pad;
 
 		pa.mapWidth = {};
-		Object.keys(pa.width).forEach((scope: Scope) => {
+		Object.keys(pa.width).forEach((scope: ScopeLocation) => {
 			pa.mapWidth[scope] =
 				pa.width[scope] -
 				pa.map.originX -
@@ -118,7 +136,7 @@ const plotAesthetics = Object.freeze(
 		});
 
 		pa.mapHeight = {};
-		Object.keys(pa.height).forEach((scope: Scope) => {
+		Object.keys(pa.height).forEach((scope: ScopeLocation) => {
 			pa.mapHeight[scope] = pa.height[scope] - pa.map.originY - pa.map.pad;
 		});
 		return pa;
@@ -143,10 +161,35 @@ function assignData({
 	allCovidData: AllCovidData;
 	allGeoData: AllGeoData;
 }) {
-	SCOPES.forEach(key => {
-		const scopedGeoData: ScopedGeoData = allGeoData[key];
+	WORLD_LOCATIONS.forEach(location => {
+		const scopedGeoData: ScopedGeoData = allGeoData[location];
 		scopedGeoData.features.forEach(feature => {
-			feature.covidData = allCovidData[key].data[feature.properties.code];
+			const covidData: LocationCovidData =
+				allCovidData[location].data[feature.properties.code];
+			feature.covidData = covidData;
+
+			if (typeof covidData === "undefined") {
+				return;
+			}
+
+			feature.covidData.day_over_day_diffs = (() => {
+				const dodd = {
+					cases: [],
+					cases_per_capita: [],
+					deaths: [],
+					deaths_per_capita: [],
+				};
+
+				for (let [caseType, data] of Object.entries(dodd)) {
+					for (let i = 1; i < Object.keys(covidData.date).length; ++i) {
+						const diff =
+							covidData[caseType][i] - covidData[caseType][i - 1];
+						data.push(diff);
+					}
+				}
+
+				return dodd;
+			})();
 		});
 	});
 }
@@ -207,19 +250,29 @@ function updateTooltip({ visibility }: { visibility: Visibility }) {
 let mouseMoved = false;
 
 function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: number }) {
+	const {
+		count,
+		scopedCovidData,
+		playbackInfo,
+	}: {
+		count: CountMethod;
+		scopedCovidData: ScopedCovidData;
+		playbackInfo: PlaybackInfo;
+	} = plotGroup.datum();
+
 	const sliderNode = plotGroup
 		.selectAll(".date-slider")
 		.property("value", dateIndex)
 		.node();
 
-	const minDate = plotGroup.datum().scopedCovidData.agg.date.min_nonzero;
+	const minDate = scopedCovidData.agg[count].date.min_nonzero;
 	const dateKey = getDateNDaysAfter(minDate, dateIndex);
 
 	const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
 	const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
 	plotGroup.selectAll(".date-span").text(dateStr);
 
-	if (!plotGroup.datum().playbackInfo.isPlaying) {
+	if (!playbackInfo.isPlaying) {
 		plotGroup.selectAll(".play-button").text("Play");
 	}
 
@@ -275,14 +328,21 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 					if (typeof d.covidData === "undefined") {
 						return plotAesthetics.colors.missing;
 					}
+
+					const data: DataGroup =
+						count === "dodd" ? d.covidData.day_over_day_diffs : d.covidData;
+
 					const index = d.covidData.date[dateKey];
 					if (typeof index === "undefined") {
 						return plotAesthetics.colors.missing;
 					}
 
-					const value = d.covidData[caseType][index];
+					const value = data[caseType][index];
 					if (value < vmin) {
 						return plotAesthetics.colors.zero;
+					}
+					if (count === "dodd") {
+						console.log(data, index, caseType, value);
 					}
 					return plotAesthetics.colors.scale(colorScale(value));
 				})
@@ -349,30 +409,30 @@ function initializeChoropleth({
 	allCovidData: AllCovidData;
 	allGeoData: AllGeoData;
 }) {
-	const scope = plotGroup.datum().scope;
-	const scopedCovidData: ScopedCovidData = allCovidData[scope];
-	const scopedGeoData: ScopedGeoData = allGeoData[scope];
+	const { location, count } = plotGroup.datum();
+	const scopedCovidData: ScopedCovidData = allCovidData[location];
+	const scopedGeoData: ScopedGeoData = allGeoData[location];
 
 	const projectionExtent = [
 		[0, 0],
 		[
-			plotAesthetics.mapWidth[scope] - plotAesthetics.map.pad,
-			plotAesthetics.mapHeight[scope] - plotAesthetics.map.pad,
+			plotAesthetics.mapWidth[location] - plotAesthetics.map.pad,
+			plotAesthetics.mapHeight[location] - plotAesthetics.map.pad,
 		],
 	];
-	const projection = (scope === "usa" ? d3.geoAlbersUsa() : d3.geoTimes()).fitExtent(
-		projectionExtent,
-		scopedGeoData,
-	);
+	const projection = (location === "usa"
+		? d3.geoAlbersUsa()
+		: d3.geoTimes()
+	).fitExtent(projectionExtent, scopedGeoData);
 
 	const path = d3.geoPath(projection);
 
 	const zoom = d3
 		.zoom()
-		.scaleExtent([1, plotAesthetics.map.maxZoom[scope]])
+		.scaleExtent([1, plotAesthetics.map.maxZoom[location]])
 		.translateExtent([
 			[0, 0],
-			[plotAesthetics.width[scope], plotAesthetics.height[scope]],
+			[plotAesthetics.width[location], plotAesthetics.height[location]],
 		])
 		.filter(function () {
 			return (
@@ -430,13 +490,14 @@ function initializeChoropleth({
 
 	plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
 
-	const legendTransX = plotAesthetics.mapWidth[scope] + plotAesthetics.legend.padLeft;
+	const legendTransX =
+		plotAesthetics.mapWidth[location] + plotAesthetics.legend.padLeft;
 	const legendTransY =
 		(plotAesthetics.title.height +
-			plotAesthetics.height[scope] -
-			plotAesthetics.legend.height[scope]) /
+			plotAesthetics.height[location] -
+			plotAesthetics.legend.height[location]) /
 		2;
-	const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg.date;
+	const { min_nonzero: minDate, max: maxDate } = scopedCovidData.agg[count].date;
 	const firstDay = dateStrParser(minDate);
 	const lastDay = dateStrParser(maxDate);
 	const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
@@ -467,8 +528,8 @@ function initializeChoropleth({
 			.append("rect")
 			.attr("x", 0)
 			.attr("y", 0)
-			.attr("width", plotAesthetics.mapWidth[scope])
-			.attr("height", plotAesthetics.mapHeight[scope])
+			.attr("width", plotAesthetics.mapWidth[location])
+			.attr("height", plotAesthetics.mapHeight[location])
 			.attr("fill-opacity", 0)
 			.attr("stroke", "#ccc")
 			.attr("stroke-width", 1);
@@ -503,7 +564,7 @@ function initializeChoropleth({
 			.attr("transform", `translate(${legendTransX} ${legendTransY})`);
 
 		const { barWidth, height: barHeights } = plotAesthetics.legend;
-		const barHeight = barHeights[scope];
+		const barHeight = barHeights[location];
 		legend
 			.append("rect")
 			.attr("x", 0)
@@ -512,7 +573,7 @@ function initializeChoropleth({
 			.attr("height", barHeight)
 			.attr("fill", `url(#${plotAesthetics.legend.gradientID})`);
 
-		const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[caseType];
+		const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[count][caseType];
 		const legendScale = d3
 			.scaleLog()
 			.nice()
@@ -581,7 +642,7 @@ const plotGroups = d3
 	.selectAll()
 	.data(
 		SCOPES.map(scope => {
-			return { scope };
+			return scope;
 		}),
 	)
 	.join("div")
@@ -589,10 +650,10 @@ const plotGroups = d3
 
 const plotContainers = plotGroups
 	.selectAll()
-	.data(function ({ scope }: { scope: Scope }) {
+	.data(function (scope: Scope) {
 		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
 			(caseType: CaseType) => ({
-				scope,
+				...scope,
 				caseType,
 				plotGroup: d3.select(this),
 			}),
@@ -604,8 +665,8 @@ const plotContainers = plotGroups
 const svgs = plotContainers
 	.append("svg")
 	.classed("plot", true)
-	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.scope])
-	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.scope]);
+	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.location])
+	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.location]);
 
 class PlaybackInfo {
 	static speeds = [0.25, 0.5, 1, 2, 4];
@@ -690,6 +751,8 @@ class PlaybackInfo {
 		function startPlayback(playbackInfo: PlaybackInfo) {
 			playbackInfo.isPlaying = true;
 
+			const maxDateIndex = parseFloat(sliderNode.max);
+
 			if (sliderNode.value === sliderNode.max) {
 				updateMaps({ plotGroup, dateIndex: 0 });
 				// A number indistinguishable from 0 (except to a computer)
@@ -700,7 +763,6 @@ class PlaybackInfo {
 				playbackInfo.timerStartDate = new Date();
 				playbackInfo.timerElapsedTimeProptn = 0;
 
-				const maxDateIndex = parseFloat(sliderNode.max);
 				const dateIndex = parseFloat(sliderNode.value);
 				if (dateIndex < maxDateIndex) {
 					updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
@@ -715,13 +777,13 @@ class PlaybackInfo {
 			}
 
 			playbackInfo.timerStartDate = new Date();
-
 			const timeRemainingProptn = 1 - playbackInfo.timerElapsedTimeProptn;
 
 			const initialIntervalMS =
 				timeRemainingProptn === 1
 					? 0
 					: timeRemainingProptn * playbackInfo.currentIntervalMS;
+
 			playbackInfo.timer = setTimeout(() => {
 				updateDate();
 				playbackInfo.timer = setInterval(
@@ -731,7 +793,7 @@ class PlaybackInfo {
 			}, initialIntervalMS);
 		}
 
-		function onPlaybackButtonClick(playbackInfo: PlaybackInfo) {
+		playButtons.on("click", function (playbackInfo: PlaybackInfo) {
 			if (playbackInfo.isPlaying) {
 				haltPlayback(playbackInfo);
 				playButtons.text("Play");
@@ -739,11 +801,8 @@ class PlaybackInfo {
 				startPlayback(playbackInfo);
 				playButtons.text("Pause");
 			}
-		}
-
-		playButtons.on("click", function (playbackInfo: PlaybackInfo) {
-			onPlaybackButtonClick(playbackInfo);
 		});
+
 		const speedButtons = buttonSpans
 			.selectAll()
 			.data(() =>
@@ -778,7 +837,6 @@ class PlaybackInfo {
 			speedButtons.each(function (d: any) {
 				d3.select(this).property("disabled", d.speed === speed);
 			});
-			console.log(wasPlaying);
 			if (wasPlaying) {
 				startPlayback(playbackInfo);
 			}
@@ -788,7 +846,7 @@ class PlaybackInfo {
 
 // Create defs: gradient and clipPath
 (() => {
-	plotGroups.each(function ({ scope }: { scope: Scope }) {
+	plotGroups.each(function (scope: Scope) {
 		const svgs = d3.select(this).selectAll("svg");
 		const defs = svgs.append("defs");
 		const verticalLegendGradient = defs
@@ -816,8 +874,8 @@ class PlaybackInfo {
 			.append("rect")
 			.attr("x", plotAesthetics.map.originX)
 			.attr("y", plotAesthetics.map.originY)
-			.attr("width", plotAesthetics.mapWidth[scope])
-			.attr("height", plotAesthetics.mapHeight[scope]);
+			.attr("width", plotAesthetics.mapWidth[scope.location])
+			.attr("height", plotAesthetics.mapHeight[scope.location]);
 		canvases.attr("clip-path", `url(#${clipPathID})`);
 	});
 })();
