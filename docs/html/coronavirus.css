@@ -17,6 +17,10 @@ body {
 	padding: 2px;
 }
 
+div.plot-scope-group {
+	display: inline-block;
+}
+
 div.plot-container {
 	display: inline-block;
 	padding: 1em;
