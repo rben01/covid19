@@ -2561,131 +2561,80 @@ video {
 
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
-<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
-
-<script src="usa_states_diff_interactive_autoload.js"></script>
-<script src="usa_states_total_interactive_autoload.js"></script>
-
-<!--
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"
-  integrity="sha384-JpP8FXbgAZLkfur7LiK3j9AGBhHNIvF742meBJrjO2ShJDhCG2I1uVvW+0DUtrmc"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"
-  integrity="sha384-xZlADit0Q04ISQEdKg2k3L4W9AwQBAuDs9nJL9fM/WwzL1tEU9VPNezOFX0nLEAz"></script> -->
-
-<script>
-  function setPlaybackSpeed(player_id, speed) {
-    const vdiv = document.getElementById(player_id)
-    const video = vdiv.getElementsByClassName("content")[0].getElementsByTagName("video")[0]
-    video.playbackRate = speed
-  }
-</script>
+<meta charset="UTF-8" />
+<script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+<script
+	type="text/javascript"
+	src="https://d3js.org/d3-geo-projection.v2.min.js"
+></script>
+<link rel="stylesheet" type="text/css" href="./html/coronavirus.css" />
+<link
+	rel="stylesheet"
+	type="text/css"
+	href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+/>
+<link
+	rel="stylesheet"
+	type="text/css"
+	href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css"
+/>
 
 <style>
-  .admonitionblock td.icon [class^="fa icon-"] {
-    font-size: 2.25em;
-  }
+	.admonitionblock td.icon [class^="fa icon-"] {
+		font-size: 2.25em;
+	}
 
-  .admonitionblock .fa.icon-tip::before {
-    color: rgb(73, 72, 70) !important;
-  }
+	.admonitionblock .fa.icon-tip::before {
+		color: rgb(73, 72, 70) !important;
+	}
 
-  body {
-    font-family: "Noto Sans", sans-serif !important;
-  }
+	body {
+		font-family: "Noto Sans", sans-serif !important;
+	}
 
-  .table-bullet {
-    display: inline-block;
-    transform: translateY(5px);
-  }
+	.table-bullet {
+		display: inline-block;
+		transform: translateY(5px);
+	}
 
-  div.ulist.compact li p {
-    margin-bottom: .13em;
-    padding-bottom: 0px;
-  }
+	div.ulist.compact li p {
+		margin-bottom: 0.13em;
+		padding-bottom: 0px;
+	}
 
-  br {
-    content: "";
-    margin: 1em;
-    display: block;
-    font-size: 20%;
-  }
+	br {
+		content: "";
+		margin: 1em;
+		display: block;
+		font-size: 20%;
+	}
 
-  a {
-    text-decoration: none;
-  }
+	a {
+		text-decoration: none;
+	}
 
-  a:hover {
-    cursor: auto;
-    text-decoration: underline;
-  }
+	a:hover {
+		cursor: auto;
+		text-decoration: underline;
+	}
 
-  #toc a:hover {
-    text-decoration: underline;
-  }
+	#toc a:hover {
+		text-decoration: underline;
+	}
 
-  a.no-underline:hover {
-    text-decoration: none;
-  }
+	a.no-underline:hover {
+		text-decoration: none;
+	}
 
-  a.prominent-link:hover {
-    color: #3e6cb1 !important;
-    text-decoration: underline;
-  }
+	a.prominent-link:hover {
+		color: #3e6cb1 !important;
+		text-decoration: underline;
+	}
 
-  a.no-underline:hover+a.prominent-link {
-    color: #3e6cb1 !important;
-    text-decoration: underline;
-  }
-
-  @media screen and (max-width: 4in) {
-    .bk-root {
-      display: none;
-    }
-
-    .insufficient-width-warning {
-      display: inherit;
-    }
-  }
-
-  @media screen and (min-width: 4.0000000001in) {
-    .bk-root {
-      display: inherit;
-    }
-
-    .insufficient-width-warning {
-      display: none;
-    }
-
-  }
-
-  .mobile-vertical-spacer {
-    height: 1in;
-  }
-
-  /*
-  .interactive-graph-container {
-    max-width: 90%;
-  }
-  */
-
-  @media screen and (max-width: 4in) {
-    .mobile-vertical-spacer {
-      display: none;
-    }
-  }
-
-  @media screen and (min-width: 4.0000000001in) and (max-width: 6in) {
-    .mobile-vertical-spacer {
-      display: inherit;
-    }
-  }
-
-  @media screen and (min-width: 6.0000000001in) {
-    .mobile-vertical-spacer {
-      display: none;
-    }
-  }
+	a.no-underline:hover + a.prominent-link {
+		color: #3e6cb1 !important;
+		text-decoration: underline;
+	}
 </style>
 </head>
 <body class="article toc2 toc-left">
@@ -2707,22 +2656,12 @@ video {
 </li>
 <li><a href="#sect-graphs">📊 Graphs</a>
 <ul class="sectlevel2">
-<li><a href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a>
-<ul class="sectlevel3">
-<li><a href="#timeline-interactive-world">🌍 World</a>
-<ul class="sectlevel4">
-<li><a href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></li>
-<li><a href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></li>
+<li><a href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></li>
+<li><a href="#_interactive_plots">Interactive Plots</a></li>
 </ul>
 </li>
-<li><a href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a>
-<ul class="sectlevel4">
-<li><a href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></li>
-<li><a href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a href="#_graphs">Graphs</a>
+<ul class="sectlevel2">
 <li><a href="#graphs-line">📈 Line Charts</a>
 <ul class="sectlevel3">
 <li><a href="#sect-reading-graphs">📖 Reading the Line Charts</a></li>
@@ -2935,125 +2874,25 @@ Regions that are light gray on a given day had no cases/deaths that day.
 Otherwise, the colors are logarithmically scaled.
 Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8.
 Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.<br>
-Each grid-plot has tools in the top right to pan, zoom, and reset the view.
+On desktop, zoom by holding the control key and scrolling over the graph.
+Once you&#8217;ve zoomed in, you can drag to pan.
+Reset the view by double-clicking on the graph.
+On mobile, use two fingers to zoom and pan.
 Along the bottoms are tools to control playback.
 In a given grid-plot, the date slider can be dragged to view a specific date.
 Hovering your cursor over a region will show its data for the selected date.
 In addition, the play/pause button will step through date by date until it reaches the end.</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>The interactive timelines take quite a while to load.
-If your device is small or not well suited for interactivity, you may not see anything below; try rotating your device or visiting this site on a larger device.
-If you think your device is big enough and nothing is loading below, try refreshing the page.
-You can also view these timelines as non-interactive videos here:<br>
-<a href="./figures/Geo/BokehInteractiveStatic/countries_total_interactive.mp4">1. World/Cumulative</a>, <a href="./figures/Geo/BokehInteractiveStatic/countries_diff_interactive.mp4">2. World/Daily Differences</a>, <a href="./figures/Geo/BokehInteractiveStatic/usa_states_total_interactive.mp4">3. USA/Cumulative</a>, <a href="./figures/Geo/BokehInteractiveStatic/usa_states_diff_interactive.mp4">4. USA/Daily Differences</a>.</p>
 </div>
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="timeline-interactive-world"><a class="link" href="#timeline-interactive-world">🌍 World</a></h4>
-<div class="sect4">
-<h5 id="timeline-interactive-world-cummulative"><a class="link" href="#timeline-interactive-world-cummulative">↗️ Cumulative</a></h5>
-<div class="admonitionblock important insufficient-width-warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class='interactive-graph-container'>
-
-<script src="countries_total_interactive_autoload.js?uuid=5bc2e591-3851-4f33-bc90-d5a3d583dacd" id="5bc2e591-3851-4f33-bc90-d5a3d583dacd"></script>
-<div class="mobile-vertical-spacer"></div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="timeline-interactive-world-dod-diff"><a class="link" href="#timeline-interactive-world-dod-diff">↪️ Increase per Day</a></h5>
-<div class="admonitionblock important insufficient-width-warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class='interactive-graph-container'>
-
-<script src="countries_diff_interactive_autoload.js?uuid=1edbdc22-4fb1-4bfa-95ef-2fccf8fa872e" id="1edbdc22-4fb1-4bfa-95ef-2fccf8fa872e"></script>
-<div class="mobile-vertical-spacer"></div>
+<div class="sect2">
+<h3 id="_interactive_plots"><a class="link" href="#_interactive_plots">Interactive Plots</a></h3>
+<div id="map-plots"></div>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="timeline-interactive-usa-states"><a class="link" href="#timeline-interactive-usa-states">🇺🇸 U.S. States</a></h4>
-<div class="sect4">
-<h5 id="timeline-interactive-usa-states-cummulative"><a class="link" href="#timeline-interactive-usa-states-cummulative">↗️ Cumulative</a></h5>
-<div class="admonitionblock important insufficient-width-warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class='interactive-graph-container'>
-
-<script src="usa_states_total_interactive_autoload.js?uuid=688c294d-ba19-48ee-a8ab-015dc5016238" id="688c294d-ba19-48ee-a8ab-015dc5016238"></script>
-<div class="mobile-vertical-spacer"></div>
-</div>
-</div>
-<div class="sect4">
-<h5 id="timeline-interactive-usa-states-dod-diff"><a class="link" href="#timeline-interactive-usa-states-dod-diff">↪️ Increase per Day</a></h5>
-<div class="admonitionblock important insufficient-width-warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Your device is not wide enough to display this content. Try rotating your device or viewing this site on a larger device.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class='interactive-graph-container'>
-
-<script src="usa_states_diff_interactive_autoload.js?uuid=8e97b7f4-36d1-4bcc-a301-23b20b7e3fcf" id="8e97b7f4-36d1-4bcc-a301-23b20b7e3fcf"></script>
-<div class="mobile-vertical-spacer"></div>
-</div>
-</div>
-</div>
-</div>
+<div class="sect1">
+<h2 id="_graphs"><a class="link" href="#_graphs">Graphs</a></h2>
+<div class="sectionbody">
 <div class="sect2">
 <h3 id="graphs-line"><a class="link" href="#graphs-line">📈 Line Charts</a></h3>
 <div class="sect3">
@@ -3062,7 +2901,7 @@ You can also view these timelines as non-interactive videos here:<br>
 <dl>
 <dt class="hdlist1"><a id="date-explanation-note"></a><span class="icon"><i class="fa fa-calendar-alt fa-fw"></i></span> Interpreting the Dates on the X-Axis</dt>
 <dd>
-<p>The dates on the graphs' x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
+<p>The dates on the graphs&#8217; x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
 For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
 On the last day, there will be less than 24 hours of collected data, so the vertical line over <code>today</code> at <code>current time</code> represents the data collected from midnight (this morning) to now.</p>
 </dd>
@@ -3189,8 +3028,9 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-15 12:58:37 -0400
+Last updated 2020-06-18 23:32:03 -0400
 </div>
 </div>
+<script type="text/javascript" src="./html/built/plots.js"></script>
 </body>
 </html>

@@ -94,6 +94,7 @@ class Paths:
 
     ROOT_PARENT: Path = ROOT.parent
     DATA: Path = ROOT / "data"
+    DATA_TABLE: Path = DATA / "data_table.csv"
     DOCS: Path = ROOT / "docs"
     FIGURES: Path = DOCS / "figures"
 

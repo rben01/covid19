@@ -98,7 +98,7 @@ from constants import (  # noqa E402
 )
 from typing_extensions import Literal  # noqa E402
 
-DATA_TABLE_PATH = Paths.DATA / "data_table.csv"
+DATA_TABLE_PATH = Paths.DATA_TABLE
 
 
 def _get_data(*, from_web: bool) -> pd.DataFrame:
