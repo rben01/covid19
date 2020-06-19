@@ -373,12 +373,12 @@ function updateMaps({ plotGroup, dateIndex }: { plotGroup: any; dateIndex: numbe
 						smoothAvgDays: null,
 					});
 
-					if (value === null || value < vmin) {
-						return plotAesthetics.colors.missing;
-					}
-
 					if (value === 0) {
 						return plotAesthetics.colors.zero;
+					}
+
+					if (value === null || value < vmin) {
+						return plotAesthetics.colors.missing;
 					}
 
 					return plotAesthetics.colors.scale(colorScale(value));
@@ -466,7 +466,7 @@ function initializeChoropleth({
 			const mapContainer = this;
 			// Apply zoom to other map containers in plotGroup, making sure not to let them try to zoom this map container again! (else an infinite loop will occur)
 			if (!graphHasBegunZooming) {
-				// Holy race condition Batman (JS is single threaded so it's fine; graphHasBegunZooming = false can't run before all the other zooms have been applied)
+				// Holy race condition Batman (each and zoom are synchronous so it's fine)
 				graphHasBegunZooming = true;
 				plotGroup
 					.selectAll(".map-container")
@@ -479,20 +479,6 @@ function initializeChoropleth({
 				graphHasBegunZooming = false;
 			}
 
-			// const mapContainer = this;
-			// plotGroup.selectAll(".map").each(function () {
-			// 	console.log(this, d3.event.sourceEvent);
-			// 	if (d3.event.sourceEvent.target == this) {
-			// 		d3.select(this).call(zoom.transform, transform);
-			// 	} else {
-			// 		d3.select(mapContainer)
-			// 			.selectAll(".map")
-			// 			.attr("transform", transform);
-			// 	}
-			// });
-
-			// plotGroup.selectAll(".map").attr("transform", transform);
-			// 	.each(function () {});
 			plotGroup
 				.selectAll(".state-boundary")
 				.attr("stroke-width", plotAesthetics.map.borderWidth / transform.k);
