@@ -254,8 +254,6 @@ On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
 Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.
 
-==== Plots
-
 ++++
 <div id="map-plots"></div>
 ++++

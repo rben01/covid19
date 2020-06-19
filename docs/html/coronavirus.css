@@ -48,15 +48,19 @@ span.button-container {
 
 .play-button {
 	width: 8.2em;
-	height: 2.5em;
+	height: 2em;
 	margin-right: 20px;
+	text-align: center;
+	vertical-align: middle;
+	padding: 8px 10px;
 }
 
 .speed-button {
 	text-align: center;
-	padding: 10px auto;
+	vertical-align: top;
+	padding: 8px 4px 10px;
 	margin: 0px;
-	height: 2.5em;
+	height: 2em;
 }
 
 input[type="range"] {
