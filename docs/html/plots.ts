@@ -346,7 +346,7 @@ function updateMaps({
 
 	plotGroup
 		.selectAll(".smooth-avg-text")
-		.text(`Smoothed avg: ${smoothAvgDays} day${smoothAvgDays > 1 ? "s" : ""}`);
+		.text(`Moving avg: ${smoothAvgDays} day${smoothAvgDays > 1 ? "s" : ""}`);
 
 	if (!playbackInfo.isPlaying) {
 		plotGroup.selectAll(".play-button").text("Play");
