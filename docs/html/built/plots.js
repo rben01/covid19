@@ -125,11 +125,11 @@ function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
         for (let i = index; i > index - smoothAvgDays; --i) {
             const x = data[caseType][i];
             sum += x;
-            // if (feature.properties.code === "NY") {
-            // 	console.log(dateKey, i, sum, x);
-            // }
         }
         value = sum / smoothAvgDays;
+        if (isNaN(value)) {
+            return null;
+        }
     }
     else {
         value = data[caseType][index];
@@ -137,7 +137,7 @@ function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
     return value;
 }
 function updateTooltip({ visibility }) {
-    const { feature, count, dateKey, caseType } = tooltip.datum();
+    const { feature, count, dateKey, caseType, smoothAvgDays } = tooltip.datum();
     if (typeof feature === "undefined") {
         return;
     }
@@ -148,7 +148,7 @@ function updateTooltip({ visibility }) {
         count,
         dateKey,
         caseType,
-        smoothAvgDays: null,
+        smoothAvgDays,
     });
     const formatter = getFormatter(caseType);
     const countStr = value === null ? "~No data~" : formatter(value);
@@ -158,21 +158,36 @@ function updateTooltip({ visibility }) {
     }
 }
 let mouseMoved = false;
-function updateMaps({ plotGroup, dateIndex }) {
+function updateMaps({ plotGroup, dateIndex, smoothAvgDays, }) {
     const { count, scopedCovidData, playbackInfo, } = plotGroup.datum();
-    const sliderNode = plotGroup
+    if (typeof dateIndex === "undefined" || dateIndex === null) {
+        dateIndex = plotGroup.selectAll(".date-slider").node().value;
+    }
+    if (count === "dodd" &&
+        (typeof smoothAvgDays === "undefined" || smoothAvgDays === null)) {
+        smoothAvgDays = plotGroup.selectAll(".smooth-avg-slider").node().value;
+    }
+    smoothAvgDays = +smoothAvgDays;
+    const dateSliderNode = plotGroup
         .selectAll(".date-slider")
         .property("value", dateIndex)
+        .node();
+    const smoothAvgSliderNode = plotGroup
+        .selectAll(".smooth-avg-slider")
+        .property("value", smoothAvgDays)
         .node();
     const minDate = scopedCovidData.agg.net.date.min_nonzero;
     const dateKey = getDateNDaysAfter(minDate, dateIndex);
     const trueDate = getDateNDaysAfter(minDate, dateIndex - 1);
     const dateStr = d3.timeFormat("%b %e, %Y")(dateStrParser(trueDate));
     plotGroup.selectAll(".date-span").text(dateStr);
+    plotGroup
+        .selectAll(".smooth-avg-text")
+        .text(`Smoothed avg: ${smoothAvgDays} day${smoothAvgDays > 1 ? "s" : ""}`);
     if (!playbackInfo.isPlaying) {
         plotGroup.selectAll(".play-button").text("Play");
     }
-    tooltip.datum({ ...tooltip.datum(), dateKey });
+    tooltip.datum({ ...tooltip.datum(), dateKey, smoothAvgDays });
     updateTooltip({ visibility: "nochange" });
     plotGroup
         .selectAll(".plot-container")
@@ -182,15 +197,22 @@ function updateMaps({ plotGroup, dateIndex }) {
         const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
         const svg = plotContainer.selectAll("svg").selectAll(".map");
         mouseActions.mouseover = (d) => {
-            tooltip.datum({ ...tooltip.datum(), feature: d, caseType, count });
+            tooltip.datum({
+                ...tooltip.datum(),
+                feature: d,
+                caseType,
+                count,
+                smoothAvgDays,
+            });
             updateTooltip({ visibility: "visible" });
         };
         mouseActions.mousemove = () => {
             if (!mouseMoved) {
-                const dateIndex = +sliderNode.value;
+                const dateIndex = +dateSliderNode.value;
                 tooltip.datum({
                     ...tooltip.datum(),
                     dateKey: getDateNDaysAfter(minDate, dateIndex),
+                    smoothAvgDays,
                 });
                 updateTooltip({ visibility: "visible" });
             }
@@ -210,7 +232,7 @@ function updateMaps({ plotGroup, dateIndex }) {
                 count,
                 dateKey,
                 caseType,
-                smoothAvgDays: null,
+                smoothAvgDays,
             });
             if (value === 0) {
                 return plotAesthetics.colors.zero;
@@ -414,7 +436,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             this.step = 1;
         });
     });
-    updateMaps({ plotGroup, dateIndex: daysElapsed });
+    updateMaps({ plotGroup, dateIndex: daysElapsed, smoothAvgDays: null });
 }
 const plotGroups = d3
     .select("#map-plots")
@@ -459,18 +481,23 @@ let PlaybackInfo = /** @class */ (() => {
 })();
 // Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-    plotGroups.each(function () {
+    plotGroups.each(function ({ count }) {
         const plotGroup = d3.select(this);
-        const sliderRows = plotGroup
-            .selectAll(".plot-container")
+        const plotContainers = plotGroup.selectAll(".plot-container");
+        const dateSliderRows = plotContainers
             .append("div")
+            .classed("input-row", true)
             .append("span");
-        sliderRows.append("span").classed("date-span", true);
-        sliderRows
+        dateSliderRows
+            .append("span")
+            .classed("date-span", true)
+            .classed("slider-text", true);
+        dateSliderRows
             .selectAll()
             .data(() => [{ plotGroup }])
             .join("input")
             .classed("date-slider", true)
+            .classed("input-slider", true)
             .attr("type", "range")
             // Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
             .attr("min", 0)
@@ -478,8 +505,39 @@ let PlaybackInfo = /** @class */ (() => {
             .property("value", 1)
             .on("input", function (d) {
             const dateIndex = +this.value;
-            updateMaps({ plotGroup: d.plotGroup, dateIndex });
+            updateMaps({ plotGroup: d.plotGroup, dateIndex, smoothAvgDays: null });
         });
+        if (count === "dodd") {
+            const smoothAvgSliderRows = plotContainers
+                .append("div")
+                .classed("input-row", true)
+                .append("span");
+            smoothAvgSliderRows
+                .append("span")
+                .classed("smooth-avg-text", true)
+                .classed("slider-text", true);
+            smoothAvgSliderRows
+                .selectAll()
+                .data(() => [{ plotGroup }])
+                .join("input")
+                .classed("smooth-avg-slider", true)
+                .classed("input-slider", true)
+                .attr("type", "range")
+                .attr("min", 1)
+                .attr("max", 7)
+                .property("value", 1)
+                .on("input", function (d) {
+                const smoothAvgDays = +this.value;
+                console.log(d);
+                updateMaps({
+                    plotGroup: d.plotGroup,
+                    dateIndex: null,
+                    smoothAvgDays,
+                });
+            });
+            console.log(smoothAvgSliderRows.data());
+            console.log(dateSliderRows.data());
+        }
         const playbackInfo = new PlaybackInfo();
         plotGroup.datum({ ...plotGroup.datum(), playbackInfo });
         const buttonsRows = plotGroup
@@ -497,8 +555,8 @@ let PlaybackInfo = /** @class */ (() => {
             .join("button")
             .classed("play-button", true)
             .text("Play");
-        const sliders = plotGroup.selectAll(".date-slider");
-        const sliderNode = sliders.node();
+        const dateSliders = plotGroup.selectAll(".date-slider");
+        const dateSliderNode = dateSliders.node();
         function haltPlayback(playbackInfo) {
             playbackInfo.isPlaying = false;
             clearInterval(playbackInfo.timer);
@@ -509,18 +567,22 @@ let PlaybackInfo = /** @class */ (() => {
         }
         function startPlayback(playbackInfo) {
             playbackInfo.isPlaying = true;
-            const maxDateIndex = parseFloat(sliderNode.max);
-            if (sliderNode.value === sliderNode.max) {
-                updateMaps({ plotGroup, dateIndex: 0 });
+            const maxDateIndex = parseFloat(dateSliderNode.max);
+            if (dateSliderNode.value === dateSliderNode.max) {
+                updateMaps({ plotGroup, dateIndex: 0, smoothAvgDays: null });
                 // A number indistinguishable from 0 (except to a computer)
                 playbackInfo.timerElapsedTimeProptn = 0.0000001;
             }
             function updateDate() {
                 playbackInfo.timerStartDate = new Date();
                 playbackInfo.timerElapsedTimeProptn = 0;
-                const dateIndex = parseFloat(sliderNode.value);
+                const dateIndex = parseFloat(dateSliderNode.value);
                 if (dateIndex < maxDateIndex) {
-                    updateMaps({ plotGroup, dateIndex: dateIndex + 1 });
+                    updateMaps({
+                        plotGroup,
+                        dateIndex: dateIndex + 1,
+                        smoothAvgDays: null,
+                    });
                 }
                 // If it's the last date, end the timer (don't wait for the date to be one past the end; just end it when it hits the end)
                 if (dateIndex >= maxDateIndex - 1) {
