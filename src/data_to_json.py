@@ -278,8 +278,14 @@ def _data_to_json(outfile: Path):
         data[df_name]["agg"]["dodd"] = (
             dodd_diffs.agg(agg_methods).rename(columns=jsonify).to_dict("dict")
         )
+
+        max_moving_avg_days = 7
         for ct in CASE_TYPES:
-            min_val = dodd_diffs.loc[dodd_diffs[ct] > 0, ct].min()
+            min_nonzero = dodd_diffs.loc[dodd_diffs[ct] > 0, ct].min()
+            moving_avg = dodd_diffs.rolling(max_moving_avg_days).mean()
+            min_val = moving_avg.loc[
+                moving_avg[ct] > min_nonzero / max_moving_avg_days, ct
+            ].min()
             if int(min_val) == min_val:
                 min_val = int(min_val)
 

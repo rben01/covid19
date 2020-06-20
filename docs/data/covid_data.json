@@ -32,22 +32,22 @@
 "cases": {
 "min": 0.0,
 "max": 11571.0,
-"min_nonzero": 1
+"min_nonzero": 0.2857142857142857
 },
 "cases_per_capita": {
 "min": 0.0,
 "max": 63.52924743505923,
-"min_nonzero": 0.0034487657057220844
+"min_nonzero": 0.0018760229836179683
 },
 "deaths": {
 "min": 0.0,
 "max": 951.0,
-"min_nonzero": 1
+"min_nonzero": 0.2857142857142857
 },
 "deaths_per_capita": {
 "min": 0.0,
 "max": 6.871817051474398,
-"min_nonzero": 0.002530862411866827
+"min_nonzero": 0.0004926808151037963
 }
 }
 },
@@ -27809,22 +27809,22 @@
 "cases": {
 "min": 0.0,
 "max": 57905.0,
-"min_nonzero": 1
+"min_nonzero": 0.2857142857142857
 },
 "cases_per_capita": {
 "min": 0.0,
 "max": 189.34731255458678,
-"min_nonzero": 7.132957413080732e-05
+"min_nonzero": 6.930116865211063e-05
 },
 "deaths": {
 "min": 0.0,
 "max": 4421.0,
-"min_nonzero": 1
+"min_nonzero": 0.2857142857142857
 },
 "deaths_per_capita": {
 "min": 0.0,
 "max": 17.870971585155168,
-"min_nonzero": 7.132957413163998e-05
+"min_nonzero": 1.0189939162233827e-05
 }
 }
 },
