@@ -346,7 +346,7 @@ def data_to_json():
         existing_data_file_name is not None
         and existing_data_file_name != new_data_file_name
     ):
-        print("Deleting", existing_data_file_name, "covid_data-{digest}.json")
+        print("Deleting", existing_data_file_name, "replacing with", new_data_file_name)
         (DATA_DIR / existing_data_file_name).unlink()
 
     return data

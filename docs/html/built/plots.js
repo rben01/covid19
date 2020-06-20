@@ -650,16 +650,11 @@ const svgs = plotContainers
         canvases.attr("clip-path", `url(#${clipPathID})`);
     });
 })();
-const nowMS = new Date().getTime();
+// Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-    // Ignore browser cache for this data (in reality I guess I should probably use a hash of the content)
-    d3.json("./data/digest.json").then((object) => {
-        const digest = object.digest;
-        return d3.json(`./data/covid_data-${digest}.json`);
-    }),
+    d3.json("./data/covid_data-7dec5f8e184c91cf0e4f7736ee46d4a4191c79b7.json"),
     d3.json("./data/geo_data.json"),
 ]).then(objects => {
-    console.log(objects);
     const allCovidData = objects[0];
     const allGeoData = objects[1];
     assignData({ allCovidData, allGeoData });

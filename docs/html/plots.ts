@@ -948,7 +948,7 @@ const svgs = plotContainers
 
 // Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	d3.json("./data/covid_data-97c7b8179025a143c66980103a160f8fd4322b08.json"),
+	d3.json("./data/covid_data-7dec5f8e184c91cf0e4f7736ee46d4a4191c79b7.json"),
 	d3.json("./data/geo_data.json"),
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
