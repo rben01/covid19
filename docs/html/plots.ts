@@ -202,18 +202,6 @@ function assignData({
 	});
 }
 
-const mouseActions: {
-	mouseover: (d: Feature) => void;
-	mousemove: () => void;
-	mouseout: () => void;
-	info: { prevFeature: any };
-} = {
-	mouseover: null,
-	mousemove: null,
-	mouseout: null,
-	info: { prevFeature: null },
-};
-
 function moveTooltipTo(x: number, y: number) {
 	tooltip.style("top", `${+y - 30}px`).style("left", `${+x + 10}px`);
 }
@@ -297,6 +285,7 @@ function updateTooltip({ visibility }: { visibility: TooltipVisibility }) {
 }
 
 let mouseMoved = false;
+let hasPlayedAnimation = false;
 
 function updateMaps({
 	plotGroup,
@@ -334,10 +323,7 @@ function updateMaps({
 		.property("value", dateIndex)
 		.node();
 
-	const smoothAvgSliderNode = plotGroup
-		.selectAll(".smooth-avg-slider")
-		.property("value", smoothAvgDays)
-		.node();
+	plotGroup.selectAll(".smooth-avg-slider").property("value", smoothAvgDays);
 
 	const minDate = scopedCovidData.agg.net.date.min_nonzero;
 	const dateKey = getDateNDaysAfter(minDate, dateIndex);
@@ -350,11 +336,13 @@ function updateMaps({
 		.selectAll(".smooth-avg-text")
 		.text(`Moving avg: ${smoothAvgDays} day${smoothAvgDays > 1 ? "s" : ""}`);
 
-	if (!playbackInfo.isPlaying) {
-		plotGroup.selectAll(".play-button").text("Play");
+	if (hasPlayedAnimation && !playbackInfo.isPlaying) {
+		plotGroup
+			.selectAll(".play-button")
+			.text(dateIndex === +dateSliderNode.max ? "Restart" : "Play");
 	}
 
-	tooltip.datum({ ...tooltip.datum(), dateKey, smoothAvgDays });
+	Object.assign(tooltip.datum(), { dateKey, smoothAvgDays });
 	updateTooltip({ visibility: "nochange" });
 
 	plotGroup
@@ -369,39 +357,7 @@ function updateMaps({
 
 			const svg = plotContainer.selectAll("svg").selectAll(".map");
 
-			mouseActions.mouseover = (d: Feature) => {
-				tooltip.datum({
-					...tooltip.datum(),
-					feature: d,
-					caseType,
-					count,
-					smoothAvgDays,
-				});
-				updateTooltip({ visibility: "visible" });
-			};
-			mouseActions.mousemove = () => {
-				if (!mouseMoved) {
-					const dateIndex = +dateSliderNode.value;
-					tooltip.datum({
-						...tooltip.datum(),
-						dateKey: getDateNDaysAfter(minDate, dateIndex),
-						smoothAvgDays,
-					});
-					updateTooltip({ visibility: "visible" });
-				}
-
-				mouseMoved = true;
-
-				tooltip.style("visibility", "visible");
-				moveTooltipTo(d3.event.pageX, d3.event.pageY);
-			};
-			mouseActions.mouseout = () => {
-				tooltip.style("visibility", "hidden");
-				mouseMoved = false;
-			};
-
-			const p = svg
-				.selectAll("path")
+			svg.selectAll("path")
 				.attr("fill", (feature: Feature) => {
 					const value = getDataOnDate({
 						feature,
@@ -421,11 +377,37 @@ function updateMaps({
 
 					return plotAesthetics.colors.scale(colorScale(value));
 				})
-				.classed("state-boundary", true);
+				.classed("state-boundary", true)
+				.on("mouseover", (d: Feature) => {
+					tooltip.datum({
+						...tooltip.datum(),
+						feature: d,
+						caseType,
+						count,
+						smoothAvgDays,
+					});
+					updateTooltip({ visibility: "visible" });
+				})
+				.on("mousemove", () => {
+					if (!mouseMoved) {
+						const dateIndex = +dateSliderNode.value;
+						tooltip.datum({
+							...tooltip.datum(),
+							dateKey: getDateNDaysAfter(minDate, dateIndex),
+							smoothAvgDays,
+						});
+						updateTooltip({ visibility: "visible" });
+					}
 
-			Object.entries(mouseActions).forEach(([event, action]) => [
-				p.on(event, action),
-			]);
+					mouseMoved = true;
+
+					tooltip.style("visibility", "visible");
+					moveTooltipTo(d3.event.pageX, d3.event.pageY);
+				})
+				.on("mouseout", () => {
+					tooltip.style("visibility", "hidden");
+					mouseMoved = false;
+				});
 		});
 }
 
@@ -455,7 +437,7 @@ const tooltip: {
 	.join("div")
 	.attr("id", "map-tooltip");
 
-let graphHasBegunZooming = false;
+let graphIsCurrentlyZooming = false;
 function initializeChoropleth({
 	plotGroup,
 	allCovidData,
@@ -465,7 +447,10 @@ function initializeChoropleth({
 	allCovidData: AllCovidData;
 	allGeoData: AllGeoData;
 }) {
-	const { location, count } = plotGroup.datum();
+	const {
+		location,
+		count,
+	}: { location: WorldLocation; count: CountMethod } = plotGroup.datum();
 	const scopedCovidData: ScopedCovidData = allCovidData[location];
 	const scopedGeoData: ScopedGeoData = allGeoData[location];
 
@@ -481,7 +466,7 @@ function initializeChoropleth({
 		: d3.geoTimes()
 	).fitExtent(projectionExtent, scopedGeoData);
 
-	const path = d3.geoPath(projection);
+	const geoPath = d3.geoPath(projection);
 
 	const zoom = d3
 		.zoom()
@@ -505,32 +490,24 @@ function initializeChoropleth({
 
 			const mapContainer = this;
 			// Apply zoom to other map containers in plotGroup, making sure not to let them try to zoom this map container again! (else an infinite loop will occur)
-			if (!graphHasBegunZooming) {
+			if (!graphIsCurrentlyZooming) {
 				// Holy race condition Batman (each and zoom are synchronous so it's fine)
-				graphHasBegunZooming = true;
-				plotGroup
-					.selectAll(".map-container")
-					.filter(function () {
-						return this !== mapContainer;
-					})
-					.each(function () {
+				graphIsCurrentlyZooming = true;
+				plotGroup.selectAll(".map-container").each(function () {
+					if (this !== mapContainer) {
 						zoom.transform(d3.select(this), transform);
-					});
-				graphHasBegunZooming = false;
+					}
+				});
+				graphIsCurrentlyZooming = false;
 			}
 
+			// Rescale state boundary thickness to counter zoom
 			plotGroup
 				.selectAll(".state-boundary")
 				.attr("stroke-width", plotAesthetics.map.borderWidth / transform.k);
 		});
 
-	let idleTimeout: number = null;
-	const idleDelay = 350;
-	const idled = () => {
-		idleTimeout = null;
-	};
-
-	plotGroup.datum({ ...plotGroup.datum(), scopedCovidData });
+	Object.assign(plotGroup.datum(), { scopedCovidData });
 
 	const legendTransX =
 		plotAesthetics.mapWidth[location] + plotAesthetics.legend.padLeft;
@@ -577,29 +554,27 @@ function initializeChoropleth({
 			.attr("stroke", "#ccc")
 			.attr("stroke-width", 1);
 
+		// Reset zoom on double click
 		mapContainer.on("dblclick", function () {
 			const mc = d3.select(this);
 			const t = plotAesthetics.map.zoomTransition;
 			mc.transition(t).call(zoom.transform, d3.zoomIdentity);
-			// maps.transition(t).attr("transform", "scaleX(1)");
 			mc.selectAll(".state-boundary")
 				.transition(t)
 				.attr("stroke-width", plotAesthetics.map.borderWidth);
 		});
 
-		const map = mapContainer
+		mapContainer
 			.append("g")
 			.classed("map", true)
-			.attr("transform", "translate(0 0)"); // A dummy transform just so it exists
-
-		map.selectAll("path")
+			.selectAll("path")
 			.data(scopedGeoData.features)
 			.join("path")
-			.attr("d", path)
+			.attr("d", geoPath)
 			.attr("stroke", "#fff8")
-			.attr("stroke-width", plotAesthetics.map.borderWidth)
-			.attr("pointer-events", "all");
+			.attr("stroke-width", plotAesthetics.map.borderWidth);
 
+		// I think this has to go after the map in order for it to catch zoom events (the zoom catcher has to have a greater z-index than the map itself). I'd have to check if this still *has* to go here but nothing is hurt by it going here, so it's not moving
 		mapContainer.call(zoom);
 
 		const legend = svg
@@ -624,7 +599,8 @@ function initializeChoropleth({
 			.domain([vmin, vmax])
 			.range([barHeight, 0]);
 
-		legendScale.ticks(7).forEach((y: number) => {
+		const nLegendTicks = 7;
+		legendScale.ticks(nLegendTicks).forEach((y: number) => {
 			const ys = legendScale(y);
 			legend
 				.append("line")
@@ -637,14 +613,14 @@ function initializeChoropleth({
 		});
 
 		const bigNumberTickFormatter = legendScale.tickFormat(
-			7,
+			nLegendTicks,
 			isPerCapita(caseType) ? "~g" : "~s",
 		);
 		const smallNumberTickFormatter = legendScale.tickFormat(
-			7,
+			nLegendTicks,
 			count === "net" ? "~g" : "~r",
 		);
-		legendScale.ticks(7).forEach((y: number) => {
+		legendScale.ticks(nLegendTicks).forEach((y: number) => {
 			const formatter = y < 1 ? smallNumberTickFormatter : bigNumberTickFormatter;
 			legend
 				.append("text")
@@ -653,21 +629,21 @@ function initializeChoropleth({
 				.text(`${formatter(y)}`)
 				.attr("fill", "black")
 				.attr("font-size", 12)
-				.attr("font-family", "sans-serif")
 				.attr("text-anchor", "left")
 				.attr("alignment-baseline", "middle");
 		});
 
-		const prefixStr = count === "dodd" ? "New Daily" : "Total";
+		// Add title
+		const titlePrefixStr = count === "dodd" ? "New Daily" : "Total";
 		let caseTypeStr = caseType;
-		let suffixStr = "";
+		let titleSuffixStr = "";
 		if (isPerCapita(caseTypeStr)) {
 			caseTypeStr = caseTypeStr.replace("_per_capita", "");
-			suffixStr = " Per 100,000 People";
+			titleSuffixStr = " Per 100,000 People";
 		}
 		caseTypeStr = caseTypeStr.replace(/^./, (c: string) => c.toUpperCase());
 
-		const titleStr = `${prefixStr} ${caseTypeStr}${suffixStr}`;
+		const titleStr = `${titlePrefixStr} ${caseTypeStr}${titleSuffixStr}`;
 		svg.append("text")
 			.attr("x", 20)
 			.attr("y", plotAesthetics.title.height)
@@ -678,6 +654,7 @@ function initializeChoropleth({
 			.attr("font-family", "sans-serif")
 			.attr("fill", "black");
 
+		// Finally, configure the date sliders
 		plotContainer.selectAll(".date-slider").each(function () {
 			this.min = 0;
 			this.max = daysElapsed;
@@ -687,37 +664,6 @@ function initializeChoropleth({
 
 	updateMaps({ plotGroup, dateIndex: daysElapsed, smoothAvgDays: null });
 }
-
-const plotGroups = d3
-	.select("#map-plots")
-	.selectAll()
-	.data(
-		SCOPES.map(scope => {
-			return scope;
-		}),
-	)
-	.join("div")
-	.classed("plot-scope-group", true);
-
-const plotContainers = plotGroups
-	.selectAll()
-	.data(function (scope: Scope) {
-		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
-			(caseType: CaseType) => ({
-				...scope,
-				caseType,
-				plotGroup: d3.select(this),
-			}),
-		);
-	})
-	.join("div")
-	.classed("plot-container", true);
-
-const svgs = plotContainers
-	.append("svg")
-	.classed("plot", true)
-	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.location])
-	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.location]);
 
 class PlaybackInfo {
 	static speeds = [0.25, 0.5, 1, 2, 4];
@@ -742,9 +688,42 @@ class PlaybackInfo {
 		this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
 	}
 }
+const plotGroups = d3
+	.select("#map-plots")
+	.selectAll()
+	.data(SCOPES.map(scope => ({ ...scope, playbackInfo: new PlaybackInfo() })))
+	.join("div")
+	.classed("plot-scope-group", true);
+
+const plotContainers = plotGroups
+	.selectAll()
+	.data(function (scope: Scope) {
+		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
+			(caseType: CaseType) => ({
+				...scope,
+				caseType,
+				plotGroup: d3.select(this),
+			}),
+		);
+	})
+	.join("div")
+	.classed("plot-container", true);
+
+const svgs = plotContainers
+	.append("svg")
+	.classed("plot", true)
+	.attr("width", (d: PlotInfo) => plotAesthetics.width[d.location])
+	.attr("height", (d: PlotInfo) => plotAesthetics.height[d.location]);
+
 // Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-	plotGroups.each(function ({ count }: { count: CountMethod }) {
+	plotGroups.each(function ({
+		count,
+		playbackInfo,
+	}: {
+		count: CountMethod;
+		playbackInfo: PlaybackInfo;
+	}) {
 		const plotGroup = d3.select(this);
 		const plotContainers = plotGroup.selectAll(".plot-container");
 		const dateSliderRows = plotContainers
@@ -800,9 +779,6 @@ class PlaybackInfo {
 				});
 		}
 
-		const playbackInfo = new PlaybackInfo();
-		plotGroup.datum({ ...plotGroup.datum(), playbackInfo });
-
 		const buttonsRows = plotGroup
 			.selectAll(".plot-container")
 			.append("div")
@@ -840,7 +816,7 @@ class PlaybackInfo {
 
 			if (dateSliderNode.value === dateSliderNode.max) {
 				updateMaps({ plotGroup, dateIndex: 0, smoothAvgDays: null });
-				// A number indistinguishable from 0 (except to a computer)
+				// A number indistinguishable from 0 to a human, but not to a computer
 				playbackInfo.timerElapsedTimeProptn = 0.0000001;
 			}
 
@@ -887,6 +863,7 @@ class PlaybackInfo {
 				haltPlayback(playbackInfo);
 				playButtons.text("Play");
 			} else {
+				hasPlayedAnimation = true;
 				startPlayback(playbackInfo);
 				playButtons.text("Pause");
 			}
@@ -933,7 +910,7 @@ class PlaybackInfo {
 	});
 })();
 
-// Create defs: gradient and clipPath
+// Create defs: gradient (for legend) and clipPath (for clipping map to rect bounds when zooming in)
 (() => {
 	plotGroups.each(function (scope: Scope) {
 		const svgs = d3.select(this).selectAll("svg");
@@ -971,6 +948,7 @@ class PlaybackInfo {
 
 const nowMS = new Date().getTime();
 Promise.all([
+	// Ignore browser cache for this data (in reality I guess I should probably use a hash of the content)
 	d3.json(`./data/covid_data.json?t=${nowMS}`),
 	d3.json("./data/geo_data.json"),
 	,
