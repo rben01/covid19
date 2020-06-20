@@ -1,95 +1,22 @@
 declare const d3: any;
 
-type DateString = string;
-type CaseType = "cases" | "cases_per_capita" | "deaths" | "deaths_per_capita";
-type WorldLocation = "usa" | "world";
-type CountMethod = "net" | "dodd";
-interface Scope {
-	location: WorldLocation;
-	count: CountMethod;
-}
-// type Scope = { location: "usa"; count: "net" } | { location: "world"; count: "net" };
-type ScopeLocation = string;
-
-const WORLD_LOCATIONS: WorldLocation[] = ["usa", "world"];
-const COUNT_METHODS: CountMethod[] = ["dodd", "net"];
-const SCOPES: Scope[] = (() => {
-	const scopes: Scope[] = [];
-	COUNT_METHODS.forEach((count: CountMethod) => {
-		WORLD_LOCATIONS.forEach((location: WorldLocation) => {
-			scopes.push({ location, count });
-		});
-	});
-	return scopes;
-})();
-
-interface AllGeoData {
-	usa: ScopedGeoData;
-	world: ScopedGeoData;
-}
-
-interface ScopedGeoData {
-	type: string;
-	features: Feature[];
-}
-
-interface Feature {
-	properties: {
-		code: string;
-		name: string;
-	};
-	covidData: LocationCovidData;
-}
-
-// usa/world -> "data" -> state/country -> date -> data
-interface AllCovidData {
-	usa: ScopedCovidData;
-	world: ScopedCovidData;
-}
-
-interface Aggregated<T> {
-	min: T;
-	min_nonzero: T;
-	max: T;
-}
-
-type AggNumber = Aggregated<number>;
-type AggDate = Aggregated<DateString>;
-
-interface ScopedCovidData {
-	agg: {
-		[key: string]: {
-			cases: AggNumber;
-			cases_per_capita: AggNumber;
-			deaths: AggNumber;
-			deaths_per_capita: AggNumber;
-			date: AggDate;
-		};
-	};
-	data: {
-		[key: string]: LocationCovidData;
-	};
-}
-
-interface DataGroup {
-	cases: number[];
-	cases_per_capita: number[];
-	deaths: number[];
-	deaths_per_capita: number[];
-}
-
-interface LocationCovidData extends DataGroup {
-	date: { [key: string]: number };
-	day_over_day_diffs: DataGroup;
-}
-
-interface PlotInfo {
-	location: WorldLocation;
-	count: CountMethod;
-	caseType: CaseType;
-	scopedCovidData?: ScopedCovidData;
-	plotGroup?: any;
-}
+import {
+	AllCovidData,
+	AllGeoData,
+	CaseType,
+	CountMethod,
+	DataGroup,
+	DateString,
+	Feature,
+	LocationCovidData,
+	PlotInfo,
+	Scope,
+	ScopedCovidData,
+	ScopedGeoData,
+	SCOPES,
+	WorldLocation,
+	WORLD_LOCATIONS,
+} from "./types.js";
 
 const MS_PER_DAY = 86400 * 1000;
 
@@ -123,15 +50,16 @@ const plotAesthetics = Object.freeze(
 				height: 40,
 			},
 
-			mapWidth: null,
-			mapHeight: null,
+			mapWidth: {} as { usa: number; world: number },
+			mapHeight: {} as { usa: number; world: number },
 		};
 
 		pa.map.originX = pa.map.pad;
 		pa.map.originY = pa.title.height + pa.map.pad;
 
-		pa.mapWidth = {};
-		Object.keys(pa.width).forEach((scope: ScopeLocation) => {
+		Object.keys(pa.width).forEach((key: string) => {
+			const scope = key as WorldLocation;
+
 			pa.mapWidth[scope] =
 				pa.width[scope] -
 				pa.map.originX -
@@ -139,8 +67,8 @@ const plotAesthetics = Object.freeze(
 				pa.map.pad;
 		});
 
-		pa.mapHeight = {};
-		Object.keys(pa.height).forEach((scope: ScopeLocation) => {
+		Object.keys(pa.height).forEach((key: string) => {
+			const scope = key as WorldLocation;
 			pa.mapHeight[scope] = pa.height[scope] - pa.map.originY - pa.map.pad;
 		});
 		return pa;
@@ -184,7 +112,10 @@ function assignData({
 					deaths_per_capita: [],
 				};
 
-				for (let [caseType, data] of Object.entries(dodd)) {
+				for (let [caseType, data] of Object.entries(dodd) as [
+					CaseType,
+					number[],
+				][]) {
 					for (let i = 0; i < Object.keys(covidData.date).length; ++i) {
 						const diff =
 							covidData[caseType][i] - covidData[caseType][i - 1];
@@ -223,8 +154,8 @@ function getDataOnDate({
 	count: CountMethod;
 	dateKey: DateString;
 	caseType: CaseType;
-	smoothAvgDays: number;
-}): number {
+	smoothAvgDays?: number;
+}): number | null {
 	if (typeof feature.covidData === "undefined") {
 		return null;
 	}
@@ -237,6 +168,8 @@ function getDataOnDate({
 		return null;
 	}
 
+	smoothAvgDays = smoothAvgDays as number;
+
 	let value: number;
 	if (count === "dodd" && smoothAvgDays >= 2) {
 		let sum = 0;
@@ -244,6 +177,7 @@ function getDataOnDate({
 			const x = data[caseType][i];
 			sum += x;
 		}
+
 		value = sum / smoothAvgDays;
 		if (isNaN(value)) {
 			return null;
@@ -293,8 +227,8 @@ function updateMaps({
 	smoothAvgDays,
 }: {
 	plotGroup: any;
-	dateIndex: number;
-	smoothAvgDays: number;
+	dateIndex?: number;
+	smoothAvgDays?: number;
 }) {
 	const {
 		count,
@@ -309,14 +243,19 @@ function updateMaps({
 	if (typeof dateIndex === "undefined" || dateIndex === null) {
 		dateIndex = plotGroup.selectAll(".date-slider").node().value;
 	}
+	dateIndex = dateIndex as number;
 
 	if (
 		count === "dodd" &&
 		(typeof smoothAvgDays === "undefined" || smoothAvgDays === null)
 	) {
 		smoothAvgDays = plotGroup.selectAll(".smooth-avg-slider").node().value;
+	} else if (typeof smoothAvgDays === "undefined") {
+		smoothAvgDays = 0;
+	} else {
+		smoothAvgDays = +smoothAvgDays;
 	}
-	smoothAvgDays = +smoothAvgDays;
+	smoothAvgDays = smoothAvgDays as number;
 
 	const dateSliderNode = plotGroup
 		.selectAll(".date-slider")
@@ -347,7 +286,7 @@ function updateMaps({
 
 	plotGroup
 		.selectAll(".plot-container")
-		.each(function ({ caseType }: { caseType: CaseType }) {
+		.each(function (this: Node, { caseType }: { caseType: CaseType }) {
 			const plotContainer = d3.select(this);
 
 			const { min_nonzero: vmin, max: vmax } = scopedCovidData.agg[count][
@@ -482,7 +421,7 @@ function initializeChoropleth({
 				(!d3.event.touches || d3.event.touches.length === 2)
 			);
 		})
-		.on("zoom", function () {
+		.on("zoom", function (this: Node) {
 			tooltip.style("visibility", "hidden");
 			const transform = d3.event.transform;
 
@@ -493,7 +432,7 @@ function initializeChoropleth({
 			if (!graphIsCurrentlyZooming) {
 				// Holy race condition Batman (each and zoom are synchronous so it's fine)
 				graphIsCurrentlyZooming = true;
-				plotGroup.selectAll(".map-container").each(function () {
+				plotGroup.selectAll(".map-container").each(function (this: Node) {
 					if (this !== mapContainer) {
 						zoom.transform(d3.select(this), transform);
 					}
@@ -522,9 +461,9 @@ function initializeChoropleth({
 	const lastDay = dateStrParser(maxDate);
 	const daysElapsed = Math.round((lastDay - firstDay) / MS_PER_DAY);
 
-	plotGroup.selectAll(".plot-container").each(function () {
+	plotGroup.selectAll(".plot-container").each(function (this: Node) {
 		const plotContainer = d3.select(this);
-		const caseType = plotContainer.datum().caseType;
+		const caseType: CaseType = plotContainer.datum().caseType;
 		const svg = plotContainer.selectAll("svg");
 		const mainPlotArea = svg.selectAll("g.main-plot-area");
 
@@ -555,7 +494,7 @@ function initializeChoropleth({
 			.attr("stroke-width", 1);
 
 		// Reset zoom on double click
-		mapContainer.on("dblclick", function () {
+		mapContainer.on("dblclick", function (this: Node) {
 			const mc = d3.select(this);
 			const t = plotAesthetics.map.zoomTransition;
 			mc.transition(t).call(zoom.transform, d3.zoomIdentity);
@@ -635,9 +574,9 @@ function initializeChoropleth({
 
 		// Add title
 		const titlePrefixStr = count === "dodd" ? "New Daily" : "Total";
-		let caseTypeStr = caseType;
+		let caseTypeStr: string = caseType;
 		let titleSuffixStr = "";
-		if (isPerCapita(caseTypeStr)) {
+		if (isPerCapita(caseType)) {
 			caseTypeStr = caseTypeStr.replace("_per_capita", "");
 			titleSuffixStr = " Per 100,000 People";
 		}
@@ -655,24 +594,28 @@ function initializeChoropleth({
 			.attr("fill", "black");
 
 		// Finally, configure the date sliders
-		plotContainer.selectAll(".date-slider").each(function () {
+		plotContainer.selectAll(".date-slider").each(function (this: any) {
 			this.min = 0;
 			this.max = daysElapsed;
 			this.step = 1;
 		});
 	});
 
-	updateMaps({ plotGroup, dateIndex: daysElapsed, smoothAvgDays: null });
+	updateMaps({
+		plotGroup,
+		dateIndex: daysElapsed,
+		smoothAvgDays: (null as unknown) as number,
+	});
 }
 
 class PlaybackInfo {
 	static speeds = [0.25, 0.5, 1, 2, 4];
 	static defaultSpeed = 1;
 
-	timer: number;
+	timer?: number;
 	isPlaying: Boolean;
 	selectedIndex: number;
-	timerStartDate: Date;
+	timerStartDate?: Date;
 	timerElapsedTimeProptn: number;
 
 	get baseIntervalMS(): number {
@@ -686,6 +629,7 @@ class PlaybackInfo {
 	constructor() {
 		this.isPlaying = false;
 		this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
+		this.timerElapsedTimeProptn = 0;
 	}
 }
 const plotGroups = d3
@@ -697,14 +641,17 @@ const plotGroups = d3
 
 const plotContainers = plotGroups
 	.selectAll()
-	.data(function (scope: Scope) {
-		return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map(
-			(caseType: CaseType) => ({
-				...scope,
-				caseType,
-				plotGroup: d3.select(this),
-			}),
-		);
+	.data(function (this: Node, scope: Scope) {
+		return ([
+			"cases",
+			"cases_per_capita",
+			"deaths",
+			"deaths_per_capita",
+		] as CaseType[]).map((caseType: CaseType) => ({
+			...scope,
+			caseType,
+			plotGroup: d3.select(this),
+		}));
 	})
 	.join("div")
 	.classed("plot-container", true);
@@ -717,13 +664,16 @@ const svgs = plotContainers
 
 // Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
-	plotGroups.each(function ({
-		count,
-		playbackInfo,
-	}: {
-		count: CountMethod;
-		playbackInfo: PlaybackInfo;
-	}) {
+	plotGroups.each(function (
+		this: Node,
+		{
+			count,
+			playbackInfo,
+		}: {
+			count: CountMethod;
+			playbackInfo: PlaybackInfo;
+		},
+	) {
 		const plotGroup = d3.select(this);
 		const plotContainers = plotGroup.selectAll(".plot-container");
 		const dateSliderRows = plotContainers
@@ -745,9 +695,12 @@ const svgs = plotContainers
 			.attr("min", 0)
 			.attr("max", 1)
 			.property("value", 1)
-			.on("input", function (d: PlotInfo) {
+			.on("input", function (this: any, d: PlotInfo) {
 				const dateIndex = +this.value;
-				updateMaps({ plotGroup: d.plotGroup, dateIndex, smoothAvgDays: null });
+				updateMaps({
+					plotGroup: d.plotGroup,
+					dateIndex,
+				});
 			});
 
 		if (count === "dodd") {
@@ -769,11 +722,10 @@ const svgs = plotContainers
 				.attr("min", 1)
 				.attr("max", 7)
 				.property("value", 1)
-				.on("input", function (d: PlotInfo) {
+				.on("input", function (this: any, d: PlotInfo) {
 					const smoothAvgDays = +this.value;
 					updateMaps({
 						plotGroup: d.plotGroup,
-						dateIndex: null,
 						smoothAvgDays,
 					});
 				});
@@ -804,8 +756,9 @@ const svgs = plotContainers
 			playbackInfo.isPlaying = false;
 			clearInterval(playbackInfo.timer);
 			const now = new Date();
-			const elapsedTimeMS = now.getTime() - playbackInfo.timerStartDate.getTime();
-			playbackInfo.timerElapsedTimeProptn +=
+			const elapsedTimeMS =
+				now.getTime() - (playbackInfo.timerStartDate as Date).getTime();
+			(playbackInfo.timerElapsedTimeProptn as number) +=
 				elapsedTimeMS / playbackInfo.currentIntervalMS;
 		}
 
@@ -815,7 +768,7 @@ const svgs = plotContainers
 			const maxDateIndex = parseFloat(dateSliderNode.max);
 
 			if (dateSliderNode.value === dateSliderNode.max) {
-				updateMaps({ plotGroup, dateIndex: 0, smoothAvgDays: null });
+				updateMaps({ plotGroup, dateIndex: 0 });
 				// A number indistinguishable from 0 to a human, but not to a computer
 				playbackInfo.timerElapsedTimeProptn = 0.0000001;
 			}
@@ -829,7 +782,6 @@ const svgs = plotContainers
 					updateMaps({
 						plotGroup,
 						dateIndex: dateIndex + 1,
-						smoothAvgDays: null,
 					});
 				}
 
@@ -900,7 +852,7 @@ const svgs = plotContainers
 				haltPlayback(playbackInfo);
 			}
 			playbackInfo.selectedIndex = i;
-			speedButtons.each(function (d: any) {
+			speedButtons.each(function (this: Node, d: any) {
 				d3.select(this).property("disabled", d.speed === speed);
 			});
 			if (wasPlaying) {
@@ -912,7 +864,7 @@ const svgs = plotContainers
 
 // Create defs: gradient (for legend) and clipPath (for clipping map to rect bounds when zooming in)
 (() => {
-	plotGroups.each(function (scope: Scope) {
+	plotGroups.each(function (this: Node, scope: Scope) {
 		const svgs = d3.select(this).selectAll("svg");
 		const defs = svgs.append("defs");
 		const verticalLegendGradient = defs
@@ -948,7 +900,7 @@ const svgs = plotContainers
 
 // Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	d3.json("./data/covid_data-7dec5f8e184c91cf0e4f7736ee46d4a4191c79b7.json"),
+	d3.json("./data/covid_data-853deded4937c7d0b7086f385f337a45e2b6f203.json"),
 	d3.json("./data/geo_data.json"),
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
@@ -956,7 +908,7 @@ Promise.all([
 
 	assignData({ allCovidData, allGeoData });
 
-	plotGroups.each(function () {
+	plotGroups.each(function (this: Node) {
 		const plotGroup = d3.select(this);
 		initializeChoropleth({
 			plotGroup,

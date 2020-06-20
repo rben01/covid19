@@ -1,14 +1,4 @@
-const WORLD_LOCATIONS = ["usa", "world"];
-const COUNT_METHODS = ["dodd", "net"];
-const SCOPES = (() => {
-    const scopes = [];
-    COUNT_METHODS.forEach((count) => {
-        WORLD_LOCATIONS.forEach((location) => {
-            scopes.push({ location, count });
-        });
-    });
-    return scopes;
-})();
+import { SCOPES, WORLD_LOCATIONS, } from "./types.js";
 const MS_PER_DAY = 86400 * 1000;
 const plotAesthetics = Object.freeze((() => {
     const pa = {
@@ -38,21 +28,21 @@ const plotAesthetics = Object.freeze((() => {
         title: {
             height: 40,
         },
-        mapWidth: null,
-        mapHeight: null,
+        mapWidth: {},
+        mapHeight: {},
     };
     pa.map.originX = pa.map.pad;
     pa.map.originY = pa.title.height + pa.map.pad;
-    pa.mapWidth = {};
-    Object.keys(pa.width).forEach((scope) => {
+    Object.keys(pa.width).forEach((key) => {
+        const scope = key;
         pa.mapWidth[scope] =
             pa.width[scope] -
                 pa.map.originX -
                 (pa.legend.padLeft + pa.legend.barWidth + pa.legend.padRight) -
                 pa.map.pad;
     });
-    pa.mapHeight = {};
-    Object.keys(pa.height).forEach((scope) => {
+    Object.keys(pa.height).forEach((key) => {
+        const scope = key;
         pa.mapHeight[scope] = pa.height[scope] - pa.map.originY - pa.map.pad;
     });
     return pa;
@@ -115,6 +105,7 @@ function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
     if (typeof index === "undefined") {
         return null;
     }
+    smoothAvgDays = smoothAvgDays;
     let value;
     if (count === "dodd" && smoothAvgDays >= 2) {
         let sum = 0;
@@ -160,11 +151,18 @@ function updateMaps({ plotGroup, dateIndex, smoothAvgDays, }) {
     if (typeof dateIndex === "undefined" || dateIndex === null) {
         dateIndex = plotGroup.selectAll(".date-slider").node().value;
     }
+    dateIndex = dateIndex;
     if (count === "dodd" &&
         (typeof smoothAvgDays === "undefined" || smoothAvgDays === null)) {
         smoothAvgDays = plotGroup.selectAll(".smooth-avg-slider").node().value;
     }
-    smoothAvgDays = +smoothAvgDays;
+    else if (typeof smoothAvgDays === "undefined") {
+        smoothAvgDays = 0;
+    }
+    else {
+        smoothAvgDays = +smoothAvgDays;
+    }
+    smoothAvgDays = smoothAvgDays;
     const dateSliderNode = plotGroup
         .selectAll(".date-slider")
         .property("value", dateIndex)
@@ -280,9 +278,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
         const transform = d3.event.transform;
         d3.select(this).selectAll(".map").attr("transform", transform);
         const mapContainer = this;
-        // Apply zoom to other map containers in plotGroup, making sure not to let them try to zoom this map container again! (else an infinite loop will occur)
         if (!graphIsCurrentlyZooming) {
-            // Holy race condition Batman (each and zoom are synchronous so it's fine)
             graphIsCurrentlyZooming = true;
             plotGroup.selectAll(".map-container").each(function () {
                 if (this !== mapContainer) {
@@ -291,7 +287,6 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             });
             graphIsCurrentlyZooming = false;
         }
-        // Rescale state boundary thickness to counter zoom
         plotGroup
             .selectAll(".state-boundary")
             .attr("stroke-width", plotAesthetics.map.borderWidth / transform.k);
@@ -322,7 +317,6 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .join("g")
             .classed("map-container", true)
             .attr("transform", (d) => `translate(${d.tx},${d.ty})`);
-        // Dummy rectangle whose purpose is to catch zoom events that don't start inside a region boundary (e.g., a drag in the middle of the ocean)
         mapContainer
             .append("rect")
             .attr("x", 0)
@@ -332,7 +326,6 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("fill-opacity", 0)
             .attr("stroke", "#ccc")
             .attr("stroke-width", 1);
-        // Reset zoom on double click
         mapContainer.on("dblclick", function () {
             const mc = d3.select(this);
             const t = plotAesthetics.map.zoomTransition;
@@ -350,7 +343,6 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("d", geoPath)
             .attr("stroke", "#fff8")
             .attr("stroke-width", plotAesthetics.map.borderWidth);
-        // I think this has to go after the map in order for it to catch zoom events (the zoom catcher has to have a greater z-index than the map itself). I'd have to check if this still *has* to go here but nothing is hurt by it going here, so it's not moving
         mapContainer.call(zoom);
         const legend = svg
             .append("g")
@@ -397,11 +389,10 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
                 .attr("text-anchor", "left")
                 .attr("alignment-baseline", "middle");
         });
-        // Add title
         const titlePrefixStr = count === "dodd" ? "New Daily" : "Total";
         let caseTypeStr = caseType;
         let titleSuffixStr = "";
-        if (isPerCapita(caseTypeStr)) {
+        if (isPerCapita(caseType)) {
             caseTypeStr = caseTypeStr.replace("_per_capita", "");
             titleSuffixStr = " Per 100,000 People";
         }
@@ -416,20 +407,24 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .attr("font-size", 24)
             .attr("font-family", "sans-serif")
             .attr("fill", "black");
-        // Finally, configure the date sliders
         plotContainer.selectAll(".date-slider").each(function () {
             this.min = 0;
             this.max = daysElapsed;
             this.step = 1;
         });
     });
-    updateMaps({ plotGroup, dateIndex: daysElapsed, smoothAvgDays: null });
+    updateMaps({
+        plotGroup,
+        dateIndex: daysElapsed,
+        smoothAvgDays: null,
+    });
 }
-let PlaybackInfo = /** @class */ (() => {
+let PlaybackInfo = (() => {
     class PlaybackInfo {
         constructor() {
             this.isPlaying = false;
             this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
+            this.timerElapsedTimeProptn = 0;
         }
         get baseIntervalMS() {
             return 1000;
@@ -451,7 +446,12 @@ const plotGroups = d3
 const plotContainers = plotGroups
     .selectAll()
     .data(function (scope) {
-    return ["cases", "cases_per_capita", "deaths", "deaths_per_capita"].map((caseType) => ({
+    return [
+        "cases",
+        "cases_per_capita",
+        "deaths",
+        "deaths_per_capita",
+    ].map((caseType) => ({
         ...scope,
         caseType,
         plotGroup: d3.select(this),
@@ -464,7 +464,6 @@ const svgs = plotContainers
     .classed("plot", true)
     .attr("width", (d) => plotAesthetics.width[d.location])
     .attr("height", (d) => plotAesthetics.height[d.location]);
-// Create buttons, sliders, everything UI related not dealing with the SVGs themselves
 (() => {
     plotGroups.each(function ({ count, playbackInfo, }) {
         const plotGroup = d3.select(this);
@@ -484,13 +483,15 @@ const svgs = plotContainers
             .classed("date-slider", true)
             .classed("input-slider", true)
             .attr("type", "range")
-            // Temporary values, used to place the slider's knob to the right while we await the actual data we'll use to compute its range
             .attr("min", 0)
             .attr("max", 1)
             .property("value", 1)
             .on("input", function (d) {
             const dateIndex = +this.value;
-            updateMaps({ plotGroup: d.plotGroup, dateIndex, smoothAvgDays: null });
+            updateMaps({
+                plotGroup: d.plotGroup,
+                dateIndex,
+            });
         });
         if (count === "dodd") {
             const smoothAvgSliderRows = plotContainers
@@ -515,7 +516,6 @@ const svgs = plotContainers
                 const smoothAvgDays = +this.value;
                 updateMaps({
                     plotGroup: d.plotGroup,
-                    dateIndex: null,
                     smoothAvgDays,
                 });
             });
@@ -549,8 +549,7 @@ const svgs = plotContainers
             playbackInfo.isPlaying = true;
             const maxDateIndex = parseFloat(dateSliderNode.max);
             if (dateSliderNode.value === dateSliderNode.max) {
-                updateMaps({ plotGroup, dateIndex: 0, smoothAvgDays: null });
-                // A number indistinguishable from 0 to a human, but not to a computer
+                updateMaps({ plotGroup, dateIndex: 0 });
                 playbackInfo.timerElapsedTimeProptn = 0.0000001;
             }
             function updateDate() {
@@ -561,10 +560,8 @@ const svgs = plotContainers
                     updateMaps({
                         plotGroup,
                         dateIndex: dateIndex + 1,
-                        smoothAvgDays: null,
                     });
                 }
-                // If it's the last date, end the timer (don't wait for the date to be one past the end; just end it when it hits the end)
                 if (dateIndex >= maxDateIndex - 1) {
                     clearInterval(playbackInfo.timer);
                     playbackInfo.isPlaying = false;
@@ -603,7 +600,6 @@ const svgs = plotContainers
             .property("disabled", ({ speed }) => speed === PlaybackInfo.defaultSpeed);
         speedButtons.on("click", function ({ speed, playbackInfo, }, i) {
             const wasPlaying = playbackInfo.isPlaying;
-            // Order matters here; calculations in haltPlayback require the old value of selectedIndex
             if (wasPlaying) {
                 haltPlayback(playbackInfo);
             }
@@ -617,7 +613,6 @@ const svgs = plotContainers
         });
     });
 })();
-// Create defs: gradient (for legend) and clipPath (for clipping map to rect bounds when zooming in)
 (() => {
     plotGroups.each(function (scope) {
         const svgs = d3.select(this).selectAll("svg");
@@ -650,9 +645,8 @@ const svgs = plotContainers
         canvases.attr("clip-path", `url(#${clipPathID})`);
     });
 })();
-// Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-    d3.json("./data/covid_data-7dec5f8e184c91cf0e4f7736ee46d4a4191c79b7.json"),
+    d3.json("./data/covid_data-853deded4937c7d0b7086f385f337a45e2b6f203.json"),
     d3.json("./data/geo_data.json"),
 ]).then(objects => {
     const allCovidData = objects[0];
