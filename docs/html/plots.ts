@@ -946,12 +946,10 @@ const svgs = plotContainers
 	});
 })();
 
-const nowMS = new Date().getTime();
+// Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	// Ignore browser cache for this data (in reality I guess I should probably use a hash of the content)
-	d3.json(`./data/covid_data.json?t=${nowMS}`),
+	d3.json("./data/covid_data-97c7b8179025a143c66980103a160f8fd4322b08.json"),
 	d3.json("./data/geo_data.json"),
-	,
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
 	const allGeoData: AllGeoData = objects[1];

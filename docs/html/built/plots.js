@@ -653,10 +653,13 @@ const svgs = plotContainers
 const nowMS = new Date().getTime();
 Promise.all([
     // Ignore browser cache for this data (in reality I guess I should probably use a hash of the content)
-    d3.json(`./data/covid_data.json?t=${nowMS}`),
+    d3.json("./data/digest.json").then((object) => {
+        const digest = object.digest;
+        return d3.json(`./data/covid_data-${digest}.json`);
+    }),
     d3.json("./data/geo_data.json"),
-    ,
 ]).then(objects => {
+    console.log(objects);
     const allCovidData = objects[0];
     const allGeoData = objects[1];
     assignData({ allCovidData, allGeoData });

@@ -97,6 +97,7 @@ class Paths:
     DATA_TABLE: Path = DATA / "data_table.csv"
     DOCS: Path = ROOT / "docs"
     FIGURES: Path = DOCS / "figures"
+    SOURCE: Path = ROOT_PARENT / "src"
 
 
 class StrictEnumError(Exception):

@@ -1,12 +1,14 @@
 # %%
+import hashlib
 import json
+import re
 from pathlib import Path
 
 import geopandas
 import pandas as pd
 from IPython.display import display  # noqa E401
 
-from constants import Columns, CaseTypes, Locations, Paths
+from constants import CaseTypes, Columns, Locations, Paths
 from plot_timeline_interactive import GEO_DATA_DIR
 
 CODE = "code"
@@ -209,7 +211,7 @@ def jsonify(s):
     return s.lower().replace(" ", "_").replace("cap.", "capita")
 
 
-def _data_to_json(outfile: Path):
+def data_to_json():
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
     for c in df:
         if "per cap." in c.lower():
@@ -311,19 +313,43 @@ def _data_to_json(outfile: Path):
     with (DATA_DIR / "geo_data.json").open("w") as f:
         geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
         json.dump(geojson, f, indent=0)
-    # for df_name, df in [("usa", usa_geo_df), ("world", countries_geo_df)]:
-    #     with (DATA_DIR / f"geo_{df_name}.json").open("w") as f:
-    #         f.write(df.to_json(indent=0))
 
-    if outfile is not None:
-        with outfile.open("w") as f:
-            json.dump(data, f, indent=0)
+    data_str = json.dumps(data)
+    hasher = hashlib.sha1()
+    hasher.update(data_str.encode())
+    digest = hasher.hexdigest()
+    digest_pattern = f"[a-fA-F0-9]{{{len(digest)}}}"
+
+    existing_data_file_name = None
+    for f in DATA_DIR.iterdir():
+        if re.match(f"covid_data-{digest_pattern}.json", f.name):
+            existing_data_file_name = f.name
+            break
+
+    new_data_file_name = f"covid_data-{digest}.json"
+    with (DATA_DIR / new_data_file_name).open("w") as f:
+        json.dump(data, f, indent=0)
+
+    with (Paths.DOCS / "html" / "plots.ts").open() as f:
+        ts_file_contents = f.read()
+
+    ts_file_contents = re.sub(
+        rf'd3\.json\("\./data/covid_data-{digest_pattern}\.json"\)',
+        f'd3.json("./data/{new_data_file_name}")',
+        ts_file_contents,
+    )
+
+    with (Paths.DOCS / "html" / "plots.ts").open("w") as f:
+        f.write(ts_file_contents)
+
+    if (
+        existing_data_file_name is not None
+        and existing_data_file_name != new_data_file_name
+    ):
+        print("Deleting", existing_data_file_name, "covid_data-{digest}.json")
+        (DATA_DIR / existing_data_file_name).unlink()
 
     return data
-
-
-def data_to_json():
-    _data_to_json(outfile=DATA_DIR / "covid_data.json")
 
 
 if __name__ == "__main__":
