@@ -116,7 +116,7 @@ const plotAesthetics = Object.freeze(
 				padLeft: 20,
 				barWidth: 15,
 				padRight: 20,
-				height: { usa: 240, world: 230 },
+				height: { usa: 250, world: 230 },
 				gradientID: "verticalLegendGradient",
 			},
 			title: {
@@ -623,9 +623,8 @@ function initializeChoropleth({
 			.base(10)
 			.domain([vmin, vmax])
 			.range([barHeight, 0]);
-		console.log(count, caseType, location, legendScale.domain());
 
-		legendScale.ticks(8).forEach((y: number) => {
+		legendScale.ticks(7).forEach((y: number) => {
 			const ys = legendScale(y);
 			legend
 				.append("line")
@@ -637,14 +636,21 @@ function initializeChoropleth({
 				.attr("stroke-width", 1);
 		});
 
-		const fmtStr = isPerCapita(caseType) ? "~g" : "~s";
-		const tickFormatter = legendScale.tickFormat(7, fmtStr);
+		const bigNumberTickFormatter = legendScale.tickFormat(
+			7,
+			isPerCapita(caseType) ? "~g" : "~s",
+		);
+		const smallNumberTickFormatter = legendScale.tickFormat(
+			7,
+			count === "net" ? "~g" : "~r",
+		);
 		legendScale.ticks(7).forEach((y: number) => {
+			const formatter = y < 1 ? smallNumberTickFormatter : bigNumberTickFormatter;
 			legend
 				.append("text")
 				.attr("x", barWidth + 4)
 				.attr("y", legendScale(y))
-				.text(`${tickFormatter(y)}`)
+				.text(`${formatter(y)}`)
 				.attr("fill", "black")
 				.attr("font-size", 12)
 				.attr("font-family", "sans-serif")
@@ -965,12 +971,8 @@ class PlaybackInfo {
 
 const nowMS = new Date().getTime();
 Promise.all([
-	d3.json(
-		`https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/covid_data.json?t=${nowMS}`,
-	),
-	d3.json(
-		"https://raw.githubusercontent.com/rben01/covid19/js-migrate/docs/data/geo_data.json",
-	),
+	d3.json(`./data/covid_data.json?t=${nowMS}`),
+	d3.json("./data/geo_data.json"),
 	,
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
