@@ -107,8 +107,10 @@ const mouseActions = {
 function moveTooltipTo(x, y) {
     tooltip.style("top", `${+y - 30}px`).style("left", `${+x + 10}px`);
 }
-function getFormatter(caseType) {
-    return isPerCapita(caseType) ? numberFormatters.float : numberFormatters.int;
+function getFormatter(caseType, count, smoothAvgDays) {
+    return (count === "dodd" && smoothAvgDays > 1) || isPerCapita(caseType)
+        ? numberFormatters.float
+        : numberFormatters.int;
 }
 function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
     if (typeof feature.covidData === "undefined") {
@@ -150,7 +152,7 @@ function updateTooltip({ visibility }) {
         caseType,
         smoothAvgDays,
     });
-    const formatter = getFormatter(caseType);
+    const formatter = getFormatter(caseType, count, smoothAvgDays);
     const countStr = value === null ? "~No data~" : formatter(value);
     tooltip.html(`${dateStr}<br>${location}<br>${countStr}`);
     if (visibility !== "nochange") {
@@ -387,6 +389,7 @@ function initializeChoropleth({ plotGroup, allCovidData, allGeoData, }) {
             .base(10)
             .domain([vmin, vmax])
             .range([barHeight, 0]);
+        console.log(count, caseType, location, legendScale.domain());
         legendScale.ticks(8).forEach((y) => {
             const ys = legendScale(y);
             legend
@@ -528,15 +531,12 @@ let PlaybackInfo = /** @class */ (() => {
                 .property("value", 1)
                 .on("input", function (d) {
                 const smoothAvgDays = +this.value;
-                console.log(d);
                 updateMaps({
                     plotGroup: d.plotGroup,
                     dateIndex: null,
                     smoothAvgDays,
                 });
             });
-            console.log(smoothAvgSliderRows.data());
-            console.log(dateSliderRows.data());
         }
         const playbackInfo = new PlaybackInfo();
         plotGroup.datum({ ...plotGroup.datum(), playbackInfo });

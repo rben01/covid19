@@ -284,7 +284,7 @@ def _data_to_json(outfile: Path):
             min_nonzero = dodd_diffs.loc[dodd_diffs[ct] > 0, ct].min()
             moving_avg = dodd_diffs.rolling(max_moving_avg_days).mean()
             min_val = moving_avg.loc[
-                moving_avg[ct] > min_nonzero / max_moving_avg_days, ct
+                moving_avg[ct] >= min_nonzero / max_moving_avg_days * 0.9, ct
             ].min()
             if int(min_val) == min_val:
                 min_val = int(min_val)
