@@ -646,7 +646,7 @@ const svgs = plotContainers
     });
 })();
 Promise.all([
-    d3.json("./data/covid_data-853deded4937c7d0b7086f385f337a45e2b6f203.json"),
+    d3.json("./data/covid_data-d4bfbdb8694e9b2f48dd167baf3c6cfd6d3bc71f.json"),
     d3.json("./data/geo_data.json"),
 ]).then(objects => {
     const allCovidData = objects[0];
