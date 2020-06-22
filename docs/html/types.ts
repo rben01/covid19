@@ -53,14 +53,22 @@ export interface Aggregated<T> {
 export type AggNumber = Aggregated<number>;
 export type AggDate = Aggregated<DateString>;
 
+interface OutbreakCutoffs {
+	cases: number;
+	cases_per_capita: number;
+	deaths: number;
+	deaths_per_capita: number;
+}
+
 export interface ScopedCovidData {
 	agg: {
-		[key: string]: {
+		[key in CountMethod]: {
 			cases: AggNumber;
 			cases_per_capita: AggNumber;
 			deaths: AggNumber;
 			deaths_per_capita: AggNumber;
 			date: AggDate;
+			outbreak_cutoffs: OutbreakCutoffs;
 		};
 	};
 	data: {
@@ -77,6 +85,7 @@ export interface DataGroup {
 
 export interface LocationCovidData extends DataGroup {
 	date: { [key: string]: number };
+	outbreak_cutoffs: OutbreakCutoffs;
 	day_over_day_diffs: DataGroup;
 }
 

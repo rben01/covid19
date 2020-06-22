@@ -293,11 +293,24 @@ def data_to_json():
 
             data[df_name]["agg"]["dodd"][jsonify(ct)]["min_nonzero"] = min_val
 
+        outbreak_cutoffs = {
+            "Cases": 100,
+            "Cases Per Cap.": 1e-5,
+            "Deaths": 25,
+            "Deaths Per Cap.": 2.5e-6,
+        }
+
+        for k in ["dodd", "net"]:
+            data[df_name]["agg"][k]["outbreak_cutoffs"] = {
+                jsonify(k): v for k, v in outbreak_cutoffs.items()
+            }
+
         data[df_name]["data"] = {}
         d = data[df_name]["data"]
-        for code, group in df.groupby(CODE):
+        for code, g in df.groupby(CODE):
             d[code] = {}
-            g = group.copy()
+            d[code]["outbreak_cutoffs"] = {}
+            g = g.copy()
 
             for col in g.columns:
                 if col in [CODE, "name"]:
@@ -307,6 +320,8 @@ def data_to_json():
                     elem = {k: i for i, k in enumerate(g[col].tolist())}
                 else:
                     elem = list(map(nan_to_none, g[col].tolist()))
+                    outbreak_start_idx = int((g[col] < outbreak_cutoffs[ct]).sum())
+                    d[code]["outbreak_cutoffs"][jsonify(col)] = outbreak_start_idx
 
                 d[code][jsonify(col)] = elem
 

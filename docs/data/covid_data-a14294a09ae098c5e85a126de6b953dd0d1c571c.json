@@ -26,6 +26,12 @@
 "min": 0.0,
 "max": 144.50265081021683,
 "min_nonzero": 0.003448765705722133
+},
+"outbreak_cutoffs": {
+"cases": 100,
+"cases_per_capita": 1e-05,
+"deaths": 25,
+"deaths_per_capita": 2.5e-06
 }
 },
 "dodd": {
@@ -48,11 +54,23 @@
 "min": 0.0,
 "max": 6.871817051474398,
 "min_nonzero": 0.0004926808151037963
+},
+"outbreak_cutoffs": {
+"cases": 100,
+"cases_per_capita": 1e-05,
+"deaths": 25,
+"deaths_per_capita": 2.5e-06
 }
 }
 },
 "data": {
 "AK": {
+"outbreak_cutoffs": {
+"cases": 7,
+"cases_per_capita": 7,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -595,6 +613,12 @@
 ]
 },
 "AL": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -1132,6 +1156,12 @@
 ]
 },
 "AR": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -1674,6 +1704,12 @@
 ]
 },
 "AZ": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -2226,6 +2262,12 @@
 ]
 },
 "CA": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -2778,6 +2820,12 @@
 ]
 },
 "CO": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 9,
+"deaths_per_capita": 9
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -3325,6 +3373,12 @@
 ]
 },
 "CT": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -3862,6 +3916,12 @@
 ]
 },
 "DC": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 15,
+"deaths_per_capita": 15
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -4409,6 +4469,12 @@
 ]
 },
 "DE": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -4951,6 +5017,12 @@
 ]
 },
 "FL": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 7,
+"deaths_per_capita": 7
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -5503,6 +5575,12 @@
 ]
 },
 "GA": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 9,
+"deaths_per_capita": 9
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -6055,6 +6133,12 @@
 ]
 },
 "HI": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -6592,6 +6676,12 @@
 ]
 },
 "IA": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -7134,6 +7224,12 @@
 ]
 },
 "ID": {
+"outbreak_cutoffs": {
+"cases": 7,
+"cases_per_capita": 7,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -7671,6 +7767,12 @@
 ]
 },
 "IL": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -8223,6 +8325,12 @@
 ]
 },
 "IN": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 10,
+"deaths_per_capita": 10
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -8765,6 +8873,12 @@
 ]
 },
 "KS": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -9307,6 +9421,12 @@
 ]
 },
 "KY": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -9849,6 +9969,12 @@
 ]
 },
 "LA": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -10386,6 +10512,12 @@
 ]
 },
 "MA": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 6,
+"deaths_per_capita": 6
+},
 "date": {
 "2020-03-13": 0,
 "2020-03-14": 1,
@@ -10898,6 +11030,12 @@
 ]
 },
 "MD": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -11445,6 +11583,12 @@
 ]
 },
 "ME": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -11982,6 +12126,12 @@
 ]
 },
 "MI": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 16,
+"deaths_per_capita": 16
+},
 "date": {
 "2020-03-02": 0,
 "2020-03-03": 1,
@@ -12549,6 +12699,12 @@
 ]
 },
 "MN": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 15,
+"deaths_per_capita": 15
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -13091,6 +13247,12 @@
 ]
 },
 "MO": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -13628,6 +13790,12 @@
 ]
 },
 "MS": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -14165,6 +14333,12 @@
 ]
 },
 "MT": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -14702,6 +14876,12 @@
 ]
 },
 "NC": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -15254,6 +15434,12 @@
 ]
 },
 "ND": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -15791,6 +15977,12 @@
 ]
 },
 "NE": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 23,
+"deaths_per_capita": 23
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -16338,6 +16530,12 @@
 ]
 },
 "NH": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -16890,6 +17088,12 @@
 ]
 },
 "NJ": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 6,
+"deaths_per_capita": 6
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -17437,6 +17641,12 @@
 ]
 },
 "NM": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -17979,6 +18189,12 @@
 ]
 },
 "NV": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -18526,6 +18742,12 @@
 ]
 },
 "NY": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -19078,6 +19300,12 @@
 ]
 },
 "OH": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 15,
+"deaths_per_capita": 15
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -19625,6 +19853,12 @@
 ]
 },
 "OK": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -20162,6 +20396,12 @@
 ]
 },
 "OR": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -20714,6 +20954,12 @@
 ]
 },
 "PA": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -21256,6 +21502,12 @@
 ]
 },
 "RI": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 28,
+"deaths_per_capita": 28
+},
 "date": {
 "2020-03-02": 0,
 "2020-03-03": 1,
@@ -21823,6 +22075,12 @@
 ]
 },
 "SC": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -22375,6 +22633,12 @@
 ]
 },
 "SD": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -22912,6 +23176,12 @@
 ]
 },
 "TN": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 18,
+"deaths_per_capita": 18
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -23459,6 +23729,12 @@
 ]
 },
 "TX": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -24011,6 +24287,12 @@
 ]
 },
 "UT": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 15,
+"deaths_per_capita": 15
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -24548,6 +24830,12 @@
 ]
 },
 "VA": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 10,
+"deaths_per_capita": 10
+},
 "date": {
 "2020-03-06": 0,
 "2020-03-07": 1,
@@ -25095,6 +25383,12 @@
 ]
 },
 "VT": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -25637,6 +25931,12 @@
 ]
 },
 "WA": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 35,
+"deaths_per_capita": 35
+},
 "date": {
 "2020-01-23": 0,
 "2020-01-24": 1,
@@ -26399,6 +26699,12 @@
 ]
 },
 "WI": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 16,
+"deaths_per_capita": 16
+},
 "date": {
 "2020-03-05": 0,
 "2020-03-06": 1,
@@ -26951,6 +27257,12 @@
 ]
 },
 "WV": {
+"outbreak_cutoffs": {
+"cases": 12,
+"cases_per_capita": 12,
+"deaths": 24,
+"deaths_per_capita": 24
+},
 "date": {
 "2020-03-07": 0,
 "2020-03-08": 1,
@@ -27493,6 +27805,12 @@
 ]
 },
 "WY": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 37,
+"deaths_per_capita": 37
+},
 "date": {
 "2020-03-08": 0,
 "2020-03-09": 1,
@@ -28058,6 +28376,12 @@
 "min": 0.0,
 "max": 125.09680109608625,
 "min_nonzero": 7.351344129390878e-05
+},
+"outbreak_cutoffs": {
+"cases": 100,
+"cases_per_capita": 1e-05,
+"deaths": 25,
+"deaths_per_capita": 2.5e-06
 }
 },
 "dodd": {
@@ -28080,11 +28404,23 @@
 "min": 0.0,
 "max": 17.870971585155168,
 "min_nonzero": 1.0189939162170386e-05
+},
+"outbreak_cutoffs": {
+"cases": 100,
+"cases_per_capita": 1e-05,
+"deaths": 25,
+"deaths_per_capita": 2.5e-06
 }
 }
 },
 "data": {
 "Afghanistan": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -28662,6 +28998,12 @@
 ]
 },
 "Albania": {
+"outbreak_cutoffs": {
+"cases": 9,
+"cases_per_capita": 9,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -29239,6 +29581,12 @@
 ]
 },
 "Algeria": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -29816,6 +30164,12 @@
 ]
 },
 "Andorra": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -30393,6 +30747,12 @@
 ]
 },
 "Angola": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -30970,6 +31330,12 @@
 ]
 },
 "Antigua and Barbuda": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 38,
+"deaths_per_capita": 38
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -31547,6 +31913,12 @@
 ]
 },
 "Argentina": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -32124,6 +32496,12 @@
 ]
 },
 "Armenia": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 26,
+"deaths_per_capita": 26
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -32701,6 +33079,12 @@
 ]
 },
 "Australia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 1,
+"deaths_per_capita": 1
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -33278,6 +33662,12 @@
 ]
 },
 "Austria": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -33855,6 +34245,12 @@
 ]
 },
 "Azerbaijan": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -34432,6 +34828,12 @@
 ]
 },
 "Bahrain": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 16,
+"deaths_per_capita": 16
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -35009,6 +35411,12 @@
 ]
 },
 "Bangladesh": {
+"outbreak_cutoffs": {
+"cases": 8,
+"cases_per_capita": 8,
+"deaths": 18,
+"deaths_per_capita": 18
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -35586,6 +35994,12 @@
 ]
 },
 "Barbados": {
+"outbreak_cutoffs": {
+"cases": 17,
+"cases_per_capita": 17,
+"deaths": 36,
+"deaths_per_capita": 36
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -36163,6 +36577,12 @@
 ]
 },
 "Belarus": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -36740,6 +37160,12 @@
 ]
 },
 "Belgium": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -37317,6 +37743,12 @@
 ]
 },
 "Belize": {
+"outbreak_cutoffs": {
+"cases": 23,
+"cases_per_capita": 23,
+"deaths": 37,
+"deaths_per_capita": 37
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -37894,6 +38326,12 @@
 ]
 },
 "Benin": {
+"outbreak_cutoffs": {
+"cases": 16,
+"cases_per_capita": 16,
+"deaths": 37,
+"deaths_per_capita": 37
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -38471,6 +38909,12 @@
 ]
 },
 "Bhutan": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -39048,6 +39492,12 @@
 ]
 },
 "Bolivia": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -39625,6 +40075,12 @@
 ]
 },
 "Bosnia and Herzegovina": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -40202,6 +40658,12 @@ null
 ]
 },
 "Botswana": {
+"outbreak_cutoffs": {
+"cases": 30,
+"cases_per_capita": 30,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -40779,6 +41241,12 @@ null
 ]
 },
 "Brazil": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -41356,6 +41824,12 @@ null
 ]
 },
 "Britain": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 5,
+"deaths_per_capita": 5
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -41933,6 +42407,12 @@ null
 ]
 },
 "Brunei": {
+"outbreak_cutoffs": {
+"cases": 9,
+"cases_per_capita": 9,
+"deaths": 28,
+"deaths_per_capita": 28
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -42510,6 +42990,12 @@ null
 ]
 },
 "Bulgaria": {
+"outbreak_cutoffs": {
+"cases": 8,
+"cases_per_capita": 8,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -43087,6 +43573,12 @@ null
 ]
 },
 "Burkina Faso": {
+"outbreak_cutoffs": {
+"cases": 10,
+"cases_per_capita": 10,
+"deaths": 18,
+"deaths_per_capita": 18
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -43664,6 +44156,12 @@ null
 ]
 },
 "Burundi": {
+"outbreak_cutoffs": {
+"cases": 31,
+"cases_per_capita": 31,
+"deaths": 44,
+"deaths_per_capita": 44
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -44241,6 +44739,12 @@ null
 ]
 },
 "Cambodia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -44818,6 +45322,12 @@ null
 ]
 },
 "Cameroon": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -45395,6 +45905,12 @@ null
 ]
 },
 "Canada": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 9,
+"deaths_per_capita": 9
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -45972,6 +46488,12 @@ null
 ]
 },
 "Cape Verde": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 24,
+"deaths_per_capita": 24
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -46549,6 +47071,12 @@ null
 ]
 },
 "Central African Rep.": {
+"outbreak_cutoffs": {
+"cases": 15,
+"cases_per_capita": 15,
+"deaths": 84,
+"deaths_per_capita": 84
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -47126,6 +47654,12 @@ null
 ]
 },
 "Chad": {
+"outbreak_cutoffs": {
+"cases": 19,
+"cases_per_capita": 19,
+"deaths": 59,
+"deaths_per_capita": 59
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -47703,6 +48237,12 @@ null
 ]
 },
 "Chile": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -48280,6 +48820,12 @@ null
 ]
 },
 "China": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -48857,6 +49403,12 @@ null
 ]
 },
 "Colombia": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -49434,6 +49986,12 @@ null
 ]
 },
 "Congo": {
+"outbreak_cutoffs": {
+"cases": 15,
+"cases_per_capita": 15,
+"deaths": 33,
+"deaths_per_capita": 33
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -50011,6 +50569,12 @@ null
 ]
 },
 "Costa Rica": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -50588,6 +51152,12 @@ null
 ]
 },
 "Croatia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -51165,6 +51735,12 @@ null
 ]
 },
 "Cuba": {
+"outbreak_cutoffs": {
+"cases": 12,
+"cases_per_capita": 12,
+"deaths": 18,
+"deaths_per_capita": 18
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -51742,6 +52318,12 @@ null
 ]
 },
 "Cyprus": {
+"outbreak_cutoffs": {
+"cases": 9,
+"cases_per_capita": 9,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -52319,6 +52901,12 @@ null
 ]
 },
 "Czechia": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -52896,6 +53484,12 @@ null
 ]
 },
 "Dem. Rep. Congo": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -53473,6 +54067,12 @@ null
 ]
 },
 "Denmark": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -54050,6 +54650,12 @@ null
 ]
 },
 "Djibouti": {
+"outbreak_cutoffs": {
+"cases": 18,
+"cases_per_capita": 18,
+"deaths": 41,
+"deaths_per_capita": 41
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -54627,6 +55233,12 @@ null
 ]
 },
 "Dominica": {
+"outbreak_cutoffs": {
+"cases": 22,
+"cases_per_capita": 22,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -55204,6 +55816,12 @@ null
 ]
 },
 "Dominican Republic": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -55781,6 +56399,12 @@ null
 ]
 },
 "Ecuador": {
+"outbreak_cutoffs": {
+"cases": 1,
+"cases_per_capita": 1,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -56358,6 +56982,12 @@ null
 ]
 },
 "Egypt": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 8,
+"deaths_per_capita": 8
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -56935,6 +57565,12 @@ null
 ]
 },
 "El Salvador": {
+"outbreak_cutoffs": {
+"cases": 19,
+"cases_per_capita": 19,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -57512,6 +58148,12 @@ null
 ]
 },
 "Eq. Guinea": {
+"outbreak_cutoffs": {
+"cases": 15,
+"cases_per_capita": 15,
+"deaths": 53,
+"deaths_per_capita": 53
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -58089,6 +58731,12 @@ null
 ]
 },
 "Eritrea": {
+"outbreak_cutoffs": {
+"cases": 21,
+"cases_per_capita": 21,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -58666,6 +59314,12 @@ null
 ]
 },
 "Estonia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -59243,6 +59897,12 @@ null
 ]
 },
 "Eswatini": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 47,
+"deaths_per_capita": 47
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -59820,6 +60480,12 @@ null
 ]
 },
 "Ethiopia": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 36,
+"deaths_per_capita": 36
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -60397,6 +61063,12 @@ null
 ]
 },
 "Fiji": {
+"outbreak_cutoffs": {
+"cases": 19,
+"cases_per_capita": 19,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -60974,6 +61646,12 @@ null
 ]
 },
 "Finland": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -61551,6 +62229,12 @@ null
 ]
 },
 "France": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -62128,6 +62812,12 @@ null
 ]
 },
 "Gabon": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -62705,6 +63395,12 @@ null
 ]
 },
 "Gambia": {
+"outbreak_cutoffs": {
+"cases": 17,
+"cases_per_capita": 17,
+"deaths": 23,
+"deaths_per_capita": 23
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -63282,6 +63978,12 @@ null
 ]
 },
 "Georgia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 35,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -63859,6 +64561,12 @@ null
 ]
 },
 "Germany": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 9,
+"deaths_per_capita": 9
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -64436,6 +65144,12 @@ null
 ]
 },
 "Ghana": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -65013,6 +65727,12 @@ null
 ]
 },
 "Greece": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -65590,6 +66310,12 @@ null
 ]
 },
 "Grenada": {
+"outbreak_cutoffs": {
+"cases": 22,
+"cases_per_capita": 22,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -66167,6 +66893,12 @@ null
 ]
 },
 "Guatemala": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 16,
+"deaths_per_capita": 16
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -66744,6 +67476,12 @@ null
 ]
 },
 "Guinea": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 46,
+"deaths_per_capita": 46
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -67321,6 +68059,12 @@ null
 ]
 },
 "Guinea-Bissau": {
+"outbreak_cutoffs": {
+"cases": 25,
+"cases_per_capita": 25,
+"deaths": 57,
+"deaths_per_capita": 57
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -67898,6 +68642,12 @@ null
 ]
 },
 "Guyana": {
+"outbreak_cutoffs": {
+"cases": 12,
+"cases_per_capita": 12,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -68475,6 +69225,12 @@ null
 ]
 },
 "Haiti": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 36,
+"deaths_per_capita": 36
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -69052,6 +69808,12 @@ null
 ]
 },
 "Holy See": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 0,
+"deaths": 113,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -69629,6 +70391,12 @@ null
 ]
 },
 "Honduras": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 26,
+"deaths_per_capita": 26
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -70206,6 +70974,12 @@ null
 ]
 },
 "Hungary": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 15,
+"deaths_per_capita": 15
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -70783,6 +71557,12 @@ null
 ]
 },
 "Iceland": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -71360,6 +72140,12 @@ null
 ]
 },
 "India": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -71937,6 +72723,12 @@ null
 ]
 },
 "Indonesia": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -72514,6 +73306,12 @@ null
 ]
 },
 "Iran": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -73091,6 +73889,12 @@ null
 ]
 },
 "Iraq": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 4,
+"deaths_per_capita": 4
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -73668,6 +74472,12 @@ null
 ]
 },
 "Ireland": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -74245,6 +75055,12 @@ null
 ]
 },
 "Israel": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -74822,6 +75638,12 @@ null
 ]
 },
 "Italy": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -75399,6 +76221,12 @@ null
 ]
 },
 "Ivory Coast": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -75976,6 +76804,12 @@ null
 ]
 },
 "Jamaica": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -76553,6 +77387,12 @@ null
 ]
 },
 "Japan": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -77130,6 +77970,12 @@ null
 ]
 },
 "Jordan": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -77707,6 +78553,12 @@ null
 ]
 },
 "Kazakhstan": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -78284,6 +79136,12 @@ null
 ]
 },
 "Kenya": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 26,
+"deaths_per_capita": 26
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -78861,6 +79719,12 @@ null
 ]
 },
 "Kosovo": {
+"outbreak_cutoffs": {
+"cases": 26,
+"cases_per_capita": 26,
+"deaths": 26,
+"deaths_per_capita": 26
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -79438,6 +80302,12 @@ null
 ]
 },
 "Kuwait": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 35,
+"deaths_per_capita": 35
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -80015,6 +80885,12 @@ null
 ]
 },
 "Kyrgyzstan": {
+"outbreak_cutoffs": {
+"cases": 18,
+"cases_per_capita": 18,
+"deaths": 34,
+"deaths_per_capita": 34
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -80592,6 +81468,12 @@ null
 ]
 },
 "Laos": {
+"outbreak_cutoffs": {
+"cases": 24,
+"cases_per_capita": 24,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -81169,6 +82051,12 @@ null
 ]
 },
 "Latvia": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 34,
+"deaths_per_capita": 34
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -81746,6 +82634,12 @@ null
 ]
 },
 "Lebanon": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 10,
+"deaths_per_capita": 10
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -82323,6 +83217,12 @@ null
 ]
 },
 "Lesotho": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 39,
+"deaths_per_capita": 39
+},
 "date": {
 "2020-05-14": 0,
 "2020-05-15": 1,
@@ -82530,6 +83430,12 @@ null
 ]
 },
 "Liberia": {
+"outbreak_cutoffs": {
+"cases": 16,
+"cases_per_capita": 16,
+"deaths": 35,
+"deaths_per_capita": 35
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -83107,6 +84013,12 @@ null
 ]
 },
 "Libya": {
+"outbreak_cutoffs": {
+"cases": 24,
+"cases_per_capita": 24,
+"deaths": 33,
+"deaths_per_capita": 33
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -83684,6 +84596,12 @@ null
 ]
 },
 "Liechtenstein": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 35,
+"deaths_per_capita": 35
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -84261,6 +85179,12 @@ null
 ]
 },
 "Lithuania": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -84838,6 +85762,12 @@ null
 ]
 },
 "Luxembourg": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -85415,6 +86345,12 @@ null
 ]
 },
 "Macedonia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -85992,6 +86928,12 @@ null
 ]
 },
 "Madagascar": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 78,
+"deaths_per_capita": 78
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -86569,6 +87511,12 @@ null
 ]
 },
 "Malawi": {
+"outbreak_cutoffs": {
+"cases": 33,
+"cases_per_capita": 33,
+"deaths": 38,
+"deaths_per_capita": 38
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -87146,6 +88094,12 @@ null
 ]
 },
 "Malaysia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -87723,6 +88677,12 @@ null
 ]
 },
 "Maldives": {
+"outbreak_cutoffs": {
+"cases": 8,
+"cases_per_capita": 8,
+"deaths": 60,
+"deaths_per_capita": 60
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -88300,6 +89260,12 @@ null
 ]
 },
 "Mali": {
+"outbreak_cutoffs": {
+"cases": 25,
+"cases_per_capita": 25,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -88877,6 +89843,12 @@ null
 ]
 },
 "Malta": {
+"outbreak_cutoffs": {
+"cases": 7,
+"cases_per_capita": 7,
+"deaths": 39,
+"deaths_per_capita": 39
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -89454,6 +90426,12 @@ null
 ]
 },
 "Mauritania": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 30,
+"deaths_per_capita": 30
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -90031,6 +91009,12 @@ null
 ]
 },
 "Mauritius": {
+"outbreak_cutoffs": {
+"cases": 18,
+"cases_per_capita": 18,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -90608,6 +91592,12 @@ null
 ]
 },
 "Mexico": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -91185,6 +92175,12 @@ null
 ]
 },
 "Moldova": {
+"outbreak_cutoffs": {
+"cases": 8,
+"cases_per_capita": 8,
+"deaths": 18,
+"deaths_per_capita": 18
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -91762,6 +92758,12 @@ null
 ]
 },
 "Monaco": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -92339,6 +93341,12 @@ null
 ]
 },
 "Mongolia": {
+"outbreak_cutoffs": {
+"cases": 10,
+"cases_per_capita": 10,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -92916,6 +93924,12 @@ null
 ]
 },
 "Montenegro": {
+"outbreak_cutoffs": {
+"cases": 17,
+"cases_per_capita": 17,
+"deaths": 23,
+"deaths_per_capita": 23
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -93493,6 +94507,12 @@ null
 ]
 },
 "Morocco": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 10,
+"deaths_per_capita": 10
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -94070,6 +95090,12 @@ null
 ]
 },
 "Mozambique": {
+"outbreak_cutoffs": {
+"cases": 22,
+"cases_per_capita": 22,
+"deaths": 86,
+"deaths_per_capita": 86
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -94647,6 +95673,12 @@ null
 ]
 },
 "Myanmar": {
+"outbreak_cutoffs": {
+"cases": 27,
+"cases_per_capita": 27,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -95224,6 +96256,12 @@ null
 ]
 },
 "Namibia": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -95801,6 +96839,12 @@ null
 ]
 },
 "Nepal": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 77,
+"deaths_per_capita": 77
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -96378,6 +97422,12 @@ null
 ]
 },
 "Netherlands": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 6,
+"deaths_per_capita": 6
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -96955,6 +98005,12 @@ null
 ]
 },
 "New Zealand": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -97532,6 +98588,12 @@ null
 ]
 },
 "Nicaragua": {
+"outbreak_cutoffs": {
+"cases": 19,
+"cases_per_capita": 19,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -98109,6 +99171,12 @@ null
 ]
 },
 "Niger": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -98686,6 +99754,12 @@ null
 ]
 },
 "Nigeria": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 23,
+"deaths_per_capita": 23
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -99263,6 +100337,12 @@ null
 ]
 },
 "Norway": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -99840,6 +100920,12 @@ null
 ]
 },
 "Oman": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -100417,6 +101503,12 @@ null
 ]
 },
 "Pakistan": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -100994,6 +102086,12 @@ null
 ]
 },
 "Panama": {
+"outbreak_cutoffs": {
+"cases": 10,
+"cases_per_capita": 10,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -101571,6 +102669,12 @@ null
 ]
 },
 "Papua New Guinea": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -102148,6 +103252,12 @@ null
 ]
 },
 "Paraguay": {
+"outbreak_cutoffs": {
+"cases": 8,
+"cases_per_capita": 8,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -102725,6 +103835,12 @@ null
 ]
 },
 "Peru": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -103302,6 +104418,12 @@ null
 ]
 },
 "Philippines": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -103879,6 +105001,12 @@ null
 ]
 },
 "Poland": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 12,
+"deaths_per_capita": 12
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -104456,6 +105584,12 @@ null
 ]
 },
 "Portugal": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -105033,6 +106167,12 @@ null
 ]
 },
 "Qatar": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 28,
+"deaths_per_capita": 28
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -105610,6 +106750,12 @@ null
 ]
 },
 "Romania": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 22,
+"deaths_per_capita": 22
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -106187,6 +107333,12 @@ null
 ]
 },
 "Russia": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -106764,6 +107916,12 @@ null
 ]
 },
 "Rwanda": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 91,
+"deaths_per_capita": 91
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -107341,6 +108499,12 @@ null
 ]
 },
 "Saint Kitts and Nevis": {
+"outbreak_cutoffs": {
+"cases": 25,
+"cases_per_capita": 25,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -107918,6 +109082,12 @@ null
 ]
 },
 "Saint Lucia": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -108495,6 +109665,12 @@ null
 ]
 },
 "Saint Vincent and the Grenadines": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -109072,6 +110248,12 @@ null
 ]
 },
 "San Marino": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 3,
+"deaths_per_capita": 3
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -109649,6 +110831,12 @@ null
 ]
 },
 "Sao Tome and Principe": {
+"outbreak_cutoffs": {
+"cases": 37,
+"cases_per_capita": 0,
+"deaths": 62,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -110226,6 +111414,12 @@ null
 ]
 },
 "Saudi Arabia": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 24,
+"deaths_per_capita": 24
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -110803,6 +111997,12 @@ null
 ]
 },
 "Senegal": {
+"outbreak_cutoffs": {
+"cases": 2,
+"cases_per_capita": 2,
+"deaths": 32,
+"deaths_per_capita": 32
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -111380,6 +112580,12 @@ null
 ]
 },
 "Serbia": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -111957,6 +113163,12 @@ null
 ]
 },
 "Seychelles": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -112534,6 +113746,12 @@ null
 ]
 },
 "Sierra Leone": {
+"outbreak_cutoffs": {
+"cases": 31,
+"cases_per_capita": 31,
+"deaths": 54,
+"deaths_per_capita": 54
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -113111,6 +114329,12 @@ null
 ]
 },
 "Singapore": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 21,
+"deaths_per_capita": 21
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -113688,6 +114912,12 @@ null
 ]
 },
 "Slovakia": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 28,
+"deaths_per_capita": 28
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -114265,6 +115495,12 @@ null
 ]
 },
 "Slovenia": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 14,
+"deaths_per_capita": 14
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -114842,6 +116078,12 @@ null
 ]
 },
 "Somalia": {
+"outbreak_cutoffs": {
+"cases": 16,
+"cases_per_capita": 16,
+"deaths": 39,
+"deaths_per_capita": 39
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -115419,6 +116661,12 @@ null
 ]
 },
 "South Africa": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 5,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -115996,6 +117244,12 @@ null
 ]
 },
 "South Korea": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -116573,6 +117827,12 @@ null
 ]
 },
 "South Sudan": {
+"outbreak_cutoffs": {
+"cases": 36,
+"cases_per_capita": 36,
+"deaths": 75,
+"deaths_per_capita": 75
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -117150,6 +118410,12 @@ null
 ]
 },
 "Spain": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 3,
+"deaths_per_capita": 3
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -117727,6 +118993,12 @@ null
 ]
 },
 "Sri Lanka": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 28,
+"deaths_per_capita": 28
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -118304,6 +119576,12 @@ null
 ]
 },
 "Sudan": {
+"outbreak_cutoffs": {
+"cases": 13,
+"cases_per_capita": 13,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -118881,6 +120159,12 @@ null
 ]
 },
 "Suriname": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 34,
+"deaths_per_capita": 34
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -119458,6 +120742,12 @@ null
 ]
 },
 "Sweden": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 11,
+"deaths_per_capita": 11
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -120035,6 +121325,12 @@ null
 ]
 },
 "Switzerland": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 5,
+"deaths_per_capita": 5
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -120612,6 +121908,12 @@ null
 ]
 },
 "Syria": {
+"outbreak_cutoffs": {
+"cases": 22,
+"cases_per_capita": 22,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -121189,6 +122491,12 @@ null
 ]
 },
 "Taiwan": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -121766,6 +123074,12 @@ null
 ]
 },
 "Tajikistan": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 2,
+"deaths_per_capita": 2
+},
 "date": {
 "2020-05-01": 0,
 "2020-05-02": 1,
@@ -122038,6 +123352,12 @@ null
 ]
 },
 "Tanzania": {
+"outbreak_cutoffs": {
+"cases": 16,
+"cases_per_capita": 16,
+"deaths": 31,
+"deaths_per_capita": 31
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -122615,6 +123935,12 @@ null
 ]
 },
 "Thailand": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 1,
+"deaths_per_capita": 1
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -123192,6 +124518,12 @@ null
 ]
 },
 "The Bahamas": {
+"outbreak_cutoffs": {
+"cases": 16,
+"cases_per_capita": 0,
+"deaths": 32,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -123769,6 +125101,12 @@ null
 ]
 },
 "Timor-Leste": {
+"outbreak_cutoffs": {
+"cases": 22,
+"cases_per_capita": 0,
+"deaths": 113,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -124346,6 +125684,12 @@ null
 ]
 },
 "Togo": {
+"outbreak_cutoffs": {
+"cases": 6,
+"cases_per_capita": 6,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -124923,6 +126267,12 @@ null
 ]
 },
 "Trinidad and Tobago": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 25,
+"deaths_per_capita": 25
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -125500,6 +126850,12 @@ null
 ]
 },
 "Tunisia": {
+"outbreak_cutoffs": {
+"cases": 4,
+"cases_per_capita": 4,
+"deaths": 19,
+"deaths_per_capita": 19
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -126077,6 +127433,12 @@ null
 ]
 },
 "Turkey": {
+"outbreak_cutoffs": {
+"cases": 11,
+"cases_per_capita": 11,
+"deaths": 17,
+"deaths_per_capita": 17
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -126654,6 +128016,12 @@ null
 ]
 },
 "UAE": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 20,
+"deaths_per_capita": 20
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -127231,6 +128599,12 @@ null
 ]
 },
 "Uganda": {
+"outbreak_cutoffs": {
+"cases": 21,
+"cases_per_capita": 21,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -127808,6 +129182,12 @@ null
 ]
 },
 "Ukraine": {
+"outbreak_cutoffs": {
+"cases": 3,
+"cases_per_capita": 3,
+"deaths": 13,
+"deaths_per_capita": 13
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -128385,6 +129765,12 @@ null
 ]
 },
 "United States": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 0,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -128962,6 +130348,12 @@ null
 ]
 },
 "Uruguay": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 29,
+"deaths_per_capita": 29
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -129539,6 +130931,12 @@ null
 ]
 },
 "Uzbekistan": {
+"outbreak_cutoffs": {
+"cases": 15,
+"cases_per_capita": 15,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -130116,6 +131514,12 @@ null
 ]
 },
 "Venezuela": {
+"outbreak_cutoffs": {
+"cases": 14,
+"cases_per_capita": 14,
+"deaths": 27,
+"deaths_per_capita": 27
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -130693,6 +132097,12 @@ null
 ]
 },
 "Vietnam": {
+"outbreak_cutoffs": {
+"cases": 0,
+"cases_per_capita": 0,
+"deaths": 113,
+"deaths_per_capita": 113
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -131270,6 +132680,12 @@ null
 ]
 },
 "W. Sahara": {
+"outbreak_cutoffs": {
+"cases": 36,
+"cases_per_capita": 36,
+"deaths": 87,
+"deaths_per_capita": 87
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -131847,6 +133263,12 @@ null
 ]
 },
 "West Bank and Gaza": {
+"outbreak_cutoffs": {
+"cases": 5,
+"cases_per_capita": 0,
+"deaths": 26,
+"deaths_per_capita": 0
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -132424,6 +133846,12 @@ null
 ]
 },
 "Yemen": {
+"outbreak_cutoffs": {
+"cases": 41,
+"cases_per_capita": 41,
+"deaths": 60,
+"deaths_per_capita": 60
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -133001,6 +134429,12 @@ null
 ]
 },
 "Zambia": {
+"outbreak_cutoffs": {
+"cases": 18,
+"cases_per_capita": 18,
+"deaths": 33,
+"deaths_per_capita": 33
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
@@ -133578,6 +135012,12 @@ null
 ]
 },
 "Zimbabwe": {
+"outbreak_cutoffs": {
+"cases": 20,
+"cases_per_capita": 20,
+"deaths": 23,
+"deaths_per_capita": 23
+},
 "date": {
 "2020-03-01": 0,
 "2020-03-02": 1,
