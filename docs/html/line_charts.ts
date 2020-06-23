@@ -109,9 +109,9 @@ export function initializeLineGraph(
 
 	const location: WorldLocation = "usa";
 	const count: CountMethod = "dodd";
-	const caseType: CaseType = "cases";
+	const caseType: CaseType = "deaths";
 
-	updateLineGraph(location, caseType, count, "outbreak");
+	updateLineGraph(location, caseType, count, "first_date", 7);
 }
 
 function updateLineGraph(
@@ -119,20 +119,13 @@ function updateLineGraph(
 	caseType: CaseType,
 	count: CountMethod,
 	startFrom: StartFrom,
+	smoothAvgDays: number,
 ) {
-	const {
-		allCovidData,
-		allGeoData,
-	}: { allCovidData: AllCovidData; allGeoData: AllGeoData } = lineGraph.datum();
+	const allGeoData: AllGeoData = lineGraph.datum().allGeoData;
 
 	const scopedGeoData = allGeoData[location];
 
-	// Now for the actual data we want to plot
-	const pathDrawer: (arg0: Point[]) => void = d3
-		.line()
-		.x((p: Point) => lineXScale(p.x))
-		.y((p: Point) => lineYScale(p.y));
-
+	// Construct the lines we will plot
 	const nLines = 10;
 	const lines: Line[] = [];
 
@@ -162,36 +155,74 @@ function updateLineGraph(
 		for (const [feature, _] of topNPlaces) {
 			const thisLine = new Line(feature.properties.name);
 
-			const dates: DateString[] = Object.keys(feature.covidData.date).sort();
-			for (let i = 0; i < dates.length; ++i) {
-				const dateStr = dates[i];
-				const value = feature.covidData[count][caseType][i];
-				if (value <= 0) {
-					continue;
+			const covidData = feature.covidData;
+			const dates: DateString[] = Object.keys(covidData.date).sort();
+			const values = covidData[count][caseType];
+
+			if (count === "dodd" && smoothAvgDays >= 2) {
+				let sum = values.slice(0, smoothAvgDays - 1).reduce((a, b) => a + b);
+				let prevValue = 0;
+				for (let i = smoothAvgDays; i < values.length; ++i) {
+					const dateStr = dates[i];
+					const value = values[i];
+
+					sum -= prevValue;
+					sum += value;
+					prevValue = values[i - smoothAvgDays + 1];
+
+					const avg = sum / smoothAvgDays;
+					thisLine.push({
+						x: dateStrParser(dateStr),
+						y: avg,
+					});
 				}
-				thisLine.push({
-					x: dateStrParser(dateStr),
-					y: value,
-				});
+			} else {
+				for (let i = 0; i < dates.length; ++i) {
+					const dateStr = dates[i];
+					const value = values[i];
+					thisLine.push({
+						x: dateStrParser(dateStr),
+						y: value,
+					});
+				}
 			}
+
 			lines.push(thisLine);
 		}
 	} else {
 		for (const [feature, _] of topNPlaces) {
 			const thisLine = new Line(feature.properties.name);
-			const startIndex = feature.covidData.outbreak_cutoffs[caseType];
+			const covidData = feature.covidData;
+			const values = covidData[count][caseType];
+			const startIndex = covidData.outbreak_cutoffs[caseType];
 
-			for (
-				let i = startIndex;
-				i < feature.covidData[count][caseType].length;
-				++i
-			) {
-				const value = feature.covidData[count][caseType][i];
-				if (value <= 0) {
-					continue;
+			if (count === "dodd" && smoothAvgDays >= 2) {
+				let sum = values
+					.slice(startIndex, startIndex + smoothAvgDays - 1)
+					.reduce((a, b) => a + b);
+				let prevValue = 0;
+				for (
+					let i = Math.max(startIndex, smoothAvgDays);
+					i < values.length;
+					++i
+				) {
+					const value = values[i];
+
+					sum -= prevValue;
+					sum += value;
+					prevValue = values[i - smoothAvgDays + 1];
+
+					const avg = sum / smoothAvgDays;
+					thisLine.push({
+						x: i,
+						y: avg,
+					});
 				}
-
-				thisLine.push({ x: i, y: value });
+			} else {
+				for (let i = startIndex; i < values.length; ++i) {
+					const value = values[i];
+					thisLine.push({ x: i, y: value });
+				}
 			}
 
 			lines.push(thisLine);
@@ -227,14 +258,6 @@ function updateLineGraph(
 			plotAesthetics.graph.outerMargins.top + innerMargin,
 		]);
 
-	for (let line of lines) {
-		for (let point of line.points) {
-			if (!lineYScale(point.y)) {
-				console.log(point.y, line);
-			}
-		}
-	}
-
 	const {
 		axisXScale,
 		lineXScale,
@@ -268,7 +291,9 @@ function updateLineGraph(
 			};
 		} else {
 			const minXVal = 0;
-			const maxXVal = Math.max(...lines.map(line => line.points.length));
+			const maxXVal = Math.max(
+				...lines.map(line => line.points[line.points.length - 1].x as number),
+			);
 			return {
 				axisXScale: d3
 					.scaleLinear()
@@ -357,15 +382,13 @@ function updateLineGraph(
 		.classed("x-axis-label", true)
 		.attr("font-size", "70%");
 
-	console.log(xTicks);
 	if (startFrom === "first_date") {
 		xTickLabels
 			.text((date: Date) => {
 				const dayOfMonth = date.getDate();
-				if (dayOfMonth % 7 == 1 && dayOfMonth < 28) {
-					return dateFormatter(date);
-				}
-				return "";
+				return dayOfMonth % 7 == 1 && dayOfMonth < 28
+					? dateFormatter(date)
+					: "";
 			})
 			.attr(
 				"transform",
@@ -382,10 +405,7 @@ function updateLineGraph(
 	} else {
 		xTickLabels
 			.text((daysSince: number) => {
-				if (daysSince % 5 == 0) {
-					return daysSince;
-				}
-				return "";
+				return daysSince % 5 == 0 ? daysSince : "";
 			})
 			.attr(
 				"transform",
@@ -403,8 +423,10 @@ function updateLineGraph(
 		.join("text")
 		.classed("y-axis-label", true)
 		.text((y: number) => {
-			const firstDigit = +yFormatter(y)[0];
-			if (firstDigit <= 4 || firstDigit === 6) {
+			const yStr = yFormatter(y);
+			const firstSigFigIndex = yStr.search(/[1-9]/);
+			const firstSigFig = +yStr[firstSigFigIndex];
+			if (firstSigFig <= 4 || firstSigFig === 6) {
 				return yFormatter(y);
 			}
 			return "";
@@ -437,6 +459,15 @@ function updateLineGraph(
 		.attr("stroke", axisColor)
 		.attr("stroke-width", strokeWidth);
 
+	// Finally, draw the lines
+	// Now for the actual data we want to plot
+	const pathDrawer: (arg0: Point[]) => void = d3
+		.line()
+		.x((p: Point) => lineXScale(p.x))
+		.y((p: Point) => lineYScale(p.y))
+		.defined((p: Point) => lineYScale(p.y) > 0);
+
+	console.log(lines);
 	chartArea
 		.selectAll()
 		.data(lines)

@@ -61,16 +61,12 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     lineGraph.datum({ allCovidData, allGeoData });
     const location = "usa";
     const count = "dodd";
-    const caseType = "cases";
-    updateLineGraph(location, caseType, count, "outbreak");
+    const caseType = "deaths";
+    updateLineGraph(location, caseType, count, "first_date", 7);
 }
-function updateLineGraph(location, caseType, count, startFrom) {
-    const { allCovidData, allGeoData, } = lineGraph.datum();
+function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
+    const allGeoData = lineGraph.datum().allGeoData;
     const scopedGeoData = allGeoData[location];
-    const pathDrawer = d3
-        .line()
-        .x((p) => lineXScale(p.x))
-        .y((p) => lineYScale(p.y));
     const nLines = 10;
     const lines = [];
     const topNPlaces = [];
@@ -96,17 +92,34 @@ function updateLineGraph(location, caseType, count, startFrom) {
     if (startFrom === "first_date") {
         for (const [feature, _] of topNPlaces) {
             const thisLine = new Line(feature.properties.name);
-            const dates = Object.keys(feature.covidData.date).sort();
-            for (let i = 0; i < dates.length; ++i) {
-                const dateStr = dates[i];
-                const value = feature.covidData[count][caseType][i];
-                if (value <= 0) {
-                    continue;
+            const covidData = feature.covidData;
+            const dates = Object.keys(covidData.date).sort();
+            const values = covidData[count][caseType];
+            if (count === "dodd" && smoothAvgDays >= 2) {
+                let sum = values.slice(0, smoothAvgDays - 1).reduce((a, b) => a + b);
+                let prevValue = 0;
+                for (let i = smoothAvgDays; i < values.length; ++i) {
+                    const dateStr = dates[i];
+                    const value = values[i];
+                    sum -= prevValue;
+                    sum += value;
+                    prevValue = values[i - smoothAvgDays + 1];
+                    const avg = sum / smoothAvgDays;
+                    thisLine.push({
+                        x: dateStrParser(dateStr),
+                        y: avg,
+                    });
                 }
-                thisLine.push({
-                    x: dateStrParser(dateStr),
-                    y: value,
-                });
+            }
+            else {
+                for (let i = 0; i < dates.length; ++i) {
+                    const dateStr = dates[i];
+                    const value = values[i];
+                    thisLine.push({
+                        x: dateStrParser(dateStr),
+                        y: value,
+                    });
+                }
             }
             lines.push(thisLine);
         }
@@ -114,13 +127,31 @@ function updateLineGraph(location, caseType, count, startFrom) {
     else {
         for (const [feature, _] of topNPlaces) {
             const thisLine = new Line(feature.properties.name);
-            const startIndex = feature.covidData.outbreak_cutoffs[caseType];
-            for (let i = startIndex; i < feature.covidData[count][caseType].length; ++i) {
-                const value = feature.covidData[count][caseType][i];
-                if (value <= 0) {
-                    continue;
+            const covidData = feature.covidData;
+            const values = covidData[count][caseType];
+            const startIndex = covidData.outbreak_cutoffs[caseType];
+            if (count === "dodd" && smoothAvgDays >= 2) {
+                let sum = values
+                    .slice(startIndex, startIndex + smoothAvgDays - 1)
+                    .reduce((a, b) => a + b);
+                let prevValue = 0;
+                for (let i = Math.max(startIndex, smoothAvgDays); i < values.length; ++i) {
+                    const value = values[i];
+                    sum -= prevValue;
+                    sum += value;
+                    prevValue = values[i - smoothAvgDays + 1];
+                    const avg = sum / smoothAvgDays;
+                    thisLine.push({
+                        x: i,
+                        y: avg,
+                    });
                 }
-                thisLine.push({ x: i, y: value });
+            }
+            else {
+                for (let i = startIndex; i < values.length; ++i) {
+                    const value = values[i];
+                    thisLine.push({ x: i, y: value });
+                }
             }
             lines.push(thisLine);
         }
@@ -152,13 +183,6 @@ function updateLineGraph(location, caseType, count, startFrom) {
         plotAesthetics.graph.height - innerMargin,
         plotAesthetics.graph.outerMargins.top + innerMargin,
     ]);
-    for (let line of lines) {
-        for (let point of line.points) {
-            if (!lineYScale(point.y)) {
-                console.log(point.y, line);
-            }
-        }
-    }
     const { axisXScale, lineXScale, minXVal, maxXVal, } = (() => {
         const axisRange = [
             plotAesthetics.graph.outerMargins.left,
@@ -182,7 +206,7 @@ function updateLineGraph(location, caseType, count, startFrom) {
         }
         else {
             const minXVal = 0;
-            const maxXVal = Math.max(...lines.map(line => line.points.length));
+            const maxXVal = Math.max(...lines.map(line => line.points[line.points.length - 1].x));
             return {
                 axisXScale: d3
                     .scaleLinear()
@@ -255,15 +279,13 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .join("text")
         .classed("x-axis-label", true)
         .attr("font-size", "70%");
-    console.log(xTicks);
     if (startFrom === "first_date") {
         xTickLabels
             .text((date) => {
             const dayOfMonth = date.getDate();
-            if (dayOfMonth % 7 == 1 && dayOfMonth < 28) {
-                return dateFormatter(date);
-            }
-            return "";
+            return dayOfMonth % 7 == 1 && dayOfMonth < 28
+                ? dateFormatter(date)
+                : "";
         })
             .attr("transform", (d) => `translate(${lineXScale(d) + plotAesthetics.graph.axisStyle.labelTranslateX},${axisYScale(minYVal) +
             tickLength +
@@ -273,10 +295,7 @@ function updateLineGraph(location, caseType, count, startFrom) {
     else {
         xTickLabels
             .text((daysSince) => {
-            if (daysSince % 5 == 0) {
-                return daysSince;
-            }
-            return "";
+            return daysSince % 5 == 0 ? daysSince : "";
         })
             .attr("transform", (daysSince) => `translate(${lineXScale(daysSince)},${axisYScale(minYVal) + tickLength + 13})`)
             .attr("text-anchor", "middle");
@@ -287,8 +306,10 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .join("text")
         .classed("y-axis-label", true)
         .text((y) => {
-        const firstDigit = +yFormatter(y)[0];
-        if (firstDigit <= 4 || firstDigit === 6) {
+        const yStr = yFormatter(y);
+        const firstSigFigIndex = yStr.search(/[1-9]/);
+        const firstSigFig = +yStr[firstSigFigIndex];
+        if (firstSigFig <= 4 || firstSigFig === 6) {
             return yFormatter(y);
         }
         return "";
@@ -318,6 +339,12 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .attr("fill-opacity", 0)
         .attr("stroke", axisColor)
         .attr("stroke-width", strokeWidth);
+    const pathDrawer = d3
+        .line()
+        .x((p) => lineXScale(p.x))
+        .y((p) => lineYScale(p.y))
+        .defined((p) => lineYScale(p.y) > 0);
+    console.log(lines);
     chartArea
         .selectAll()
         .data(lines)
