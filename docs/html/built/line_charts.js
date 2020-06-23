@@ -62,7 +62,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     const location = "usa";
     const count = "dodd";
     const caseType = "deaths";
-    updateLineGraph(location, caseType, count, "first_date", 7);
+    updateLineGraph(location, caseType, count, "first_date", 1);
 }
 function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
     const allGeoData = lineGraph.datum().allGeoData;
@@ -70,7 +70,7 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
     const nLines = 10;
     const lines = [];
     const topNPlaces = [];
-    let minValue = Infinity;
+    let cutoffValue = -Infinity;
     for (const feature of scopedGeoData.features) {
         if (typeof feature.covidData === "undefined") {
             continue;
@@ -79,14 +79,14 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         const currentValue = values[values.length - 1];
         if (topNPlaces.length < nLines) {
             topNPlaces.push([feature, currentValue]);
-            if (currentValue < minValue) {
-                minValue = currentValue;
+            if (currentValue < cutoffValue) {
+                cutoffValue = currentValue;
             }
         }
-        else if (currentValue < minValue) {
-            const idxToReplace = topNPlaces.findIndex(([_, value]) => value === minValue);
+        else if (currentValue > cutoffValue) {
+            const idxToReplace = topNPlaces.findIndex(([_, value]) => value === cutoffValue);
             topNPlaces[idxToReplace] = [feature, currentValue];
-            minValue = Math.min(...topNPlaces.map(([_, value]) => value));
+            cutoffValue = Math.min(...topNPlaces.map(([_, value]) => value));
         }
     }
     if (startFrom === "first_date") {
