@@ -65,7 +65,7 @@ function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
     if (typeof feature.covidData === "undefined") {
         return null;
     }
-    const data = count === "dodd" ? feature.covidData.day_over_day_diffs : feature.covidData;
+    const data = count === "dodd" ? feature.covidData.dodd : feature.covidData.net;
     const index = feature.covidData.date[dateKey];
     if (typeof index === "undefined") {
         return null;

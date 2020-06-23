@@ -108,7 +108,7 @@ function getDataOnDate({
 	}
 
 	const data: DataGroup =
-		count === "dodd" ? feature.covidData.day_over_day_diffs : feature.covidData;
+		count === "dodd" ? feature.covidData.dodd : feature.covidData.net;
 
 	const index = feature.covidData.date[dateKey];
 	if (typeof index === "undefined") {

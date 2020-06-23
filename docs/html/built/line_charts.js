@@ -9,71 +9,170 @@ class Line {
     }
 }
 const plotAesthetics = (() => {
-    const width = 600, height = 600;
+    const chartWidth = 500, chartHeight = 500;
+    const outerMargins = {
+        top: 3,
+        bottom: 60,
+        left: 40,
+        right: 3,
+    };
+    const legend = {
+        width: 90,
+    };
+    const fullWidth = chartWidth + outerMargins.left + outerMargins.right + legend.width;
+    const fullHeight = chartHeight + outerMargins.top + outerMargins.bottom;
     const pa = {
-        width: width,
-        height: height,
-        axis: {
-            outerMargins: {
-                top: 3,
-                bottom: 60,
-                left: 40,
-                right: 3,
-            },
+        fullWidth,
+        fullHeight,
+        graph: {
+            outerMargins,
+            legend,
             innerMargin: 15,
-            width: null,
-            height: null,
-            style: {
+            width: chartWidth,
+            height: chartHeight,
+            axisStyle: {
                 strokeWidth: 1,
                 tickLength: 6,
                 axisColor: "black",
                 gridlineColor: "#e4e4e4",
-                labelTranslateX: (7 / 600) * width,
-                labelTranslateY: (7 / 600) * height,
+                labelTranslateX: (7 / 500) * chartWidth,
+                labelTranslateY: (7 / 500) * chartHeight,
+            },
+            line: {
+                strokeWidth: 2,
             },
         },
         colors: {
             scale: d3.scaleOrdinal().range(d3.schemeTableau10),
         },
     };
-    pa.axis.width = pa.width - pa.axis.outerMargins.left;
-    pa.axis.height = pa.height - pa.axis.outerMargins.bottom;
+    pa.graph.width = pa.fullWidth - pa.graph.outerMargins.left;
+    pa.graph.height = pa.fullHeight - pa.graph.outerMargins.bottom;
     return pa;
 })();
 const lineGraph = d3.select("#line-charts-section").append("div").attr("id", "line-chart");
 const dateFormatter = d3.timeFormat("%b %-d");
 const svg = lineGraph
     .append("svg")
-    .attr("width", plotAesthetics.width)
-    .attr("height", plotAesthetics.height);
+    .attr("width", plotAesthetics.fullWidth)
+    .attr("height", plotAesthetics.fullHeight);
 const chartArea = svg.append("g").classed("line-chart-area", true);
 export function initializeLineGraph(allCovidData, allGeoData) {
     lineGraph.datum({ allCovidData, allGeoData });
     const location = "usa";
-    const count = "net";
+    const count = "dodd";
     const caseType = "cases";
-    updateLineGraph(location, caseType, count, "first_date");
+    updateLineGraph(location, caseType, count, "outbreak");
 }
-const outbreakCutoff = {
-    cases: ["cases", 100],
-    cases_per_capita: ["cases", 100],
-    deaths: ["deaths", 25],
-    deaths_per_capita: ["deaths", 25],
-};
 function updateLineGraph(location, caseType, count, startFrom) {
     const { allCovidData, allGeoData, } = lineGraph.datum();
-    const scopedCovidData = allCovidData[location];
     const scopedGeoData = allGeoData[location];
-    const innerMargin = plotAesthetics.axis.innerMargin;
+    const pathDrawer = d3
+        .line()
+        .x((p) => lineXScale(p.x))
+        .y((p) => lineYScale(p.y));
+    const nLines = 10;
+    const lines = [];
+    const topNPlaces = [];
+    let minValue = Infinity;
+    for (const feature of scopedGeoData.features) {
+        if (typeof feature.covidData === "undefined") {
+            continue;
+        }
+        const values = feature.covidData[count][caseType];
+        const currentValue = values[values.length - 1];
+        if (topNPlaces.length < nLines) {
+            topNPlaces.push([feature, currentValue]);
+            if (currentValue < minValue) {
+                minValue = currentValue;
+            }
+        }
+        else if (currentValue < minValue) {
+            const idxToReplace = topNPlaces.findIndex(([_, value]) => value === minValue);
+            topNPlaces[idxToReplace] = [feature, currentValue];
+            minValue = Math.min(...topNPlaces.map(([_, value]) => value));
+        }
+    }
+    if (startFrom === "first_date") {
+        for (const [feature, _] of topNPlaces) {
+            const thisLine = new Line(feature.properties.name);
+            const dates = Object.keys(feature.covidData.date).sort();
+            for (let i = 0; i < dates.length; ++i) {
+                const dateStr = dates[i];
+                const value = feature.covidData[count][caseType][i];
+                if (value <= 0) {
+                    continue;
+                }
+                thisLine.push({
+                    x: dateStrParser(dateStr),
+                    y: value,
+                });
+            }
+            lines.push(thisLine);
+        }
+    }
+    else {
+        for (const [feature, _] of topNPlaces) {
+            const thisLine = new Line(feature.properties.name);
+            const startIndex = feature.covidData.outbreak_cutoffs[caseType];
+            for (let i = startIndex; i < feature.covidData[count][caseType].length; ++i) {
+                const value = feature.covidData[count][caseType][i];
+                if (value <= 0) {
+                    continue;
+                }
+                thisLine.push({ x: i, y: value });
+            }
+            lines.push(thisLine);
+        }
+    }
+    const [minYVal, maxYVal] = (() => {
+        let min = Infinity, max = -Infinity;
+        for (let line of lines) {
+            for (let point of line.points) {
+                const y = point.y;
+                if (0 < y && y < min) {
+                    min = y;
+                }
+                else if (y > max) {
+                    max = y;
+                }
+            }
+        }
+        return [min, max];
+    })();
+    const innerMargin = plotAesthetics.graph.innerMargin;
+    const axisYScale = d3
+        .scaleLog()
+        .domain([minYVal, maxYVal])
+        .range([plotAesthetics.graph.height, plotAesthetics.graph.outerMargins.top]);
+    const lineYScale = d3
+        .scaleLog()
+        .domain([minYVal, maxYVal])
+        .range([
+        plotAesthetics.graph.height - innerMargin,
+        plotAesthetics.graph.outerMargins.top + innerMargin,
+    ]);
+    for (let line of lines) {
+        for (let point of line.points) {
+            if (!lineYScale(point.y)) {
+                console.log(point.y, line);
+            }
+        }
+    }
     const { axisXScale, lineXScale, minXVal, maxXVal, } = (() => {
         const axisRange = [
-            plotAesthetics.axis.outerMargins.left,
-            plotAesthetics.width - plotAesthetics.axis.outerMargins.right,
+            plotAesthetics.graph.outerMargins.left,
+            plotAesthetics.fullWidth - plotAesthetics.graph.outerMargins.right,
         ];
         const lineRange = [axisRange[0] + innerMargin, axisRange[1] - innerMargin];
         if (startFrom === "first_date") {
-            const { min_nonzero: _minDateStr, max: _maxDateStr, } = scopedCovidData.agg.net.date;
-            const [minDate, maxDate] = [_minDateStr, _maxDateStr].map(dateStrParser);
+            const lineXs = lines.map(line => line.points.map(p => p.x));
+            const minDate = lineXs
+                .map(points => points[0])
+                .reduce((a, b) => (a < b ? a : b));
+            const maxDate = lineXs
+                .map(points => points[points.length - 1])
+                .reduce((a, b) => (a > b ? a : b));
             return {
                 axisXScale: d3.scaleTime().domain([minDate, maxDate]).range(axisRange),
                 lineXScale: d3.scaleTime().domain([minDate, maxDate]).range(lineRange),
@@ -82,16 +181,8 @@ function updateLineGraph(location, caseType, count, startFrom) {
             };
         }
         else {
-            let maxXVal = -1;
-            for (const feature of scopedGeoData.features) {
-                const covidData = feature.covidData;
-                const outBreakStartIndex = covidData.outbreak_cutoffs[caseType];
-                const nDaysSinceOutbreak = covidData[caseType].length - outBreakStartIndex;
-                if (nDaysSinceOutbreak > maxXVal) {
-                    maxXVal = nDaysSinceOutbreak;
-                }
-            }
             const minXVal = 0;
+            const maxXVal = Math.max(...lines.map(line => line.points.length));
             return {
                 axisXScale: d3
                     .scaleLinear()
@@ -106,20 +197,10 @@ function updateLineGraph(location, caseType, count, startFrom) {
             };
         }
     })();
-    const { min_nonzero: minYVal, max: maxYVal } = allCovidData[location].agg[count][caseType];
-    const axisYScale = d3
-        .scaleLog()
-        .domain([minYVal, maxYVal])
-        .range([plotAesthetics.axis.height, plotAesthetics.axis.outerMargins.top]);
-    const lineYScale = d3
-        .scaleLog()
-        .domain([minYVal, maxYVal])
-        .range([
-        plotAesthetics.axis.height - innerMargin,
-        plotAesthetics.axis.outerMargins.top + innerMargin,
-    ]);
-    const { strokeWidth, axisColor, tickLength, gridlineColor, } = plotAesthetics.axis.style;
-    const xTicks = axisXScale.ticks(d3.timeDay.every(7));
+    const { strokeWidth, axisColor, tickLength, gridlineColor, } = plotAesthetics.graph.axisStyle;
+    const xTicks = startFrom === "first_date"
+        ? axisXScale.ticks(d3.timeDay.every(7))
+        : axisXScale.ticks(10);
     const yFormatter = getFormatter(count, caseType, 1);
     const yTicks = axisYScale.ticks(15);
     const xAxis = chartArea.append("g").classed("line-chart-x-axis", true);
@@ -141,7 +222,7 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .join("line")
         .classed("y-axis-tick", true)
         .attr("x1", axisXScale(minXVal))
-        .attr("x2", axisXScale(minXVal) - plotAesthetics.axis.style.tickLength)
+        .attr("x2", axisXScale(minXVal) - plotAesthetics.graph.axisStyle.tickLength)
         .attr("y1", lineYScale)
         .attr("y2", lineYScale)
         .attr("stroke", axisColor)
@@ -166,38 +247,53 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .attr("x2", axisXScale(maxXVal))
         .attr("y1", lineYScale)
         .attr("y2", lineYScale)
-        .attr("stroke", plotAesthetics.axis.style.gridlineColor)
-        .attr("stroke-width", plotAesthetics.axis.style.strokeWidth);
-    xAxis
+        .attr("stroke", plotAesthetics.graph.axisStyle.gridlineColor)
+        .attr("stroke-width", plotAesthetics.graph.axisStyle.strokeWidth);
+    const xTickLabels = xAxis
         .selectAll()
         .data(xTicks)
         .join("text")
         .classed("x-axis-label", true)
-        .text((date) => {
-        const dayOfMonth = date.getDate();
-        if (dayOfMonth % 7 == 1 && dayOfMonth < 28) {
-            return dateFormatter(date);
-        }
-        return "";
-    })
-        .attr("text-anchor", "end")
-        .attr("font-size", "70%")
-        .attr("transform", (d) => `translate(${lineXScale(d) + plotAesthetics.axis.style.labelTranslateX},${axisYScale(minYVal) +
-        tickLength +
-        plotAesthetics.axis.style.labelTranslateY}) rotate(-60)`);
+        .attr("font-size", "70%");
+    console.log(xTicks);
+    if (startFrom === "first_date") {
+        xTickLabels
+            .text((date) => {
+            const dayOfMonth = date.getDate();
+            if (dayOfMonth % 7 == 1 && dayOfMonth < 28) {
+                return dateFormatter(date);
+            }
+            return "";
+        })
+            .attr("transform", (d) => `translate(${lineXScale(d) + plotAesthetics.graph.axisStyle.labelTranslateX},${axisYScale(minYVal) +
+            tickLength +
+            plotAesthetics.graph.axisStyle.labelTranslateY}) rotate(-60)`)
+            .attr("text-anchor", "end");
+    }
+    else {
+        xTickLabels
+            .text((daysSince) => {
+            if (daysSince % 5 == 0) {
+                return daysSince;
+            }
+            return "";
+        })
+            .attr("transform", (daysSince) => `translate(${lineXScale(daysSince)},${axisYScale(minYVal) + tickLength + 13})`)
+            .attr("text-anchor", "middle");
+    }
     yAxis
         .selectAll()
         .data(yTicks)
         .join("text")
         .classed("y-axis-label", true)
         .text((y) => {
-        const firstDigit = +y.toString()[0];
+        const firstDigit = +yFormatter(y)[0];
         if (firstDigit <= 4 || firstDigit === 6) {
             return yFormatter(y);
         }
         return "";
     })
-        .attr("x", axisXScale(minXVal) - plotAesthetics.axis.style.tickLength - 3)
+        .attr("x", axisXScale(minXVal) - plotAesthetics.graph.axisStyle.tickLength - 3)
         .attr("y", lineYScale)
         .attr("text-anchor", "end")
         .attr("dominant-baseline", "middle")
@@ -222,40 +318,12 @@ function updateLineGraph(location, caseType, count, startFrom) {
         .attr("fill-opacity", 0)
         .attr("stroke", axisColor)
         .attr("stroke-width", strokeWidth);
-    const pathDrawer = d3
-        .line()
-        .x((p) => lineXScale(p.x))
-        .y((p) => lineYScale(p.y));
-    const lines = [];
-    if (startFrom === "first_date") {
-        for (const feature of scopedGeoData.features) {
-            if (typeof feature.covidData === "undefined") {
-                continue;
-            }
-            const thisLine = new Line(feature.properties.name);
-            const dates = Object.keys(feature.covidData.date).sort();
-            dates.forEach((dateStr, index) => {
-                const value = feature.covidData[caseType][index];
-                const scaledValue = lineYScale(value);
-                if (scaledValue === null || isNaN(scaledValue)) {
-                    return;
-                }
-                thisLine.push({
-                    x: dateStrParser(dateStr),
-                    y: value,
-                });
-            });
-            lines.push(thisLine);
-        }
-    }
-    else {
-    }
     chartArea
         .selectAll()
         .data(lines)
         .join("path")
         .attr("d", (l) => pathDrawer(l.points))
-        .attr("stroke-width", 1)
+        .attr("stroke-width", plotAesthetics.graph.line.strokeWidth)
         .attr("fill-opacity", 0)
         .attr("stroke", (l) => plotAesthetics.colors.scale(l.name))
         .attr("_name", (l) => l.name);

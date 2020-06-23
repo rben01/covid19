@@ -24,7 +24,7 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 				return;
 			}
 
-			feature.covidData.day_over_day_diffs = (() => {
+			feature.covidData.dodd = (() => {
 				const dodd = {
 					cases: [],
 					cases_per_capita: [],
@@ -38,7 +38,7 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 				][]) {
 					for (let i = 0; i < Object.keys(covidData.date).length; ++i) {
 						const diff =
-							covidData[caseType][i] - covidData[caseType][i - 1];
+							covidData.net[caseType][i] - covidData.net[caseType][i - 1];
 						if (!diff) {
 							data.push(0);
 						} else {
@@ -55,7 +55,7 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 
 // Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	d3.json("./data/covid_data-a14294a09ae098c5e85a126de6b953dd0d1c571c.json"),
+	d3.json("./data/covid_data-414ba6e6fcfae258f654e278eff0aba755ce30a9.json"),
 	d3.json("./data/geo_data.json"),
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];

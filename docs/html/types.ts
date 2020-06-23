@@ -83,10 +83,11 @@ export interface DataGroup {
 	deaths_per_capita: number[];
 }
 
-export interface LocationCovidData extends DataGroup {
+export interface LocationCovidData {
 	date: { [key: string]: number };
 	outbreak_cutoffs: OutbreakCutoffs;
-	day_over_day_diffs: DataGroup;
+	net: DataGroup;
+	dodd: DataGroup;
 }
 
 export interface PlotInfo {

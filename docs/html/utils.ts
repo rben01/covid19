@@ -7,7 +7,11 @@ export function isPerCapita(caseType: CaseType) {
 }
 
 export const dateStrParser = d3.timeParse("%Y-%m-%d");
-export const getFormatter = (() => {
+export const getFormatter: (
+	count: CountMethod,
+	caseType: CaseType,
+	smoothAvgDays: number,
+) => (_: number) => string = (() => {
 	const intFormatter = d3.format(",~s");
 	const bigFloatFormatter = d3.format("~g");
 	const smallFloatFormatter = d3.format(",.2f");

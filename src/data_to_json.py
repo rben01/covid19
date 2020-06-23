@@ -308,7 +308,7 @@ def data_to_json():
         data[df_name]["data"] = {}
         d = data[df_name]["data"]
         for code, g in df.groupby(CODE):
-            d[code] = {}
+            d[code] = {"net": {}}
             d[code]["outbreak_cutoffs"] = {}
             g = g.copy()
 
@@ -318,12 +318,12 @@ def data_to_json():
 
                 if col == Columns.DATE:
                     elem = {k: i for i, k in enumerate(g[col].tolist())}
+                    d[code][jsonify(col)] = elem
                 else:
                     elem = list(map(nan_to_none, g[col].tolist()))
                     outbreak_start_idx = int((g[col] < outbreak_cutoffs[ct]).sum())
                     d[code]["outbreak_cutoffs"][jsonify(col)] = outbreak_start_idx
-
-                d[code][jsonify(col)] = elem
+                    d[code]["net"][jsonify(col)] = elem
 
     with (DATA_DIR / "geo_data.json").open("w") as f:
         geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
