@@ -47,7 +47,7 @@ const plotAesthetics = (() => {
 				left: 40,
 				right: 3,
 			},
-			innerMargin: 5,
+			innerMargin: 15,
 			width: (null as unknown) as number,
 			height: (null as unknown) as number,
 			style: {
@@ -307,26 +307,24 @@ function updateLineGraph(
 		.attr("font-size", "70%");
 
 	// Axes themselves
-	xAxis
+	const axisLine = d3
+		.line()
+		.x((p: [number, number]) => axisXScale(p[0]))
+		.y((p: [number, number]) => axisYScale(p[1]));
+	chartArea
 		.selectAll()
-		.data([minXVal, maxXVal])
-		.join("line")
-		.classed("x-axis-axis", true)
-		.attr("x1", axisXScale)
-		.attr("x2", axisXScale)
-		.attr("y1", axisYScale(minYVal))
-		.attr("y2", axisYScale(maxYVal))
-		.attr("stroke", axisColor)
-		.attr("stroke-width", strokeWidth);
-	yAxis
-		.selectAll()
-		.data([minYVal, maxYVal])
-		.join("line")
-		.classed("y-axis-axis", true)
-		.attr("x1", axisXScale(minXVal))
-		.attr("x2", axisXScale(maxXVal))
-		.attr("y1", axisYScale)
-		.attr("y2", axisYScale)
+		.data([
+			[
+				[minXVal, minYVal],
+				[minXVal, maxYVal],
+				[maxXVal, maxYVal],
+				[maxXVal, minYVal],
+				[minXVal, minYVal],
+			],
+		])
+		.join("path")
+		.attr("d", axisLine)
+		.attr("fill-opacity", 0)
 		.attr("stroke", axisColor)
 		.attr("stroke-width", strokeWidth);
 
@@ -339,7 +337,6 @@ function updateLineGraph(
 	const lines: Line[] = [];
 	if (startFrom === "first_date") {
 		for (const feature of scopedGeoData.features) {
-			console.log(feature);
 			if (typeof feature.covidData === "undefined") {
 				continue;
 			}
@@ -365,12 +362,7 @@ function updateLineGraph(
 		.selectAll()
 		.data(lines)
 		.join("path")
-		.attr("d", (l: Line) => {
-			console.log(
-				l.points.map(p => ({ p, x: lineXScale(p.x), y: lineYScale(p.y) })),
-			);
-			return pathDrawer(l.points);
-		})
+		.attr("d", (l: Line) => pathDrawer(l.points))
 		.attr("stroke-width", 1)
 		.attr("fill-opacity", 0)
 		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.name))
