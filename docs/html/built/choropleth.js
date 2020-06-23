@@ -8,7 +8,7 @@ const plotAesthetics = Object.freeze((() => {
         colors: {
             scale: (t) => d3.interpolateCividis(1 - t),
             nSteps: 101,
-            missing: "#ccc",
+            missing: "#bbb",
             zero: "#ddc",
         },
         map: {
@@ -168,7 +168,7 @@ function updateMaps({ plotGroup, dateIndex, smoothAvgDays, }) {
                 return plotAesthetics.colors.zero;
             }
             if (value === null || value < vmin) {
-                return plotAesthetics.colors.missing;
+                return `url(#missingDataFillPattern)`;
             }
             return plotAesthetics.colors.scale(colorScale(value));
         })
@@ -607,6 +607,15 @@ const svgs = plotContainers
             .attr("y", plotAesthetics.map.originY)
             .attr("width", plotAesthetics.mapWidth[scope.location])
             .attr("height", plotAesthetics.mapHeight[scope.location]);
+        defs.append("pattern")
+            .attr("id", "missingDataFillPattern")
+            .attr("patternUnits", "userSpaceOnUse")
+            .attr("width", 8)
+            .attr("height", 8)
+            .append("path")
+            .attr("d", "M-2,2 l3,-3 M0,8 l8,-8 M6,10 l3,-3")
+            .style("stroke", plotAesthetics.colors.missing)
+            .style("stroke-width", 2);
         canvases.attr("clip-path", `url(#${clipPathID})`);
     });
 })();

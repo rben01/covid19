@@ -27,7 +27,7 @@ const plotAesthetics = Object.freeze(
 			colors: {
 				scale: (t: number) => d3.interpolateCividis(1 - t),
 				nSteps: 101,
-				missing: "#ccc",
+				missing: "#bbb",
 				zero: "#ddc",
 			},
 			map: {
@@ -258,7 +258,7 @@ function updateMaps({
 					}
 
 					if (value === null || value < vmin) {
-						return plotAesthetics.colors.missing;
+						return `url(#missingDataFillPattern)`; //plotAesthetics.colors.missing;
 					}
 
 					return plotAesthetics.colors.scale(colorScale(value));
@@ -841,6 +841,17 @@ const svgs = plotContainers
 			.attr("y", plotAesthetics.map.originY)
 			.attr("width", plotAesthetics.mapWidth[scope.location])
 			.attr("height", plotAesthetics.mapHeight[scope.location]);
+
+		// https://stackoverflow.com/a/14500054/5496433
+		defs.append("pattern")
+			.attr("id", "missingDataFillPattern")
+			.attr("patternUnits", "userSpaceOnUse")
+			.attr("width", 8)
+			.attr("height", 8)
+			.append("path")
+			.attr("d", "M-2,2 l3,-3 M0,8 l8,-8 M6,10 l3,-3")
+			.style("stroke", plotAesthetics.colors.missing)
+			.style("stroke-width", 2);
 		canvases.attr("clip-path", `url(#${clipPathID})`);
 	});
 })();
