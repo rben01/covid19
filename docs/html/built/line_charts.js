@@ -9,24 +9,20 @@ class Line {
     }
 }
 const plotAesthetics = (() => {
-    const chartWidth = 500, chartHeight = 500;
+    const chartWidth = 600, chartHeight = 500;
     const outerMargins = {
         top: 3,
         bottom: 60,
         left: 40,
         right: 3,
     };
-    const legend = {
-        width: 90,
-    };
-    const fullWidth = chartWidth + outerMargins.left + outerMargins.right + legend.width;
+    const fullWidth = chartWidth + outerMargins.left + outerMargins.right;
     const fullHeight = chartHeight + outerMargins.top + outerMargins.bottom;
     const pa = {
         fullWidth,
         fullHeight,
         graph: {
             outerMargins,
-            legend,
             innerMargin: 15,
             width: chartWidth,
             height: chartHeight,
@@ -62,7 +58,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     const location = "usa";
     const count = "dodd";
     const caseType = "deaths";
-    updateLineGraph(location, caseType, count, "first_date", 1);
+    updateLineGraph(location, caseType, count, "first_date", 7);
 }
 function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
     const allGeoData = lineGraph.datum().allGeoData;

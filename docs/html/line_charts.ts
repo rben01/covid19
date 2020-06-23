@@ -35,7 +35,7 @@ class Line {
 }
 
 const plotAesthetics = (() => {
-	const chartWidth = 500,
+	const chartWidth = 600,
 		chartHeight = 500;
 	const outerMargins = {
 		top: 3,
@@ -43,18 +43,13 @@ const plotAesthetics = (() => {
 		left: 40,
 		right: 3,
 	};
-	const legend = {
-		width: 90,
-	};
-	const fullWidth =
-		chartWidth + outerMargins.left + outerMargins.right + legend.width;
+	const fullWidth = chartWidth + outerMargins.left + outerMargins.right;
 	const fullHeight = chartHeight + outerMargins.top + outerMargins.bottom;
 	const pa = {
 		fullWidth,
 		fullHeight,
 		graph: {
 			outerMargins,
-			legend,
 			innerMargin: 15,
 			width: chartWidth,
 			height: chartHeight,
@@ -111,7 +106,7 @@ export function initializeLineGraph(
 	const count: CountMethod = "dodd";
 	const caseType: CaseType = "deaths";
 
-	updateLineGraph(location, caseType, count, "first_date", 1);
+	updateLineGraph(location, caseType, count, "first_date", 7);
 }
 
 function updateLineGraph(
