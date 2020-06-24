@@ -104,7 +104,7 @@ export function initializeLineGraph(
 
 	const location: WorldLocation = "usa";
 	const count: CountMethod = "dodd";
-	const caseType: CaseType = "deaths";
+	const caseType: CaseType = "cases_per_capita";
 
 	updateLineGraph(location, caseType, count, "first_date", 7);
 }
@@ -460,7 +460,8 @@ function updateLineGraph(
 		.line()
 		.x((p: Point) => lineXScale(p.x))
 		.y((p: Point) => lineYScale(p.y))
-		.defined((p: Point) => lineYScale(p.y) > 0);
+		.defined((p: Point) => lineYScale(p.y) > 0)
+		.curve(d3.curveMonotoneX);
 
 	console.log(lines);
 	chartArea

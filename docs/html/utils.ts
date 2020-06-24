@@ -13,11 +13,16 @@ export const getFormatter: (
 	smoothAvgDays: number,
 ) => (_: number) => string = (() => {
 	const bigFloatFormatter = d3.format("~g");
-	const smallFloatFormatter = d3.format(",.2f");
+	const smallFloatFormatter = d3.format(",.2r");
+	const tinyFloatFormatter = d3.format(".2~e");
 	const floatFormatter = (t: number) =>
-		t < 1 ? smallFloatFormatter(t) : bigFloatFormatter(t);
+		t < 1e-2
+			? tinyFloatFormatter(t)
+			: t < 1
+			? smallFloatFormatter(t)
+			: bigFloatFormatter(t);
 	const intFormatter = (t: number) =>
-		t < 1 ? smallFloatFormatter(t) : d3.format(",~s")(t);
+		t < 1 ? floatFormatter(t) : d3.format(",~s")(t);
 
 	return (count: CountMethod, caseType: CaseType, smoothAvgDays: number) => {
 		return (count === "net" && !isPerCapita(caseType)) ||

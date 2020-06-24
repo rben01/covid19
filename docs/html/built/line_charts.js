@@ -57,7 +57,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     lineGraph.datum({ allCovidData, allGeoData });
     const location = "usa";
     const count = "dodd";
-    const caseType = "deaths";
+    const caseType = "cases_per_capita";
     updateLineGraph(location, caseType, count, "first_date", 7);
 }
 function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
@@ -339,7 +339,8 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         .line()
         .x((p) => lineXScale(p.x))
         .y((p) => lineYScale(p.y))
-        .defined((p) => lineYScale(p.y) > 0);
+        .defined((p) => lineYScale(p.y) > 0)
+        .curve(d3.curveMonotoneX);
     console.log(lines);
     chartArea
         .selectAll()
