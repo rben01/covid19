@@ -2,7 +2,7 @@ body {
 	font-family: sans-serif;
 }
 
-#map-tooltip {
+.tooltip {
 	position: absolute;
 	z-index: 100;
 	visibility: hidden;

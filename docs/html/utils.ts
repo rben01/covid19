@@ -2,6 +2,8 @@ import { CaseType, CountMethod } from "./types";
 
 declare const d3: any;
 
+export const MS_PER_DAY = 86400 * 1000;
+
 export function isPerCapita(caseType: CaseType) {
 	return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
 }
@@ -14,7 +16,7 @@ export function getFormatter(
 	smoothAvgDays: number,
 ): (_: number) => string {
 	const bigFloatFormatter = d3.format(".3~s");
-	const smallFloatFormatter = d3.format(",.3r");
+	const smallFloatFormatter = d3.format(",.3~r");
 	const tinyFloatFormatter = d3.format(".2~e");
 	const floatFormatter = (t: number) =>
 		t < 1e-2

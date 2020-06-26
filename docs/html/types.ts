@@ -90,10 +90,4 @@ export interface LocationCovidData {
 	dodd: DataGroup;
 }
 
-export interface PlotInfo {
-	location: WorldLocation;
-	count: CountMethod;
-	caseType: CaseType;
-	scopedCovidData?: ScopedCovidData;
-	plotGroup?: any;
-}
+export type TooltipVisibility = "visible" | "hidden" | "nochange";

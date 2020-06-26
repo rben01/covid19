@@ -114,34 +114,9 @@
 <li><a href="#sect-graphs">📊 Graphs</a>
 <ul class="sectlevel2">
 <li><a href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></li>
-</ul>
-</li>
-<li><a href="#_graphs">Graphs</a>
-<ul class="sectlevel2">
 <li><a href="#graphs-line">📈 Line Charts</a>
 <ul class="sectlevel3">
-<li><a href="#sect-reading-graphs">📖 Reading the Line Charts</a></li>
-<li><a href="#graphs-world-china-row">🌍 World, China, and Rest of World</a>
-<ul class="sectlevel4">
-<li><a href="#world-china-row-cases-deaths">World, China, and Rest of World - Cases and deaths over time</a></li>
-</ul>
-</li>
-<li><a href="#graphs-top-ten-countries-no-china">🗺 Top Ten Countries, Excluding China</a>
-<ul class="sectlevel4">
-<li><a href="#top-ten-countries-no-china-cases-deaths-total">Countries - Cases and deaths over time</a></li>
-<li><a href="#top-ten-countries-no-china-cases-deaths-per-capita">Countries - Cases and deaths per capita over time</a></li>
-<li><a href="#top-ten-countries-no-china-cases-since">Countries - Cases since hitting 100 cases</a></li>
-<li><a href="#top-ten-countries-no-china-deaths-since">Countries - Deaths since hitting 25 deaths</a></li>
-</ul>
-</li>
-<li><a href="#graphs-usa-top-states">🇺🇸 Top Ten USA States</a>
-<ul class="sectlevel4">
-<li><a href="#usa-top-states-cases-deaths-total">USA States - Cases and deaths over time</a></li>
-<li><a href="#usa-top-states-cases-deaths-per-capita">USA States - Cases and deaths per capita over time</a></li>
-<li><a href="#usa-top-states-cases-since">USA States - Cases since hitting 100 cases</a></li>
-<li><a href="#usa-top-states-deaths-since">USA States - Deaths since hitting 25 deaths</a></li>
-</ul>
-</li>
+<li><a href="#sect-reading-graphs">📖 Reading the Line Chart</a></li>
 </ul>
 </li>
 </ul>
@@ -338,140 +313,33 @@ Along the bottoms are controls for continuous playback of the data over time as 
 </div>
 <div id="map-plots"></div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_graphs"><a class="link" href="#_graphs">Graphs</a></h2>
-<div class="sectionbody">
-<div id="line-charts-section"></div>
 <div class="sect2">
 <h3 id="graphs-line"><a class="link" href="#graphs-line">📈 Line Charts</a></h3>
 <div class="sect3">
-<h4 id="sect-reading-graphs"><a class="link" href="#sect-reading-graphs">📖 Reading the Line Charts</a></h4>
+<h4 id="sect-reading-graphs"><a class="link" href="#sect-reading-graphs">📖 Reading the Line Chart</a></h4>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><a id="date-explanation-note"></a><span class="icon"><i class="fa fa-calendar-alt fa-fw"></i></span> Interpreting the Dates on the X-Axis</dt>
+<dt class="hdlist1"><a id="date-explanation-note"></a><span class="icon"><i class="fa fa-calendar-alt fa-fw"></i></span> Interpreting the Axes</dt>
 <dd>
 <p>The dates on the graphs&#8217; x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
 For instance, the vertical line over March 21 represents data collected from 00:00 March 20 to 23:59:59 March 20.
 On the last day, there will be less than 24 hours of collected data, so the vertical line over <code>today</code> at <code>current time</code> represents the data collected from midnight (this morning) to now.</p>
-</dd>
-<dt class="hdlist1"><span class="icon"><i class="fa fa-hashtag fa-fw"></i></span> Interpreting the Log-Scaled Y-Axis</dt>
-<dd>
+<div class="paragraph">
 <p>The y-axis of the graphs is log scaled.
-On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
-On graphs whose y-axis major ticks are are powers of 2, the three minor ticks between 2<sup>n</sup> and 2<sup>n+1</sup> are located at 1.25×2<sup>n</sup>, 1.5×2<sup>n</sup>, and 1.75×2<sup>n</sup>.
-On graphs whose y-axis major ticks are are powers of 10, the eight minor ticks between 10<sup>n</sup> and 10<sup>n+1</sup> are located at 2×10<sup>n</sup>, 3×10<sup>n</sup>, &#8230;&#8203;, 8×10<sup>n</sup>, 9×10<sup>n</sup>.<br>
-The nature of log-scale graphs is that the CFR can be observed from the vertical distance between the <strong>Confirmed Cases</strong> and <strong>Deaths</strong> lines for a given country&#8201;&#8212;&#8201;it&#8217;s roughly 1/2<sup>distance</sup>.</p>
-</dd>
-<dt class="hdlist1"><span class="icon"><i class="fa fa-stopwatch fa-fw"></i></span> Doubling Time</dt>
-<dd>
-<p>Some graphs are annotated with benchmark lines showing the rate of new cases (possibly per capita) for a particular doubling time (DT).
-Lines annotated &#8220;n days&#8221; show how the number of coronavirus cases would increase within a region if it doubled every n days.
-Comparing the slope of a region&#8217;s growth line to the slopes of these benchmark lines gives an indication of that region&#8217;s doubling time.
-These graphs&#8217; legends also list the doubling times over different periods of time, e.g., &#8220;20d DT&#8221; means the average doubling time of a region over the past 20 days.<br>
-To find the daily percent increase for any doubling time T, simply compute 2<sup>1/T</sup>. Below is a list of doubling times and corresponding per-day percent increases.</p>
-<div class="ulist circle compact">
-<ul class="circle">
-<li>
-<p>1 day: +100% daily</p>
-</li>
-<li>
-<p>2 days: +41% daily</p>
-</li>
-<li>
-<p>3 days: +26% daily</p>
-</li>
-<li>
-<p>4 days: +19% daily</p>
-</li>
-<li>
-<p>5 days: +15% daily</p>
-</li>
-<li>
-<p>6 days: +12% daily</p>
-</li>
-<li>
-<p>1 week: +10% daily</p>
-</li>
-<li>
-<p>2 weeks: +5% daily</p>
-</li>
-</ul>
+On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.</p>
 </div>
 </dd>
 <dt class="hdlist1"><span class="icon"><i class="fa fa-sort-amount-down fa-fw"></i></span> Ranking and Sorting</dt>
 <dd>
-<p>In each graph, the &#8220;top 10&#8221; refers to top 10 by total number of cases/deaths, even for the per-capita graphs.
-Graphs&#8217; legends are, however, sorted according to the relevant measurement (number of cases, cases per capita, or doubling time thereof).
-In a graph of countries and their cases per capita, the first country in the legend will have the most cases per capita of all countries included in that graph, but not necessarily the most cases per capita of any country in the world.
-The country with the most cases per capita in the world — San Marino at the time of writing — would have to be in the top 10 by number of cases to make it onto the graph, which, given its population of 33k, it is not.</p>
+<p>In each graph, the &#8220;top 10&#8221; locations for the given variable are displayed. You can use the arrows to move to lower- or higher-ranked locations (not yet implemented; coming soon).</p>
+</dd>
+<dt class="hdlist1"><span class="icon"><i class="fa fa-mouse fa-fw"></i></span> Interaction</dt>
+<dd>
+<p>By default, the legend displays data for the graphed locations on the most recent date for which there is data. Hover your mouse over the graph to choose a different date to display in the legend.</p>
 </dd>
 </dl>
 </div>
-</div>
-<div class="sect3">
-<h4 id="graphs-world-china-row"><a class="link" href="#graphs-world-china-row">🌍 World, China, and Rest of World</a></h4>
-<div class="sect4">
-<h5 id="world-china-row-cases-deaths"><a class="link" href="#world-china-row-cases-deaths">World, China, and Rest of World - Cases and deaths over time</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_fixed_date/Stage_All/world.png" alt="World, China, and Rest of World - Cases and deaths over time" width="750" title="World, China, and Rest of World - Cases and deaths over time"></span></p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="graphs-top-ten-countries-no-china"><a class="link" href="#graphs-top-ten-countries-no-china">🗺 Top Ten Countries, Excluding China</a></h4>
-<div class="sect4">
-<h5 id="top-ten-countries-no-china-cases-deaths-total"><a class="link" href="#top-ten-countries-no-china-cases-deaths-total">Countries - Cases and deaths over time</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_fixed_date/Stage_All/countries_wo_china.png" alt="Countries - Cases and deaths over time" width="750" title="Countries - Cases and deaths over time"></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="top-ten-countries-no-china-cases-deaths-per-capita"><a class="link" href="#top-ten-countries-no-china-cases-deaths-per-capita">Countries - Cases and deaths per capita over time</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Per_capita/From_fixed_date/Stage_All/countries_wo_china.png" alt="Countries - Cases and deaths per capita over time" width="750" title="Countries - Cases and deaths per capita over time"></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="top-ten-countries-no-china-cases-since"><a class="link" href="#top-ten-countries-no-china-cases-since">Countries - Cases since hitting 100 cases</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_local_spread_start/Stage_Confirmed/countries_wo_china.png" alt="Countries - Cases since hitting 100 cases" width="750" title="Countries - Cases since hitting 100 cases. The thin dotted lines are annoted with a time period and show how the number of cases would grow if it doubled periodically with that period."></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="top-ten-countries-no-china-deaths-since"><a class="link" href="#top-ten-countries-no-china-deaths-since">Countries - Deaths since hitting 25 deaths</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_local_spread_start/Stage_Death/countries_wo_china.png" alt="Countries - Deaths since hitting 25 deaths" width="750" title="Countries - Deaths since hitting 25 deaths. The thin dotted lines are annoted with a time period and show how the number of deaths would grow if it doubled periodically with that period."></span></p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="graphs-usa-top-states"><a class="link" href="#graphs-usa-top-states">🇺🇸 Top Ten USA States</a></h4>
-<div class="sect4">
-<h5 id="usa-top-states-cases-deaths-total"><a class="link" href="#usa-top-states-cases-deaths-total">USA States - Cases and deaths over time</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_fixed_date/Stage_All/states.png" alt="USA States - Cases and deaths over time" width="750" title="USA States - Cases and deaths over time"></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="usa-top-states-cases-deaths-per-capita"><a class="link" href="#usa-top-states-cases-deaths-per-capita">USA States - Cases and deaths per capita over time</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Per_capita/From_fixed_date/Stage_All/states.png" alt="USA States - Cases and deaths per capita over time" width="750" title="USA States - Cases and deaths per capita over time"></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="usa-top-states-cases-since"><a class="link" href="#usa-top-states-cases-since">USA States - Cases since hitting 100 cases</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_local_spread_start/Stage_Confirmed/states.png" alt="USA States - Cases since hitting 100 cases" width="750" title="USA States - Cases since hitting 100 cases. The thin dotted lines are annoted with a time period and show how the number of cases would grow if it doubled periodically with that period."></span></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="usa-top-states-deaths-since"><a class="link" href="#usa-top-states-deaths-since">USA States - Deaths since hitting 25 deaths</a></h5>
-<div class="paragraph">
-<p><span class="image"><img src="./figures/Total_cases/From_local_spread_start/Stage_Death/states.png" alt="USA States - Deaths since hitting 25 deaths" width="750" title="USA States - Deaths since hitting 25 deaths. The thin dotted lines are annoted with a time period and show how the number of deaths would grow if it doubled periodically with that period."></span></p>
-</div>
-</div>
+<div id="line-charts-section"></div>
 </div>
 </div>
 </div>
@@ -479,7 +347,7 @@ The country with the most cases per capita in the world — San Marino at the ti
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-25 23:12:26 -0400
+Last updated 2020-06-26 12:12:48 -0400
 </div>
 </div>
 <script type="module" src="./html/built/plots.js"></script>

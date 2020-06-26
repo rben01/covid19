@@ -1,6 +1,5 @@
-import { WORLD_LOCATIONS, COUNT_METHODS, } from "./types.js";
-import { dateStrParser, isPerCapita } from "./utils.js";
-const MS_PER_DAY = 86400 * 1000;
+import { COUNT_METHODS, WORLD_LOCATIONS, } from "./types.js";
+import { dateStrParser, isPerCapita, MS_PER_DAY } from "./utils.js";
 const plotAesthetics = Object.freeze((() => {
     const pa = {
         width: { usa: 500, world: 500 },
@@ -399,6 +398,7 @@ const tooltip = d3
     .selectAll()
     .data([{ dateKey: null, location: null, countStr: null }])
     .join("div")
+    .classed("tooltip", true)
     .attr("id", "map-tooltip");
 function _initializeChoropleth({ allCovidData, allGeoData, }) {
     const datum = {
@@ -554,7 +554,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         .attr("min", 0)
         .attr("max", 1)
         .property("value", 1)
-        .on("input", function (d) {
+        .on("input", function () {
         const dateIndex = +this.value;
         updateMaps({ choropleth, dateIndex });
     });
@@ -578,7 +578,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         .attr("min", 1)
         .attr("max", 7)
         .property("value", 1)
-        .on("input", function (d) {
+        .on("input", function () {
         const smoothAvgDays = +this.value;
         updateMaps({ choropleth, smoothAvgDays });
     });

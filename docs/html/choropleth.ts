@@ -5,21 +5,17 @@ import {
 	AllGeoData,
 	CaseType,
 	CountMethod,
+	COUNT_METHODS,
 	DataGroup,
 	DateString,
 	Feature,
-	PlotInfo,
-	Scope,
 	ScopedCovidData,
 	ScopedGeoData,
-	SCOPES,
+	TooltipVisibility,
 	WorldLocation,
 	WORLD_LOCATIONS,
-	COUNT_METHODS,
 } from "./types.js";
-import { dateStrParser, isPerCapita } from "./utils.js";
-
-const MS_PER_DAY = 86400 * 1000;
+import { dateStrParser, isPerCapita, MS_PER_DAY } from "./utils.js";
 
 const plotAesthetics = Object.freeze(
 	(() => {
@@ -163,7 +159,6 @@ function getDataOnDate({
 	return value;
 }
 
-type TooltipVisibility = "visible" | "hidden" | "nochange";
 function updateTooltip({ visibility }: { visibility: TooltipVisibility }) {
 	const { feature, count, dateKey, caseType, smoothAvgDays } = tooltip.datum();
 
@@ -586,6 +581,7 @@ const tooltip: {
 	.selectAll()
 	.data([{ dateKey: null, location: null, countStr: null }])
 	.join("div")
+	.classed("tooltip", true)
 	.attr("id", "map-tooltip");
 
 function _initializeChoropleth({
@@ -778,7 +774,7 @@ function _initializeChoropleth({
 		.attr("min", 0)
 		.attr("max", 1)
 		.property("value", 1)
-		.on("input", function (this: any, d: PlotInfo) {
+		.on("input", function (this: any) {
 			const dateIndex = +this.value;
 			updateMaps({ choropleth, dateIndex });
 		});
@@ -803,7 +799,7 @@ function _initializeChoropleth({
 		.attr("min", 1)
 		.attr("max", 7)
 		.property("value", 1)
-		.on("input", function (this: any, d: PlotInfo) {
+		.on("input", function (this: any) {
 			const smoothAvgDays = +this.value;
 			updateMaps({ choropleth, smoothAvgDays });
 		});

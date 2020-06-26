@@ -7,7 +7,6 @@ import {
 	DataGroup,
 	DateString,
 	Feature,
-	PlotInfo,
 	Scope,
 	ScopedCovidData,
 	ScopedGeoData,
@@ -15,7 +14,7 @@ import {
 	WorldLocation,
 } from "./types.js";
 
-import { dateStrParser, getFormatter, isPerCapita } from "./utils.js";
+import { dateStrParser, getFormatter, MS_PER_DAY } from "./utils.js";
 
 type Affliction = "cases" | "deaths";
 type Accumulation = "total" | "per_capita";
@@ -200,7 +199,10 @@ export function initializeLineGraph(
 		.append("div")
 		.classed("line-chart-legend-container", true)
 		.append("table")
-		.classed("line-chart-legend", true);
+		.classed("line-chart-legend", true)
+		.append("tr")
+		.append("th")
+		.attr("colspan", 3);
 
 	updateLineGraph(lineGraphContainer, 7);
 }
@@ -586,29 +588,6 @@ function updateLineGraph(
 		.attr("x", axisXScale(minXVal) - plotAesthetics.graph.axisStyle.tickLength - 3)
 		.attr("y", lineYScale);
 
-	// Axes themselves
-	const axisLine = d3
-		.line()
-		.x((p: [number, number]) => axisXScale(p[0]))
-		.y((p: [number, number]) => axisYScale(p[1]));
-	chartArea
-		.selectAll(".axes-border")
-		.data([
-			[
-				[minXVal, minYVal],
-				[minXVal, maxYVal],
-				[maxXVal, maxYVal],
-				[maxXVal, minYVal],
-				[minXVal, minYVal],
-			],
-		])
-		.join("path")
-		.classed("axes-border", true)
-		.attr("d", axisLine)
-		.attr("fill-opacity", 0)
-		.attr("stroke", axisColor)
-		.attr("stroke-width", strokeWidth);
-
 	// Finally, draw the lines
 	// Now for the actual data we want to plot
 	const pathDrawer: (arg0: Point[]) => void = d3
@@ -635,11 +614,125 @@ function updateLineGraph(
 		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.name))
 		.attr("_name", (l: any) => l.name);
 
-	lineGraphContainer
-		.selectAll(".line-chart-legend")
-		.selectAll("tr")
+	const legend = lineGraphContainer.selectAll(".line-chart-legend");
+	// Axes themselves; also a region for catching mouse events
+	function getInfoFromXVal(x: XAxisType) {
+		let xVal: XAxisType, xStr: string;
+		if (startFrom === "first_date") {
+			x = x as Date;
+			const roundedXVal = new Date(
+				Math.round(x.getTime() / MS_PER_DAY) * MS_PER_DAY,
+			);
+			const year = roundedXVal.getUTCFullYear();
+			const month = roundedXVal.getUTCMonth();
+			const date = roundedXVal.getUTCDate();
+
+			xVal = new Date(year, month, date);
+			if (xVal < minXVal) {
+				xVal = minXVal;
+			} else if (xVal > maxXVal) {
+				xVal = maxXVal;
+			}
+			xStr = dateFormatter(xVal);
+		} else {
+			x = x as number;
+			xVal = Math.round(x);
+			if (xVal < minXVal) {
+				xVal = minXVal;
+			} else if (xVal > maxXVal) {
+				xVal = maxXVal;
+			}
+			xStr = `${xVal} days since`;
+		}
+
+		return { xVal, xStr };
+	}
+
+	const mainChartArea = chartArea.append("g");
+	mainChartArea
+		.selectAll(".chart-region")
+		.data([
+			{
+				x: axisXScale(minXVal),
+				y: axisYScale(maxYVal),
+				width: axisXScale(maxXVal) - axisXScale(minXVal),
+				height: axisYScale(minYVal) - axisYScale(maxYVal),
+			},
+		])
+		.join("rect")
+		.classed("chart-region", true)
+		.attr("x", (d: any) => d.x)
+		.attr("y", (d: any) => d.y)
+		.attr("width", (d: any) => d.width)
+		.attr("height", (d: any) => d.height)
+		.attr("fill-opacity", 0)
+		.attr("stroke", axisColor)
+		.attr("stroke-width", strokeWidth)
+		.on("mousemove", function (this: Node) {
+			const mouseXScreen = d3.mouse(this)[0];
+			const mouseXVal = lineXScale.invert(mouseXScreen);
+
+			const { xVal, xStr: headerStr } = getInfoFromXVal(mouseXVal);
+
+			const values = lines.map(line => {
+				let prevDist = Infinity;
+				let prevY = NaN;
+				for (const point of line.points) {
+					const dist = Math.abs(
+						startFrom === "first_date"
+							? (point.x as Date).getTime() - (xVal as Date).getTime()
+							: (point.x as number) - (xVal as number),
+					);
+					if (dist > prevDist) {
+						return prevY;
+					}
+
+					prevDist = dist;
+					prevY = point.y;
+				}
+				return prevY;
+			});
+
+			legend
+				.selectAll("td .legend-value")
+				.text((_: any, i: number) => yFormatter(values[i]));
+
+			legend.selectAll("tr th").text(headerStr);
+
+			const hoverLineX = lineXScale(xVal);
+
+			mainChartArea
+				.selectAll(".line-chart-hover-line")
+				.data([0])
+				.join((enter: any) =>
+					enter
+						.insert("line", "rect.chart-region")
+						.classed("line-chart-hover-line", true)
+						.attr("stroke", "#444")
+						.attr("stroke-width", 1.5)
+						.attr("stroke-dasharray", "4 4"),
+				)
+				.attr("x1", hoverLineX)
+				.attr("x2", hoverLineX)
+				.attr("y1", axisYScale(minYVal))
+				.attr("y2", axisYScale(maxYVal));
+		})
+		.on("mouseout", function (this: Node) {
+			const values = lines.map(line => line.points[line.points.length - 1].y);
+			legend
+				.selectAll("td.legend-value")
+				.text((_: any, i: number) => yFormatter(values[i]));
+			mainChartArea.selectAll(".line-chart-hover-line").remove();
+		});
+
+	const headerStr = getInfoFromXVal(maxXVal).xStr;
+	legend.selectAll("tr th").text(headerStr);
+
+	legend
+		.selectAll("tr.legend-data-row")
 		.data(lines)
 		.join("tr")
+		.classed("legend-data-row", true)
 		.each(function (this: Node, line: Line) {
 			const row = d3.select(this);
 			const name = line.name;
