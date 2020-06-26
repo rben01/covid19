@@ -39,6 +39,7 @@ const plotAesthetics = (() => {
             },
         },
         colors: {
+            scaleFactory: () => d3.scaleOrdinal().range(d3.schemeTableau10),
             scale: d3.scaleOrdinal().range(d3.schemeTableau10),
         },
     };
@@ -106,11 +107,11 @@ export function initializeLineGraph(allCovidData, allGeoData) {
                 .append("input")
                 .property("checked", value === datum[key])
                 .attr("type", "radio")
-                .property("name", key)
+                .property("name", `${key}-line-chart`)
                 .on("change", function (d) {
                 const datum = lineGraph.datum();
                 datum[key] = value;
-                updateLineGraph(lineGraphContainer, "outbreak", 7);
+                updateLineGraph(lineGraphContainer, 7, { refreshColors: true });
             });
         }
     }
@@ -123,11 +124,15 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     chartArea.append("g").classed("line-chart-x-axis", true);
     chartArea.append("g").classed("line-chart-y-axis", true);
     lineGraphContainer.append("div").classed("line-chart-legend", true).append("table");
-    updateLineGraph(lineGraphContainer, startFrom, 7);
+    updateLineGraph(lineGraphContainer, 7);
 }
-function updateLineGraph(lineGraphContainer, startFrom, smoothAvgDays) {
-    const { location, count, affliction, accumulation, allGeoData, } = lineGraphContainer.datum();
+const EPSILON = 1e-8;
+function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = { refreshColors: false }) {
+    const { location, count, affliction, accumulation, allGeoData, startFrom, } = lineGraphContainer.datum();
     const lineGraph = lineGraphContainer.selectAll(".line-chart");
+    if (refreshColors) {
+        plotAesthetics.colors.scale = plotAesthetics.colors.scaleFactory();
+    }
     const scopedGeoData = allGeoData[location];
     const caseType = (accumulation === "per_capita"
         ? `${affliction}_per_capita`
@@ -227,7 +232,7 @@ function updateLineGraph(lineGraphContainer, startFrom, smoothAvgDays) {
         for (let line of lines) {
             for (let point of line.points) {
                 const y = point.y;
-                if (0 < y && y < min) {
+                if (EPSILON < y && y < min) {
                     min = y;
                 }
                 else if (y > max) {
@@ -417,7 +422,7 @@ function updateLineGraph(lineGraphContainer, startFrom, smoothAvgDays) {
         .line()
         .x((p) => lineXScale(p.x))
         .y((p) => lineYScale(p.y))
-        .defined((p) => lineYScale(p.y) > 0)
+        .defined((p) => p.y > EPSILON)
         .curve(d3.curveMonotoneX);
     chartArea
         .selectAll(".chart-line")

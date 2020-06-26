@@ -69,9 +69,9 @@ const plotAesthetics = (() => {
 			},
 		},
 		colors: {
-			scale: d3.scaleOrdinal().range(d3.schemeTableau10) as (
-				arg0: string,
-			) => string,
+			scaleFactory: () =>
+				d3.scaleOrdinal().range(d3.schemeTableau10) as (_: string) => string,
+			scale: d3.scaleOrdinal().range(d3.schemeTableau10) as (_: string) => string,
 		},
 	};
 
@@ -177,11 +177,11 @@ export function initializeLineGraph(
 				.append("input")
 				.property("checked", value === datum[key])
 				.attr("type", "radio")
-				.property("name", key)
+				.property("name", `${key}-line-chart`)
 				.on("change", function (d: any) {
 					const datum = lineGraph.datum();
 					datum[key] = value as never; // ?? some TS weirdness;
-					updateLineGraph(lineGraphContainer, "outbreak", 7);
+					updateLineGraph(lineGraphContainer, 7, { refreshColors: true });
 				});
 		}
 	}
@@ -198,13 +198,14 @@ export function initializeLineGraph(
 
 	lineGraphContainer.append("div").classed("line-chart-legend", true).append("table");
 
-	updateLineGraph(lineGraphContainer, startFrom, 7);
+	updateLineGraph(lineGraphContainer, 7);
 }
 
+const EPSILON = 1e-8;
 function updateLineGraph(
 	lineGraphContainer: LineGraphContainer,
-	startFrom: StartFrom,
 	smoothAvgDays: number,
+	{ refreshColors }: { refreshColors: Boolean } = { refreshColors: false },
 ) {
 	const {
 		location,
@@ -212,9 +213,14 @@ function updateLineGraph(
 		affliction,
 		accumulation,
 		allGeoData,
+		startFrom,
 	} = lineGraphContainer.datum();
 
 	const lineGraph = lineGraphContainer.selectAll(".line-chart");
+
+	if (refreshColors) {
+		plotAesthetics.colors.scale = plotAesthetics.colors.scaleFactory();
+	}
 
 	const scopedGeoData = allGeoData[location];
 
@@ -338,7 +344,7 @@ function updateLineGraph(
 		for (let line of lines) {
 			for (let point of line.points) {
 				const y = point.y;
-				if (0 < y && y < min) {
+				if (EPSILON < y && y < min) {
 					min = y;
 				} else if (y > max) {
 					max = y;
@@ -605,7 +611,7 @@ function updateLineGraph(
 		.line()
 		.x((p: Point) => lineXScale(p.x))
 		.y((p: Point) => lineYScale(p.y))
-		.defined((p: Point) => lineYScale(p.y) > 0)
+		.defined((p: Point) => p.y > EPSILON)
 		.curve(d3.curveMonotoneX);
 
 	chartArea

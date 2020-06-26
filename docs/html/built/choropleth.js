@@ -437,7 +437,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
                 .append("input")
                 .property("checked", value === datum[key])
                 .attr("type", "radio")
-                .property("name", key)
+                .property("name", `${key}-choropleth`)
                 .on("change", function (d) {
                 choropleth.datum()[key] = value;
                 updateMaps({ choropleth });

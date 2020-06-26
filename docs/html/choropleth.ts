@@ -638,7 +638,7 @@ function _initializeChoropleth({
 				.append("input")
 				.property("checked", value === datum[key])
 				.attr("type", "radio")
-				.property("name", key)
+				.property("name", `${key}-choropleth`)
 				.on("change", function (d: any) {
 					choropleth.datum()[key] = value;
 					updateMaps({ choropleth });
