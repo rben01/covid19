@@ -64,10 +64,10 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         )
         .fillna(geo_df[CODE])
     )
+    geo_df["name"] = geo_df[CODE]
+    geo_df[CODE] += " - " + geo_df["NAME_SORT"]
 
     geo_df = geo_df[geo_df[CODE] != "Antarctica"]
-
-    geo_df["name"] = geo_df[CODE]
 
     geo_df = geo_df[
         [
@@ -211,6 +211,47 @@ def jsonify(s):
     return s.lower().replace(" ", "_").replace("cap.", "capita")
 
 
+def save_file_with_digest(filename_stub, data):
+    data_str = json.dumps(data)
+    hasher = hashlib.sha1()
+    hasher.update(data_str.encode())
+    digest = hasher.hexdigest()
+    digest_pattern = f"[a-fA-F0-9]{{{len(digest)}}}"
+
+    existing_data_file_name = None
+    for f in DATA_DIR.iterdir():
+        if re.match(filename_stub.format(digest_pattern), f.name):
+            existing_data_file_name = f.name
+            break
+
+    new_data_file_name = filename_stub.format(digest)
+    with (DATA_DIR / new_data_file_name).open("w") as f:
+        json.dump(data, f, indent=0)
+
+    with (Paths.DOCS / "html" / "plots.ts").open() as f:
+        ts_file_contents = f.read()
+
+    ts_file_contents = re.sub(
+        re.escape('d3.json("./data/{}")').replace(
+            r"\{\}", filename_stub.format(digest_pattern)
+        ),
+        f'd3.json("./data/{new_data_file_name}")',
+        ts_file_contents,
+    )
+
+    with (Paths.DOCS / "html" / "plots.ts").open("w") as f:
+        f.write(ts_file_contents)
+
+    if (
+        existing_data_file_name is not None
+        and existing_data_file_name != new_data_file_name
+    ):
+        print(
+            "Deleting", existing_data_file_name, "replacing with", new_data_file_name,
+        )
+        (DATA_DIR / existing_data_file_name).unlink()
+
+
 def data_to_json():
     df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
     for c in df:
@@ -240,7 +281,9 @@ def data_to_json():
         .fillna(countries_df[Columns.COUNTRY])
     )
     countries_df = countries_df.rename(columns={Columns.COUNTRY: "name"})
-    countries_df["code"] = countries_df["name"]
+
+    countries_geo_df = get_countries_geo_df()
+    countries_df[CODE] = countries_df.merge(countries_geo_df, on="name")[CODE]
 
     usa_geo_df = get_usa_states_geo_df()
     usa_geo_df["name"] = usa_geo_df.merge(
@@ -248,8 +291,6 @@ def data_to_json():
         how="left",
         on=CODE,
     )["name"]
-
-    countries_geo_df = get_countries_geo_df()
 
     data = {}
     for df_name, df in [("usa", usa_df), ("world", countries_df)]:
@@ -325,44 +366,45 @@ def data_to_json():
                     d[code]["outbreak_cutoffs"][jsonify(col)] = outbreak_start_idx
                     d[code]["net"][jsonify(col)] = elem
 
-    with (DATA_DIR / "geo_data.json").open("w") as f:
-        geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
-        json.dump(geojson, f, indent=0)
+    geojson = {"usa": usa_geo_df._to_geo(), "world": countries_geo_df._to_geo()}
+    save_file_with_digest("geo_data-{}.json", geojson)
 
-    data_str = json.dumps(data)
-    hasher = hashlib.sha1()
-    hasher.update(data_str.encode())
-    digest = hasher.hexdigest()
-    digest_pattern = f"[a-fA-F0-9]{{{len(digest)}}}"
+    save_file_with_digest("covid_data-{}.json", data)
 
-    existing_data_file_name = None
-    for f in DATA_DIR.iterdir():
-        if re.match(f"covid_data-{digest_pattern}.json", f.name):
-            existing_data_file_name = f.name
-            break
+    # data_str = json.dumps(data)
+    # hasher = hashlib.sha1()
+    # hasher.update(data_str.encode())
+    # digest = hasher.hexdigest()
+    # digest_pattern = f"[a-fA-F0-9]{{{len(digest)}}}"
 
-    new_data_file_name = f"covid_data-{digest}.json"
-    with (DATA_DIR / new_data_file_name).open("w") as f:
-        json.dump(data, f, indent=0)
+    # existing_data_file_name = None
+    # for f in DATA_DIR.iterdir():
+    #     if re.match(f"covid_data-{digest_pattern}.json", f.name):
+    #         existing_data_file_name = f.name
+    #         break
 
-    with (Paths.DOCS / "html" / "plots.ts").open() as f:
-        ts_file_contents = f.read()
+    # new_data_file_name = f"covid_data-{digest}.json"
+    # with (DATA_DIR / new_data_file_name).open("w") as f:
+    #     json.dump(data, f, indent=0)
 
-    ts_file_contents = re.sub(
-        rf'd3\.json\("\./data/covid_data-{digest_pattern}\.json"\)',
-        f'd3.json("./data/{new_data_file_name}")',
-        ts_file_contents,
-    )
+    # with (Paths.DOCS / "html" / "plots.ts").open() as f:
+    #     ts_file_contents = f.read()
 
-    with (Paths.DOCS / "html" / "plots.ts").open("w") as f:
-        f.write(ts_file_contents)
+    # ts_file_contents = re.sub(
+    #     rf'd3\.json\("\./data/covid_data-{digest_pattern}\.json"\)',
+    #     f'd3.json("./data/{new_data_file_name}")',
+    #     ts_file_contents,
+    # )
 
-    if (
-        existing_data_file_name is not None
-        and existing_data_file_name != new_data_file_name
-    ):
-        print("Deleting", existing_data_file_name, "replacing with", new_data_file_name)
-        (DATA_DIR / existing_data_file_name).unlink()
+    # with (Paths.DOCS / "html" / "plots.ts").open("w") as f:
+    #     f.write(ts_file_contents)
+
+    # if (
+    #     existing_data_file_name is not None
+    #     and existing_data_file_name != new_data_file_name
+    # ):
+    #     print("Deleting", existing_data_file_name, "replacing with", new_data_file_name)
+    #     (DATA_DIR / existing_data_file_name).unlink()
 
     return data
 
