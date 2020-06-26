@@ -405,53 +405,47 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         playbackInfo: new PlaybackInfo(),
         location: "usa",
         count: "dodd",
+        allCovidData,
+        allGeoData,
     };
     const choropleth = d3.select("#map-plots").selectAll().data([datum]).join("div");
-    const checkboxGroup = choropleth.append("div");
-    const locationTable = checkboxGroup
+    const checkboxGroup = choropleth
         .append("div")
-        .classed("choropleth-checkboxes", true)
-        .append("table");
-    const countTable = checkboxGroup
-        .append("div")
-        .classed("choropleth-checkboxes", true)
-        .append("table");
-    const wlToName = (wl) => {
-        if (wl === "usa") {
-            return "USA";
+        .classed("choropleth-checkboxes", true);
+    const checkboxTable = checkboxGroup.append("table");
+    checkboxTable
+        .append("tr")
+        .selectAll()
+        .data(["Location", "Count"])
+        .join("th")
+        .text((d) => d)
+        .attr("colspan", 2);
+    const rows = [
+        [
+            { key: "location", value: "usa", name: "USA" },
+            { key: "count", value: "dodd", name: "Daily Increase" },
+        ],
+        [
+            { key: "location", value: "world", name: "World" },
+            { key: "count", value: "net", name: "Total Cases" },
+        ],
+    ];
+    for (const row of rows) {
+        const tr = checkboxTable.append("tr");
+        for (const col of row) {
+            const { key, value, name } = col;
+            tr.append("td").text(name);
+            tr.append("td")
+                .append("input")
+                .property("checked", value === datum[key])
+                .attr("type", "radio")
+                .property("name", key)
+                .on("change", function (d) {
+                choropleth.datum()[key] = value;
+                updateMaps({ choropleth });
+            });
         }
-        else {
-            return "World";
-        }
-    };
-    const cmToName = (cm) => {
-        if (cm === "dodd") {
-            return "Daily Increase";
-        }
-        else {
-            return "Total Cases";
-        }
-    };
-    for (const [table, name, key, data, textFunc] of [
-        [locationTable, "Location", "location", WORLD_LOCATIONS, wlToName],
-        [countTable, "Count", "count", COUNT_METHODS, cmToName],
-    ]) {
-        const headerRow = table.append("tr");
-        headerRow.append("th").text(name);
-        headerRow.append("th");
-        const rows = table.selectAll().data(data).join("tr");
-        rows.append("td").text(textFunc);
-        rows.append("td")
-            .append("input")
-            .property("checked", (d) => d === datum[key])
-            .attr("type", "radio")
-            .property("name", name)
-            .on("change", function (d) {
-            choropleth.datum()[key] = d;
-            updateMaps({ choropleth });
-        });
     }
-    Object.assign(choropleth.datum(), { allCovidData, allGeoData });
     const plotContainers = choropleth
         .selectAll()
         .data([
