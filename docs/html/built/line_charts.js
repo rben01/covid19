@@ -300,7 +300,8 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     const xTicks = startFrom === "first_date"
         ? axisXScale.ticks(d3.timeDay.every(7))
         : axisXScale.ticks(10);
-    const yFormatter = getFormatter(count, caseType, 1);
+    const yFormatter = getFormatter(count, caseType, smoothAvgDays);
+    console.log(count, caseType, smoothAvgDays, yFormatter);
     const yTicks = axisYScale.ticks(15);
     const chartArea = lineGraph.selectAll(".line-chart-area");
     const xAxis = chartArea.selectAll(".line-chart-x-axis");
@@ -450,6 +451,10 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         const rowData = [
             { type: "color", data: plotAesthetics.colors.scale(name) },
             { type: "name", data: name },
+            {
+                type: "number",
+                data: yFormatter(line.points[line.points.length - 1].y),
+            },
         ];
         row.selectAll("td")
             .data(rowData)
@@ -467,13 +472,23 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
                     .classed("legend-item", true))
                     .style("background-color", (c) => c);
             }
-            else {
+            else if (d.type === "name") {
                 const name = d.data;
                 td.selectAll(".legend-label")
                     .data([name])
                     .join((enter) => enter
                     .append("span")
                     .classed("legend-label", true)
+                    .classed("legend-item", true))
+                    .text((t) => t);
+            }
+            else if (d.type === "number") {
+                const value = d.data;
+                td.selectAll(".legend-value")
+                    .data([value])
+                    .join((enter) => enter
+                    .append("span")
+                    .classed("legend-value", true)
                     .classed("legend-item", true))
                     .text((t) => t);
             }

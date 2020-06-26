@@ -433,7 +433,7 @@ function updateLineGraph(
 		startFrom === "first_date"
 			? axisXScale.ticks(d3.timeDay.every(7))
 			: axisXScale.ticks(10);
-	const yFormatter = getFormatter(count, caseType, 1);
+	const yFormatter = getFormatter(count, caseType, smoothAvgDays);
 	const yTicks = axisYScale.ticks(15);
 
 	const chartArea = lineGraph.selectAll(".line-chart-area");
@@ -646,6 +646,10 @@ function updateLineGraph(
 			const rowData = [
 				{ type: "color", data: plotAesthetics.colors.scale(name) },
 				{ type: "name", data: name },
+				{
+					type: "number",
+					data: yFormatter(line.points[line.points.length - 1].y),
+				},
 			];
 			row.selectAll("td")
 				.data(rowData)
@@ -653,7 +657,7 @@ function updateLineGraph(
 				.classed("color-cell", true)
 				.each(function (
 					this: Node,
-					d: { type: "color" | "name"; data: string },
+					d: { type: "color" | "name" | "number"; data: string },
 				) {
 					const td = d3.select(this);
 					if (d.type === "color") {
@@ -667,7 +671,7 @@ function updateLineGraph(
 									.classed("legend-item", true),
 							)
 							.style("background-color", (c: string) => c);
-					} else {
+					} else if (d.type === "name") {
 						const name = d.data;
 						td.selectAll(".legend-label")
 							.data([name])
@@ -675,6 +679,17 @@ function updateLineGraph(
 								enter
 									.append("span")
 									.classed("legend-label", true)
+									.classed("legend-item", true),
+							)
+							.text((t: string) => t);
+					} else if (d.type === "number") {
+						const value = d.data;
+						td.selectAll(".legend-value")
+							.data([value])
+							.join((enter: any) =>
+								enter
+									.append("span")
+									.classed("legend-value", true)
 									.classed("legend-item", true),
 							)
 							.text((t: string) => t);

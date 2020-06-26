@@ -7,13 +7,14 @@ export function isPerCapita(caseType: CaseType) {
 }
 
 export const dateStrParser: (_: string) => Date = d3.timeParse("%Y-%m-%d");
-export const getFormatter: (
+
+export function getFormatter(
 	count: CountMethod,
 	caseType: CaseType,
 	smoothAvgDays: number,
-) => (_: number) => string = (() => {
-	const bigFloatFormatter = d3.format("~g");
-	const smallFloatFormatter = d3.format(",.2r");
+): (_: number) => string {
+	const bigFloatFormatter = d3.format(".3~s");
+	const smallFloatFormatter = d3.format(",.3r");
 	const tinyFloatFormatter = d3.format(".2~e");
 	const floatFormatter = (t: number) =>
 		t < 1e-2
@@ -22,12 +23,9 @@ export const getFormatter: (
 			? smallFloatFormatter(t)
 			: bigFloatFormatter(t);
 	const intFormatter = (t: number) =>
-		t < 1 ? floatFormatter(t) : d3.format(",~s")(t);
+		t < 1 ? floatFormatter(t) : d3.format(",.4~s")(t);
 
-	return (count: CountMethod, caseType: CaseType, smoothAvgDays: number) => {
-		return (count === "net" && !isPerCapita(caseType)) ||
-			(count === "dodd" && smoothAvgDays === 1)
-			? intFormatter
-			: floatFormatter;
-	};
-})();
+	return count === "net" || (count === "dodd" && smoothAvgDays === 1)
+		? intFormatter
+		: floatFormatter;
+}

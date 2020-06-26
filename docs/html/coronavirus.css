@@ -106,6 +106,10 @@ span.button-container {
 	padding-bottom: 4px;
 }
 
+.line-chart-legend .legend-value {
+	margin-left: 1em;
+}
+
 input[type="range"] {
 	-webkit-appearance: none;
 	-moz-apperance: none;
