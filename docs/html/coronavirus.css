@@ -25,7 +25,9 @@ div.plot-scope-group {
 
 div.plot-container {
 	display: inline-block;
-	padding: 1em;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	padding-right: 1em;
 }
 
 span.slider-text {
@@ -61,6 +63,17 @@ span.button-container {
 	padding: auto 6px;
 	margin: 0px;
 	height: 2em;
+}
+
+.choropleth-checkboxes th {
+	text-align: left;
+}
+
+.choropleth-checkboxes th:nth-child(2),
+.choropleth-checkboxes td:nth-child(3) {
+	border-left: rgb(222, 222, 222);
+	border-left-style: solid;
+	border-left-width: 1px;
 }
 
 input[type="range"] {
