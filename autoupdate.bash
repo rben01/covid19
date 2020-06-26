@@ -3,7 +3,7 @@ ghpages_branch='master'
 
 curr_branch="$(git rev-parse --abbrev-ref HEAD)" &&
 	git checkout "$ghpages_branch" &&
-	python src/case_tracker.py --use-web-data --force-graphs &&
+	python src/case_tracker.py --use-web-data --no-graphs &&
 	tsc &&
 	touch README.asciidoc &&
 	asciidoctor --base-dir docs -o index.html README.asciidoc &&
