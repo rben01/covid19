@@ -75,7 +75,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     checkboxTable
         .append("tr")
         .selectAll()
-        .data(["Location", "Count", "Cases/Deaths", "Total/Per 100k Residents"])
+        .data(["Location", "Count", "Cases/Deaths", "Total/Per 100k"])
         .join("th")
         .text((d) => d)
         .attr("colspan", 2);
@@ -84,7 +84,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
             { key: "location", value: "usa", name: "USA" },
             { key: "count", value: "dodd", name: "Daily Increase" },
             { key: "affliction", value: "cases", name: "Cases" },
-            { key: "accumulation", value: "per_capita", name: "Per Capita" },
+            { key: "accumulation", value: "per_capita", name: "Per 100k Residents" },
         ],
         [
             { key: "location", value: "world", name: "World" },
