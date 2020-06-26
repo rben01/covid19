@@ -131,7 +131,7 @@ export function initializeLineGraph(
 	checkboxTable
 		.append("tr")
 		.selectAll()
-		.data(["Location", "Count", "Cases/Deaths", "Total/Per 100k"])
+		.data(["Location", "Count", "Cases/Deaths", "Per 100k/Total"])
 		.join("th")
 		.text((d: string) => d)
 		.attr("colspan", 2);
@@ -150,7 +150,7 @@ export function initializeLineGraph(
 			{ key: "location", value: "world", name: "World" },
 			{ key: "count", value: "net", name: "Cases Over Time" },
 			{ key: "affliction", value: "deaths", name: "Deaths" },
-			{ key: "accumulation", value: "total", name: "Total" },
+			{ key: "accumulation", value: "total", name: "Total for Location" },
 		],
 	];
 	for (const row of rows) {
@@ -707,8 +707,10 @@ function updateLineGraph(
 		})
 		.on("mouseout", function (this: Node) {
 			const values = lines.map(line => line.points[line.points.length - 1].y);
+			const headerStr = getInfoFromXVal(maxXVal).xStr;
+			legend.selectAll("tr th").text(headerStr);
 			legend
-				.selectAll("td.legend-value")
+				.selectAll("td .legend-value")
 				.text((_: any, i: number) => yFormatter(values[i]));
 			mainChartArea.selectAll(".line-chart-hover-line").remove();
 		});
