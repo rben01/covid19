@@ -75,7 +75,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
     checkboxTable
         .append("tr")
         .selectAll()
-        .data(["Location", "Count", "Cases/Deaths", "Total/Per Capita"])
+        .data(["Location", "Count", "Cases/Deaths", "Total/Per 100k Residents"])
         .join("th")
         .text((d) => d)
         .attr("colspan", 2);

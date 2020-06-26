@@ -131,7 +131,7 @@ export function initializeLineGraph(
 	checkboxTable
 		.append("tr")
 		.selectAll()
-		.data(["Location", "Count", "Cases/Deaths", "Total/Per Capita"])
+		.data(["Location", "Count", "Cases/Deaths", "Total/Per 100k Residents"])
 		.join("th")
 		.text((d: string) => d)
 		.attr("colspan", 2);
