@@ -18,10 +18,12 @@ type XAxisType = number | Date;
 type Point = { x: XAxisType; y: number };
 class Line {
 	name: string;
+	code: string;
 	points: Point[];
 
-	constructor(name: string) {
+	constructor(name: string, code: string) {
 		this.name = name;
+		this.code = code;
 		this.points = [];
 	}
 
@@ -255,7 +257,7 @@ function updateLineGraph(
 
 	if (startFrom === "first_date") {
 		for (const [feature, _] of topNPlaces) {
-			const thisLine = new Line(feature.properties.name);
+			const thisLine = new Line(feature.properties.name, feature.properties.code);
 
 			const covidData = feature.covidData;
 			const dates: DateString[] = Object.keys(covidData.date).sort();
@@ -293,7 +295,7 @@ function updateLineGraph(
 		}
 	} else {
 		for (const [feature, _] of topNPlaces) {
-			const thisLine = new Line(feature.properties.name);
+			const thisLine = new Line(feature.properties.name, feature.properties.code);
 			const covidData = feature.covidData;
 			const values = covidData[count][caseType];
 			const startIndex = covidData.outbreak_cutoffs[caseType];
@@ -604,8 +606,7 @@ function updateLineGraph(
 			(exit: any) => exit.remove(),
 		)
 		.attr("d", (l: Line) => pathDrawer(l.points))
-		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.name))
-		.attr("_name", (l: any) => l.name);
+		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.code));
 
 	const legend = lineGraphContainer.selectAll(".line-chart-legend");
 	// Axes themselves; also a region for catching mouse events
@@ -728,9 +729,9 @@ function updateLineGraph(
 		.classed("legend-data-row", true)
 		.each(function (this: Node, line: Line) {
 			const row = d3.select(this);
-			const name = line.name;
+			const { name, code } = line;
 			const rowData = [
-				{ type: "color", data: plotAesthetics.colors.scale(name) },
+				{ type: "color", data: plotAesthetics.colors.scale(code) },
 				{ type: "name", data: name },
 				{
 					type: "number",

@@ -64,10 +64,23 @@ def get_countries_geo_df() -> geopandas.GeoDataFrame:
         )
         .fillna(geo_df[CODE])
     )
-    geo_df["name"] = geo_df[CODE]
-    geo_df[CODE] += " - " + geo_df["NAME_SORT"]
-
     geo_df = geo_df[geo_df[CODE] != "Antarctica"]
+
+    colonial_power_main_countries = {
+        "Britain": "England",
+        "France": "France, Metropolitan",
+        "Norway": "Norway",
+        "Papua New Guinea": "Papua New Guinea",
+    }
+
+    is_main_country_idx = geo_df[CODE].map(colonial_power_main_countries).isna() | (
+        geo_df["NAME_SORT"] == geo_df[CODE].map(colonial_power_main_countries)
+    )
+
+    geo_df[CODE] = geo_df[CODE].where(
+        is_main_country_idx, geo_df[CODE].str.cat(geo_df["NAME_SORT"], sep=" - "),
+    )
+    geo_df["name"] = geo_df[CODE]
 
     geo_df = geo_df[
         [
@@ -283,7 +296,10 @@ def data_to_json():
     countries_df = countries_df.rename(columns={Columns.COUNTRY: "name"})
 
     countries_geo_df = get_countries_geo_df()
-    countries_df[CODE] = countries_df.merge(countries_geo_df, on="name")[CODE]
+
+    countries_df[CODE] = countries_df.merge(countries_geo_df, how="left", on="name")[
+        CODE
+    ].values
 
     usa_geo_df = get_usa_states_geo_df()
     usa_geo_df["name"] = usa_geo_df.merge(

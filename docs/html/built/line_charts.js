@@ -1,7 +1,8 @@
 import { dateStrParser, EPSILON, getFormatter, MS_PER_DAY } from "./utils.js";
 class Line {
-    constructor(name) {
+    constructor(name, code) {
         this.name = name;
+        this.code = code;
         this.points = [];
     }
     push(p) {
@@ -167,7 +168,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     }
     if (startFrom === "first_date") {
         for (const [feature, _] of topNPlaces) {
-            const thisLine = new Line(feature.properties.name);
+            const thisLine = new Line(feature.properties.name, feature.properties.code);
             const covidData = feature.covidData;
             const dates = Object.keys(covidData.date).sort();
             const values = covidData[count][caseType];
@@ -202,7 +203,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     }
     else {
         for (const [feature, _] of topNPlaces) {
-            const thisLine = new Line(feature.properties.name);
+            const thisLine = new Line(feature.properties.name, feature.properties.code);
             const covidData = feature.covidData;
             const values = covidData[count][caseType];
             const startIndex = covidData.outbreak_cutoffs[caseType];
@@ -418,8 +419,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         .attr("stroke-width", plotAesthetics.graph.line.strokeWidth)
         .attr("fill-opacity", 0), (update) => update, (exit) => exit.remove())
         .attr("d", (l) => pathDrawer(l.points))
-        .attr("stroke", (l) => plotAesthetics.colors.scale(l.name))
-        .attr("_name", (l) => l.name);
+        .attr("stroke", (l) => plotAesthetics.colors.scale(l.code));
     const legend = lineGraphContainer.selectAll(".line-chart-legend");
     function getInfoFromXVal(x) {
         let xVal, xStr;
@@ -525,9 +525,9 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         .classed("legend-data-row", true)
         .each(function (line) {
         const row = d3.select(this);
-        const name = line.name;
+        const { name, code } = line;
         const rowData = [
-            { type: "color", data: plotAesthetics.colors.scale(name) },
+            { type: "color", data: plotAesthetics.colors.scale(code) },
             { type: "name", data: name },
             {
                 type: "number",
