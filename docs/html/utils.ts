@@ -6,7 +6,7 @@ export function isPerCapita(caseType: CaseType) {
 	return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
 }
 
-export const dateStrParser = d3.timeParse("%Y-%m-%d");
+export const dateStrParser: (_: string) => Date = d3.timeParse("%Y-%m-%d");
 export const getFormatter = (() => {
 	const intFormatter = d3.format(",~s");
 	const bigFloatFormatter = d3.format("~g");

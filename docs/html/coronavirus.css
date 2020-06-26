@@ -63,6 +63,14 @@ span.button-container {
 	height: 2em;
 }
 
+.choropleth-checkboxes {
+	display: inline-block;
+}
+
+.choropleth-checkboxes th {
+	text-align: left;
+}
+
 input[type="range"] {
 	-webkit-appearance: none;
 	-moz-apperance: none;
