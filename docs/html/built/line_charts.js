@@ -46,23 +46,92 @@ const plotAesthetics = (() => {
     pa.graph.height = pa.fullHeight - pa.graph.outerMargins.bottom;
     return pa;
 })();
-const lineGraph = d3.select("#line-charts-section").append("div").attr("id", "line-chart");
 const dateFormatter = d3.timeFormat("%b %-d");
-const svg = lineGraph
-    .append("svg")
-    .attr("width", plotAesthetics.fullWidth)
-    .attr("height", plotAesthetics.fullHeight);
-const chartArea = svg.append("g").classed("line-chart-area", true);
 export function initializeLineGraph(allCovidData, allGeoData) {
-    lineGraph.datum({ allCovidData, allGeoData });
     const location = "usa";
     const count = "dodd";
-    const caseType = "cases_per_capita";
-    updateLineGraph(location, caseType, count, "first_date", 7);
+    const affliction = "cases";
+    const accumulation = "per_capita";
+    const startFrom = "first_date";
+    const datum = {
+        allCovidData,
+        allGeoData,
+        location,
+        count,
+        affliction,
+        accumulation,
+        startFrom,
+    };
+    const lineGraphContainer = d3
+        .select("#line-charts-section")
+        .append("div");
+    lineGraphContainer.datum(datum);
+    const checkboxGroup = lineGraphContainer
+        .append("div")
+        .classed("checkbox-table", true);
+    const checkboxTable = checkboxGroup.append("table");
+    checkboxTable
+        .append("tr")
+        .selectAll()
+        .data(["Location", "Count", "Cases/Deaths", "Total/Per Capita", "Date Axis"])
+        .join("th")
+        .text((d) => d)
+        .attr("colspan", 2);
+    const rows = [
+        [
+            { key: "location", value: "usa", name: "USA" },
+            { key: "count", value: "dodd", name: "Daily Increase" },
+            { key: "affliction", value: "cases", name: "Cases" },
+            { key: "accumulation", value: "per_capita", name: "Per Capita" },
+            { key: "startFrom", value: "first_date", name: "Calendar Date" },
+        ],
+        [
+            { key: "location", value: "world", name: "World" },
+            { key: "count", value: "net", name: "Total Cases" },
+            { key: "affliction", value: "deaths", name: "Deaths" },
+            { key: "accumulation", value: "total", name: "Total" },
+            {
+                key: "startFrom",
+                value: "outbreak",
+                name: "Days Since First Outbreak",
+            },
+        ],
+    ];
+    for (const row of rows) {
+        const tr = checkboxTable.append("tr");
+        for (const col of row) {
+            const { key, value, name } = col;
+            tr.append("td").text(name);
+            tr.append("td")
+                .append("input")
+                .property("checked", value === datum[key])
+                .attr("type", "radio")
+                .property("name", key)
+                .on("change", function (d) {
+                const datum = lineGraph.datum();
+                datum[key] = value;
+                updateLineGraph(lineGraphContainer, "outbreak", 7);
+            });
+        }
+    }
+    const lineGraph = lineGraphContainer.append("div").classed("line-chart", true);
+    const svg = lineGraph
+        .append("svg")
+        .attr("width", plotAesthetics.fullWidth)
+        .attr("height", plotAesthetics.fullHeight);
+    const chartArea = svg.append("g").classed("line-chart-area", true);
+    chartArea.append("g").classed("line-chart-x-axis", true);
+    chartArea.append("g").classed("line-chart-y-axis", true);
+    lineGraphContainer.append("div").classed("line-chart-legend", true).append("table");
+    updateLineGraph(lineGraphContainer, startFrom, 7);
 }
-function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
-    const allGeoData = lineGraph.datum().allGeoData;
+function updateLineGraph(lineGraphContainer, startFrom, smoothAvgDays) {
+    const { location, count, affliction, accumulation, allGeoData, } = lineGraphContainer.datum();
+    const lineGraph = lineGraphContainer.selectAll(".line-chart");
     const scopedGeoData = allGeoData[location];
+    const caseType = (accumulation === "per_capita"
+        ? `${affliction}_per_capita`
+        : affliction);
     const nLines = 10;
     const lines = [];
     const topNPlaces = [];
@@ -152,6 +221,7 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
             lines.push(thisLine);
         }
     }
+    lines.sort((l1, l2) => l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y);
     const [minYVal, maxYVal] = (() => {
         let min = Infinity, max = -Infinity;
         for (let line of lines) {
@@ -223,58 +293,64 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         : axisXScale.ticks(10);
     const yFormatter = getFormatter(count, caseType, 1);
     const yTicks = axisYScale.ticks(15);
-    const xAxis = chartArea.append("g").classed("line-chart-x-axis", true);
-    const yAxis = chartArea.append("g").classed("line-chart-y-axis", true);
+    const chartArea = lineGraph.selectAll(".line-chart-area");
+    const xAxis = chartArea.selectAll(".line-chart-x-axis");
+    const yAxis = chartArea.selectAll(".line-chart-y-axis");
     xAxis
-        .selectAll()
+        .selectAll(".x-axis-tick")
         .data(xTicks)
-        .join("line")
+        .join((enter) => enter
+        .append("line")
         .classed("x-axis-tick", true)
+        .attr("stroke", axisColor)
+        .attr("stroke-width", strokeWidth), (update) => update, (exit) => exit.remove())
         .attr("x1", lineXScale)
         .attr("x2", lineXScale)
         .attr("y1", axisYScale(minYVal))
-        .attr("y2", axisYScale(minYVal) + tickLength)
-        .attr("stroke", axisColor)
-        .attr("stroke-width", strokeWidth);
+        .attr("y2", axisYScale(minYVal) + tickLength);
     yAxis
-        .selectAll()
+        .selectAll(".y-axis-tick")
         .data(yTicks)
-        .join("line")
+        .join((enter) => enter
+        .append("line")
         .classed("y-axis-tick", true)
+        .attr("stroke", axisColor)
+        .attr("stroke-width", strokeWidth), (update) => update, (exit) => exit.remove())
         .attr("x1", axisXScale(minXVal))
         .attr("x2", axisXScale(minXVal) - plotAesthetics.graph.axisStyle.tickLength)
         .attr("y1", lineYScale)
-        .attr("y2", lineYScale)
-        .attr("stroke", axisColor)
-        .attr("stroke-width", strokeWidth);
+        .attr("y2", lineYScale);
     xAxis
-        .selectAll()
+        .selectAll(".x-axis-gridline")
         .data(xTicks)
-        .join("line")
+        .join((enter) => enter
+        .append("line")
         .classed("x-axis-gridline", true)
+        .attr("stroke", gridlineColor)
+        .attr("stroke-width", strokeWidth), (update) => update, (exit) => exit.remove())
         .attr("x1", lineXScale)
         .attr("x2", lineXScale)
         .attr("y1", axisYScale(minYVal))
-        .attr("y2", axisYScale(maxYVal))
-        .attr("stroke", gridlineColor)
-        .attr("stroke-width", strokeWidth);
+        .attr("y2", axisYScale(maxYVal));
     yAxis
-        .selectAll()
+        .selectAll(".y-axis-gridline")
         .data(yTicks)
-        .join("line")
+        .join((enter) => enter
+        .append("line")
         .classed("y-axis-gridline", true)
+        .attr("stroke", plotAesthetics.graph.axisStyle.gridlineColor)
+        .attr("stroke-width", plotAesthetics.graph.axisStyle.strokeWidth), (update) => update, (exit) => exit.remove())
         .attr("x1", axisXScale(minXVal))
         .attr("x2", axisXScale(maxXVal))
         .attr("y1", lineYScale)
-        .attr("y2", lineYScale)
-        .attr("stroke", plotAesthetics.graph.axisStyle.gridlineColor)
-        .attr("stroke-width", plotAesthetics.graph.axisStyle.strokeWidth);
+        .attr("y2", lineYScale);
     const xTickLabels = xAxis
-        .selectAll()
+        .selectAll(".x-axis-label")
         .data(xTicks)
-        .join("text")
+        .join((enter) => enter
+        .append("text")
         .classed("x-axis-label", true)
-        .attr("font-size", "70%");
+        .attr("font-size", "70%"), (update) => update, (exit) => exit.remove());
     if (startFrom === "first_date") {
         xTickLabels
             .text((date) => {
@@ -297,10 +373,14 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
             .attr("text-anchor", "middle");
     }
     yAxis
-        .selectAll()
+        .selectAll(".y-axis-label")
         .data(yTicks)
-        .join("text")
+        .join((enter) => enter
+        .append("text")
         .classed("y-axis-label", true)
+        .attr("text-anchor", "end")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", "70%"), (update) => update, (exit) => exit.remove())
         .text((y) => {
         const yStr = yFormatter(y);
         const firstSigFigIndex = yStr.search(/[1-9]/);
@@ -311,16 +391,13 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         return "";
     })
         .attr("x", axisXScale(minXVal) - plotAesthetics.graph.axisStyle.tickLength - 3)
-        .attr("y", lineYScale)
-        .attr("text-anchor", "end")
-        .attr("dominant-baseline", "middle")
-        .attr("font-size", "70%");
+        .attr("y", lineYScale);
     const axisLine = d3
         .line()
         .x((p) => axisXScale(p[0]))
         .y((p) => axisYScale(p[1]));
     chartArea
-        .selectAll()
+        .selectAll(".axes-border")
         .data([
         [
             [minXVal, minYVal],
@@ -331,6 +408,7 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         ],
     ])
         .join("path")
+        .classed("axes-border", true)
         .attr("d", axisLine)
         .attr("fill-opacity", 0)
         .attr("stroke", axisColor)
@@ -341,14 +419,51 @@ function updateLineGraph(location, caseType, count, startFrom, smoothAvgDays) {
         .y((p) => lineYScale(p.y))
         .defined((p) => lineYScale(p.y) > 0)
         .curve(d3.curveMonotoneX);
-    console.log(lines);
     chartArea
-        .selectAll()
+        .selectAll(".chart-line")
         .data(lines)
-        .join("path")
-        .attr("d", (l) => pathDrawer(l.points))
+        .join((enter) => enter
+        .append("path")
+        .classed("chart-line", true)
         .attr("stroke-width", plotAesthetics.graph.line.strokeWidth)
-        .attr("fill-opacity", 0)
+        .attr("fill-opacity", 0), (update) => update, (exit) => exit.remove())
+        .attr("d", (l) => pathDrawer(l.points))
         .attr("stroke", (l) => plotAesthetics.colors.scale(l.name))
         .attr("_name", (l) => l.name);
+    lineGraphContainer
+        .selectAll(".line-chart-legend")
+        .selectAll("tr")
+        .data(lines)
+        .join("tr")
+        .each(function (line) {
+        const row = d3.select(this);
+        const name = line.name;
+        const rowData = [
+            { type: "color", data: plotAesthetics.colors.scale(name) },
+            { type: "name", data: name },
+        ];
+        row.selectAll("td")
+            .data(rowData)
+            .join("td")
+            .classed("color-cell", true)
+            .each(function (d) {
+            const td = d3.select(this);
+            if (d.type === "color") {
+                const color = d.data;
+                td.selectAll(".legend-color-square")
+                    .data([color])
+                    .join((enter) => enter
+                    .append("div")
+                    .classed("legend-color-square", true))
+                    .style("background-color", (c) => c);
+            }
+            else {
+                const name = d.data;
+                td.selectAll(".legend-label")
+                    .data([name])
+                    .join((enter) => enter.append("div").classed("legend-label", true))
+                    .text((t) => t);
+            }
+        });
+    });
 }

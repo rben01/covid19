@@ -409,9 +409,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         allGeoData,
     };
     const choropleth = d3.select("#map-plots").selectAll().data([datum]).join("div");
-    const checkboxGroup = choropleth
-        .append("div")
-        .classed("choropleth-checkboxes", true);
+    const checkboxGroup = choropleth.append("div").classed("checkbox-table", true);
     const checkboxTable = checkboxGroup.append("table");
     checkboxTable
         .append("tr")

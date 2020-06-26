@@ -65,15 +65,33 @@ span.button-container {
 	height: 2em;
 }
 
-.choropleth-checkboxes th {
+.checkbox-table th {
 	text-align: left;
 }
 
-.choropleth-checkboxes th:nth-child(2),
-.choropleth-checkboxes td:nth-child(3) {
+.checkbox-table th,
+.checkbox-table td:nth-child(2n + 1) {
 	border-left: rgb(222, 222, 222);
 	border-left-style: solid;
 	border-left-width: 1px;
+}
+
+.line-chart {
+	display: inline-block;
+}
+
+.line-chart-legend {
+	display: inline-block;
+	margin-left: 3em;
+}
+
+.color-cell {
+	padding: 3px;
+}
+
+.legend-color-square {
+	width: 20px;
+	height: 20px;
 }
 
 input[type="range"] {

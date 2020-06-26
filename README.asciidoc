@@ -261,6 +261,10 @@ Along the bottoms are controls for continuous playback of the data over time as 
 
 == Graphs
 
+++++
+<div id="line-charts-section"></div>
+++++
+
 [[graphs-line]]
 === {icon-line-graphs} Line Charts
 
