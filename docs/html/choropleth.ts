@@ -138,14 +138,19 @@ function getDataOnDate({
 		return null;
 	}
 
-	smoothAvgDays = smoothAvgDays as number;
+	if (typeof smoothAvgDays === "undefined") {
+		smoothAvgDays = 0;
+	}
+	smoothAvgDays = +smoothAvgDays as number;
 
 	let value: number;
 	if (count === "dodd" && smoothAvgDays >= 2) {
 		let sum = 0;
 		for (let i = index; i > index - smoothAvgDays; --i) {
 			const x = data[caseType][i];
-			sum += x;
+			if (typeof x !== "undefined") {
+				sum += x;
+			}
 		}
 
 		value = sum / smoothAvgDays;
@@ -374,7 +379,6 @@ function updateMaps({
 			];
 			const colorScale = d3.scaleLog().domain([vmin, vmax]).range([0, 1]);
 
-			// console.log(map);
 			mapContainer
 				.selectAll(".map")
 				.selectAll("path")
@@ -399,8 +403,7 @@ function updateMaps({
 				})
 				.classed("state-boundary", true)
 				.on("mouseover", (d: Feature) => {
-					tooltip.datum({
-						...tooltip.datum(),
+					Object.assign(tooltip.datum(), {
 						feature: d,
 						caseType,
 						count,
@@ -411,7 +414,7 @@ function updateMaps({
 				.on("mousemove", () => {
 					if (!mouseMoved) {
 						const dateIndex = +dateSliderNode.value;
-						tooltip.datum({
+						Object.assign(tooltip.datum(), {
 							...tooltip.datum(),
 							dateKey: getDateNDaysAfter(minDate, dateIndex),
 							smoothAvgDays,
@@ -519,7 +522,6 @@ function updateMaps({
 		.node();
 	const movingAvgSliders = choropleth.selectAll(".smooth-avg-slider");
 
-	console.log(smoothAvgDays);
 	// If non-null, apply this slider's moving avg to all other sliders
 	if (
 		count === "dodd" &&
@@ -833,7 +835,6 @@ function _initializeChoropleth({
 		playbackInfo.isPlaying = true;
 
 		const maxDateIndex = parseFloat(dateSliderNode.max);
-		console.log(maxDateIndex);
 
 		if (dateSliderNode.value === dateSliderNode.max) {
 			updateMaps({ choropleth, dateIndex: 0 });

@@ -113,10 +113,16 @@
 </li>
 <li><a href="#sect-graphs">📊 Graphs</a>
 <ul class="sectlevel2">
-<li><a href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></li>
+<li><a href="#graphs-timeline-interactive-us">⏯ Interactive Map-Based Tracker</a>
+<ul class="sectlevel3">
+<li><a href="#_reading_the_maps">Reading the Maps</a></li>
+<li><a href="#_chart">Chart</a></li>
+</ul>
+</li>
 <li><a href="#graphs-line">📈 Line Charts</a>
 <ul class="sectlevel3">
-<li><a href="#sect-reading-graphs">📖 Reading the Line Chart</a></li>
+<li><a href="#sect-reading-graphs">Reading the Line Chart</a></li>
+<li><a href="#sect-line-chart">Chart</a></li>
 </ul>
 </li>
 </ul>
@@ -277,15 +283,6 @@ For instance, early on, many New Yorkers left the state for elsewhere in the U.S
 If a region&#8217;s true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
 Correspondingly, if a region&#8217;s true population increases (people immigrate), then its per-capita numbers will be artificially inflated.</p>
 </dd>
-<dt class="hdlist1"><span class="icon"><i class="fa fa-heartbeat fa-fw"></i></span> Case Fatality Rate (CFR)</dt>
-<dd>
-<p>CFR = <sup>deaths</sup>/<sub>confirmed cases</sub>.
-This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases is increasing relative to existing confirmed cases (the slopes of the lines in the below plots).
-If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won&#8217;t yet have had time to become fatal.
-If it&#8217;s been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not).<br>
-Of course, the numerator and denominator may be inaccurate to do testing issues.
-And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).</p>
-</dd>
 </dl>
 </div>
 </div>
@@ -295,28 +292,40 @@ And the true CFR within a region can itself change over time as treatment qualit
 <h2 id="sect-graphs"><a class="link" href="#sect-graphs">📊 Graphs</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="graphs-timeline-interactive-us"><a class="link" href="#graphs-timeline-interactive-us">⏯ Interactive Trackers</a></h3>
-<div class="paragraph">
-<p>This section contains two pairs of interactive 2x2 grid-plots: one pair for the continental U.S. and one pair for the world&#8217;s countries (due to data issues, a handful of countries are not present).
-All four grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed over time.
-In each pair, the first grid-plot shows these numbers cumulatively and the second grid-plot shows how these numbers increased each day.
-For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first U.S. grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6).<br>
-Regions that are light gray on a given day had no cases/deaths that day.
+<h3 id="graphs-timeline-interactive-us"><a class="link" href="#graphs-timeline-interactive-us">⏯ Interactive Map-Based Tracker</a></h3>
+<div class="sect3">
+<h4 id="_reading_the_maps"><a class="link" href="#_reading_the_maps">Reading the Maps</a></h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><span class="icon"><i class="fa fa-map-signs fa-fw"></i></span> Reading the maps</dt>
+<dd>
+<p>This section contains an interactive 2x2 grid-plots.
+The four quadrants show how the number of cases and deaths, total and per capita, has progressed over time.
+Regions that have light gray stripes on a given day had no data available on that day.
 Otherwise, the colors are logarithmically scaled.
-Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b<sup>n</sup> and a×b<sup>n+1</sup> are located at a×b<sup>n</sup>(bk-k+9)/9 for k=1, 2, &#8230;&#8203;, 7, 8.
-Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.<br>
+Because the range of values in each quadrants is different, each quadrant&#8217;s color scale is unique to that quadrant.</p>
+</dd>
+<dt class="hdlist1"><span class="icon"><i class="fa fa-mouse fa-fw"></i></span> Interaction</dt>
+<dd>
+<p>At the top is a menu for selecting which data you would like to view, and below are the maps themselves.
 On desktop, zoom by holding the shift key and scrolling over the graph.
 Once you&#8217;ve zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
 Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.</p>
+</dd>
+</dl>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_chart"><a class="link" href="#_chart">Chart</a></h4>
 <div id="map-plots"></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="graphs-line"><a class="link" href="#graphs-line">📈 Line Charts</a></h3>
 <div class="sect3">
-<h4 id="sect-reading-graphs"><a class="link" href="#sect-reading-graphs">📖 Reading the Line Chart</a></h4>
+<h4 id="sect-reading-graphs"><a class="link" href="#sect-reading-graphs">Reading the Line Chart</a></h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><a id="date-explanation-note"></a><span class="icon"><i class="fa fa-calendar-alt fa-fw"></i></span> Interpreting the Axes</dt>
@@ -339,6 +348,9 @@ On all graphs, minor y-axis gridlines are spaced linearly between major gridline
 </dd>
 </dl>
 </div>
+</div>
+<div class="sect3">
+<h4 id="sect-line-chart"><a class="link" href="#sect-line-chart">Chart</a></h4>
 <div id="line-charts-section"></div>
 </div>
 </div>
@@ -347,7 +359,7 @@ On all graphs, minor y-axis gridlines are spaced linearly between major gridline
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-26 12:17:43 -0400
+Last updated 2020-06-26 12:28:19 -0400
 </div>
 </div>
 <script type="module" src="./html/built/plots.js"></script>

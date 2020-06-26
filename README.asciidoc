@@ -227,33 +227,30 @@ If a region's true population decreases (its residents emigrate), then its per-c
 Correspondingly, if a region's true population increases (people immigrate), then its per-capita numbers will be artificially inflated.
 
 
-{bullet-cfr-notes} Case Fatality Rate (CFR)::
-CFR = ^deaths^/~confirmed{sp}cases~.
-This is an underestimate of the true CFR within a region; how low of an estimate it is depends on how quickly the rate of new confirmed cases is increasing relative to existing confirmed cases (the slopes of the lines in the below plots).
-If the infection rate increases rapidly, the computed CFR will be a gross underestimate, as new infections won't yet have had time to become fatal.
-If it's been flat for a while, then the computed CFR should approach the true CFR, as cases will all be resolved (either fatally or not). +
-Of course, the numerator and denominator may be inaccurate to do testing issues.
-And the true CFR within a region can itself change over time as treatment quality goes up (e.g., more resources per capita allocated to response) or down (e.g., hospitals become overburdened).
-
 [[sect-graphs]]
 == {icon-graphs} Graphs
 
 [[graphs-timeline-interactive-us]]
-=== {icon-interactive-timeline} Interactive Trackers
+=== {icon-interactive-timeline} Interactive Map-Based Tracker
 
-This section contains two pairs of interactive 2x2 grid-plots: one pair for the continental U.S. and one pair for the world's countries (due to data issues, a handful of countries are not present).
-All four grid-plots have four quadrants showing how the number of cases and deaths, total and per capita, has progressed over time.
-In each pair, the first grid-plot shows these numbers cumulatively and the second grid-plot shows how these numbers increased each day.
-For instance, New York had 6 cases on March 4 and 22 on March 5; the top-left quadrant of the first U.S. grid-plot would show 22 for New York on March 5, while that of the second grid-plot would show 16 (22 minus 6). +
-Regions that are light gray on a given day had no cases/deaths that day.
+==== Reading the Maps
+
+icon:map-signs[{bullet-opts}] Reading the maps::
+This section contains an interactive 2x2 grid-plots.
+The four quadrants show how the number of cases and deaths, total and per capita, has progressed over time.
+Regions that have light gray stripes on a given day had no data available on that day.
 Otherwise, the colors are logarithmically scaled.
-Each pair of major ticks has eight minor ticks between them (ten including the major ticks), which means the minor ticks between a×b^n^ and a×b^n+1^ are located at a×b^n^(bk-k+9)/9 for k=1, 2, ..., 7, 8.
-Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant. +
+Because the range of values in each quadrants is different, each quadrant's color scale is unique to that quadrant.
+
+{bullet-interaction} Interaction::
+At the top is a menu for selecting which data you would like to view, and below are the maps themselves.
 On desktop, zoom by holding the shift key and scrolling over the graph.
 Once you've zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.
 Along the bottoms are controls for continuous playback of the data over time as well as a slider to pick the date manually.
+
+==== Chart
 
 ++++
 <div id="map-plots"></div>
@@ -264,7 +261,7 @@ Along the bottoms are controls for continuous playback of the data over time as 
 === {icon-line-graphs} Line Charts
 
 [[sect-reading-graphs]]
-==== {icon-reading-graphs} Reading the Line Chart
+==== Reading the Line Chart
 
 [[date-explanation-note]]{bullet-start-date} Interpreting the Axes::
 The dates on the graphs`' x-axes represent data collected in the time span from the most recent occurrence of midnight to the given date.
@@ -279,6 +276,8 @@ In each graph, the "`top 10`" locations for the given variable are displayed. Yo
 
 {bullet-interaction} Interaction::
 By default, the legend displays data for the graphed locations on the most recent date for which there is data. Hover your mouse over the graph to choose a different date to display in the legend.
+[[sect-line-chart]]
+==== Chart
 
 ++++
 <div id="line-charts-section"></div>

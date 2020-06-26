@@ -87,13 +87,18 @@ function getDataOnDate({ feature, count, dateKey, caseType, smoothAvgDays, }) {
     if (typeof index === "undefined") {
         return null;
     }
-    smoothAvgDays = smoothAvgDays;
+    if (typeof smoothAvgDays === "undefined") {
+        smoothAvgDays = 0;
+    }
+    smoothAvgDays = +smoothAvgDays;
     let value;
     if (count === "dodd" && smoothAvgDays >= 2) {
         let sum = 0;
         for (let i = index; i > index - smoothAvgDays; --i) {
             const x = data[caseType][i];
-            sum += x;
+            if (typeof x !== "undefined") {
+                sum += x;
+            }
         }
         value = sum / smoothAvgDays;
         if (isNaN(value)) {
@@ -271,8 +276,7 @@ function updateMaps({ choropleth, dateIndex, smoothAvgDays, }) {
         })
             .classed("state-boundary", true)
             .on("mouseover", (d) => {
-            tooltip.datum({
-                ...tooltip.datum(),
+            Object.assign(tooltip.datum(), {
                 feature: d,
                 caseType,
                 count,
@@ -283,7 +287,7 @@ function updateMaps({ choropleth, dateIndex, smoothAvgDays, }) {
             .on("mousemove", () => {
             if (!mouseMoved) {
                 const dateIndex = +dateSliderNode.value;
-                tooltip.datum({
+                Object.assign(tooltip.datum(), {
                     ...tooltip.datum(),
                     dateKey: getDateNDaysAfter(minDate, dateIndex),
                     smoothAvgDays,
@@ -361,7 +365,6 @@ function updateMaps({ choropleth, dateIndex, smoothAvgDays, }) {
         .property("value", dateIndex)
         .node();
     const movingAvgSliders = choropleth.selectAll(".smooth-avg-slider");
-    console.log(smoothAvgDays);
     if (count === "dodd" &&
         (typeof smoothAvgDays === "undefined" || smoothAvgDays === null)) {
         smoothAvgDays = choropleth.selectAll(".smooth-avg-slider").node().value;
@@ -605,7 +608,6 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
     function startPlayback(playbackInfo) {
         playbackInfo.isPlaying = true;
         const maxDateIndex = parseFloat(dateSliderNode.max);
-        console.log(maxDateIndex);
         if (dateSliderNode.value === dateSliderNode.max) {
             updateMaps({ choropleth, dateIndex: 0 });
             playbackInfo.timerElapsedTimeProptn = 0.0000001;
