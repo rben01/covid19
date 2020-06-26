@@ -4,17 +4,11 @@ import {
 	AllGeoData,
 	CaseType,
 	CountMethod,
-	DataGroup,
 	DateString,
 	Feature,
-	Scope,
-	ScopedCovidData,
-	ScopedGeoData,
-	SCOPES,
 	WorldLocation,
 } from "./types.js";
-
-import { dateStrParser, getFormatter, MS_PER_DAY } from "./utils.js";
+import { dateStrParser, EPSILON, getFormatter, MS_PER_DAY } from "./utils.js";
 
 type Affliction = "cases" | "deaths";
 type Accumulation = "total" | "per_capita";
@@ -207,7 +201,6 @@ export function initializeLineGraph(
 	updateLineGraph(lineGraphContainer, 7);
 }
 
-const EPSILON = 1e-8;
 function updateLineGraph(
 	lineGraphContainer: LineGraphContainer,
 	smoothAvgDays: number,

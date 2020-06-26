@@ -1,4 +1,4 @@
-import { dateStrParser, getFormatter, MS_PER_DAY } from "./utils.js";
+import { dateStrParser, EPSILON, getFormatter, MS_PER_DAY } from "./utils.js";
 class Line {
     constructor(name) {
         this.name = name;
@@ -133,7 +133,6 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         .attr("colspan", 3);
     updateLineGraph(lineGraphContainer, 7);
 }
-const EPSILON = 1e-8;
 function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = { refreshColors: false }) {
     const { location, count, affliction, accumulation, allGeoData, startFrom, } = lineGraphContainer.datum();
     const lineGraph = lineGraphContainer.selectAll(".line-chart");

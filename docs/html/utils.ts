@@ -3,6 +3,7 @@ import { CaseType, CountMethod } from "./types";
 declare const d3: any;
 
 export const MS_PER_DAY = 86400 * 1000;
+export const EPSILON = 1e-8;
 
 export function isPerCapita(caseType: CaseType) {
 	return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
@@ -19,7 +20,9 @@ export function getFormatter(
 	const smallFloatFormatter = d3.format(",.3~r");
 	const tinyFloatFormatter = d3.format(".2~e");
 	const floatFormatter = (t: number) =>
-		t < 1e-2
+		t < EPSILON
+			? "0.0"
+			: t < 1e-2
 			? tinyFloatFormatter(t)
 			: t < 1
 			? smallFloatFormatter(t)
