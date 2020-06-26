@@ -38,11 +38,11 @@ class Line {
 }
 
 const plotAesthetics = (() => {
-	const chartWidth = 600,
+	const chartWidth = 500,
 		chartHeight = 500;
 	const outerMargins = {
-		top: 3,
-		bottom: 60,
+		top: 6,
+		bottom: 100,
 		left: 40,
 		right: 3,
 	};
@@ -196,7 +196,11 @@ export function initializeLineGraph(
 	chartArea.append("g").classed("line-chart-x-axis", true);
 	chartArea.append("g").classed("line-chart-y-axis", true);
 
-	lineGraphContainer.append("div").classed("line-chart-legend", true).append("table");
+	lineGraphContainer
+		.append("div")
+		.classed("line-chart-legend-container", true)
+		.append("table")
+		.classed("line-chart-legend", true);
 
 	updateLineGraph(lineGraphContainer, 7);
 }
@@ -659,7 +663,8 @@ function updateLineGraph(
 							.join((enter: any) =>
 								enter
 									.append("div")
-									.classed("legend-color-square", true),
+									.classed("legend-color-square", true)
+									.classed("legend-item", true),
 							)
 							.style("background-color", (c: string) => c);
 					} else {
@@ -667,7 +672,10 @@ function updateLineGraph(
 						td.selectAll(".legend-label")
 							.data([name])
 							.join((enter: any) =>
-								enter.append("div").classed("legend-label", true),
+								enter
+									.append("span")
+									.classed("legend-label", true)
+									.classed("legend-item", true),
 							)
 							.text((t: string) => t);
 					}

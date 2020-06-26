@@ -78,11 +78,17 @@ span.button-container {
 
 .line-chart {
 	display: inline-block;
+	vertical-align: top;
+}
+
+.line-chart-legend-container {
+	display: inline-block;
 }
 
 .line-chart-legend {
 	display: inline-block;
-	margin-left: 3em;
+	margin-top: 5.5px;
+	margin-left: 1em;
 }
 
 .color-cell {
@@ -92,6 +98,12 @@ span.button-container {
 .legend-color-square {
 	width: 20px;
 	height: 20px;
+}
+
+.line-chart-legend td {
+	display: table-cell;
+	vertical-align: middle;
+	padding-bottom: 4px;
 }
 
 input[type="range"] {
