@@ -147,7 +147,7 @@ export function initializeLineGraph(
 		],
 		[
 			{ key: "location", value: "world", name: "World" },
-			{ key: "count", value: "net", name: "Total Cases" },
+			{ key: "count", value: "net", name: "Cases Over Time" },
 			{ key: "affliction", value: "deaths", name: "Deaths" },
 			{ key: "accumulation", value: "total", name: "Total" },
 			{

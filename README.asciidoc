@@ -275,7 +275,8 @@ In each graph, the "`top 10`" locations for the given variable are displayed. Yo
 
 {bullet-interaction} Interaction::
 Use the controls at the top to select the data you wish to display. +
-By default, the legend displays data for the graphed locations on the most recent date for which there is data. Hover your mouse over the graph to choose a different date to display in the legend.
+By default, the legend displays data for the graphed locations on the most recent date for which there is data.
+Hover your mouse over the graph (desktop) or tap a spot on the graph (mobile) to choose a different date to display in the legend.
 [[sect-line-chart]]
 ==== Chart
 
