@@ -131,7 +131,7 @@ export function initializeLineGraph(
 	checkboxTable
 		.append("tr")
 		.selectAll()
-		.data(["Location", "Count", "Cases/Deaths", "Total/Per Capita", "Date Axis"])
+		.data(["Location", "Count", "Cases/Deaths", "Total/Per Capita"])
 		.join("th")
 		.text((d: string) => d)
 		.attr("colspan", 2);
@@ -145,18 +145,12 @@ export function initializeLineGraph(
 			{ key: "count", value: "dodd", name: "Daily Increase" },
 			{ key: "affliction", value: "cases", name: "Cases" },
 			{ key: "accumulation", value: "per_capita", name: "Per Capita" },
-			{ key: "startFrom", value: "first_date", name: "Calendar Date" },
 		],
 		[
 			{ key: "location", value: "world", name: "World" },
 			{ key: "count", value: "net", name: "Cases Over Time" },
 			{ key: "affliction", value: "deaths", name: "Deaths" },
 			{ key: "accumulation", value: "total", name: "Total" },
-			{
-				key: "startFrom",
-				value: "outbreak",
-				name: "Days Since First Outbreak",
-			},
 		],
 	];
 	for (const row of rows) {
