@@ -85,7 +85,7 @@ endif::[]
 :icon-notes: 📓
 :icon-graphs: 📊
 :icon-line-graphs: 📈
-:icon-interactive-timeline: ⏯
+:icon-interactive-timeline: 🗺
 :icon-interactive-cumulative: ↗️
 :icon-interactive-day-diff: ↪️
 :icon-world: 🌍
