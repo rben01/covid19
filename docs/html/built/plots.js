@@ -40,6 +40,7 @@ Promise.all([
     const allCovidData = objects[0];
     const allGeoData = objects[1];
     assignData(allCovidData, allGeoData);
+    d3.selectAll(".plot-placeholder").remove();
     initializeChoropleths(allCovidData, allGeoData);
     initializeLineGraph(allCovidData, allGeoData);
 });

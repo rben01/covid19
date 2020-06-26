@@ -253,6 +253,7 @@ Along the bottoms are controls for continuous playback of the data over time as 
 ==== Chart
 
 ++++
+<div class="plot-placeholder" style="width:1px;height:1024px;"></div>
 <div id="map-plots"></div>
 ++++
 
@@ -281,5 +282,6 @@ Hover your mouse over the graph (desktop) or tap a spot on the graph (mobile) to
 ==== Chart
 
 ++++
+<div class="plot-placeholder" style="width:1px;height:748px;"></div>
 <div id="line-charts-section"></div>
 ++++
