@@ -1,14 +1,16 @@
 import { COUNT_METHODS, WORLD_LOCATIONS, } from "./types.js";
 import { dateStrParser, isPerCapita, MS_PER_DAY } from "./utils.js";
 const plotAesthetics = Object.freeze((() => {
+    const scaleBound = 1;
+    const colorScale = (t) => d3.interpolateRdBu(scaleBound + t * (1 - 2 * scaleBound));
     const pa = {
         width: { usa: 500, world: 500 },
         height: { usa: 325, world: 300 },
         colors: {
-            scale: (t) => d3.interpolateCividis(1 - t),
-            nSteps: 101,
+            scale: colorScale,
+            nSteps: 26,
             missing: "#dadada",
-            zero: "#ddc",
+            zero: colorScale(0),
         },
         map: {
             pad: 10,
@@ -197,6 +199,9 @@ function updateMaps({ choropleth, dateIndex, smoothAvgDays, }) {
     }
     const dateKey = getDateNDaysAfter(minDate, dateIndex);
     prevChoroplethInfo.dateStr = dateKey;
+    if (typeof smoothAvgDays === "undefined") {
+        smoothAvgDays = +choropleth.selectAll(".smooth-avg-slider").node().value;
+    }
     const { barWidth, height: barHeights } = plotAesthetics.legend;
     const barHeight = barHeights[location];
     choropleth
