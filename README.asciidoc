@@ -277,6 +277,7 @@ In each graph, the ten locations with the highest numbers for the selected varia
 You can use the arrows to display lower- or higher-ranked locations. +
 By default, the legend displays data for the graphed locations on the most recent date for which there is data.
 Hover your mouse over the graph (desktop) or tap a spot on the graph (mobile) to choose a different date to display in the legend.
+Hover your mouse over a row in the legend to select an individual region to view in the chart.
 [[sect-line-chart]]
 ==== Chart
 

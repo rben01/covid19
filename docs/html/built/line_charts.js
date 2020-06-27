@@ -142,7 +142,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         .join("button")
         .classed("line-chart-legend-button", true)
         .html((n) => {
-        if (n == -10) {
+        if (n < -1) {
             return '<i class="fas fa-angle-double-up"></i>';
         }
         else if (n == -1) {
@@ -151,7 +151,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         else if (n == 1) {
             return '<i class="fas fa-chevron-down"></i>';
         }
-        else if (n === 10) {
+        else if (n > 1) {
             return '<i class="fas fa-angle-double-down"></i>';
         }
         else {
@@ -177,7 +177,18 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
     const lineGraph = lineGraphContainer.selectAll(".line-chart");
     const scopedGeoData = allGeoData[location];
     const nLines = 10;
-    startIndex = Math.max(0, Math.min(startIndex, scopedGeoData.features.length - nLines - 1));
+    const lastViableIndex = scopedGeoData.features.length - nLines - 1;
+    lineGraphContainer
+        .selectAll(".line-chart-legend-button")
+        .each(function (d) {
+        if (d < 0) {
+            this.disabled = startIndex <= 0;
+        }
+        else if (d > 0) {
+            this.disabled = startIndex >= lastViableIndex;
+        }
+    });
+    startIndex = Math.max(0, Math.min(startIndex, lastViableIndex));
     _datum.startIndex = startIndex;
     const caseType = (accumulation === "per_capita"
         ? `${affliction}_per_capita`
@@ -444,7 +455,7 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
         .y((p) => lineYScale(p.y))
         .defined((p) => p.y > EPSILON)
         .curve(d3.curveMonotoneX);
-    chartArea
+    const plottedLines = chartArea
         .selectAll(".chart-line")
         .data(lines)
         .join((enter) => enter
@@ -453,7 +464,8 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
         .attr("stroke-width", plotAesthetics.graph.line.strokeWidth)
         .attr("fill-opacity", 0), (update) => update, (exit) => exit.remove())
         .attr("d", (l) => pathDrawer(l.points))
-        .attr("stroke", (l) => plotAesthetics.colors.scale(l.feature));
+        .attr("stroke", (l) => plotAesthetics.colors.scale(l.feature))
+        .attr("stroke-width", 2);
     const legend = lineGraphContainer.selectAll(".line-chart-legend");
     function getInfoFromXVal(x) {
         let xVal, xStr;
@@ -621,5 +633,27 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
                 .join(enterFunc)
                 .call(updateFunc);
         });
+    })
+        .on("mouseover", (thisLine) => {
+        plottedLines.each(function (otherLine) {
+            const plottedLine = d3.select(this);
+            if (otherLine === thisLine) {
+                this.parentNode?.insertBefore(this, mainChartArea.node());
+                chartArea
+                    .insert("path", () => this)
+                    .attr("d", plottedLine.attr("d"))
+                    .attr("id", "temp-path-background")
+                    .attr("fill-opacity", 0)
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2 * plottedLine.attr("stroke-width"));
+            }
+            else {
+                plottedLine.style("opacity", 0.13);
+            }
+        });
+    })
+        .on("mouseout", () => {
+        plottedLines.style("opacity", 1);
+        chartArea.selectAll("#temp-path-background").remove();
     });
 }

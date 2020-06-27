@@ -211,13 +211,13 @@ export function initializeLineGraph(
 		.join("button")
 		.classed("line-chart-legend-button", true)
 		.html((n: number) => {
-			if (n == -10) {
+			if (n < -1) {
 				return '<i class="fas fa-angle-double-up"></i>';
 			} else if (n == -1) {
 				return '<i class="fas fa-chevron-up"></i>';
 			} else if (n == 1) {
 				return '<i class="fas fa-chevron-down"></i>';
-			} else if (n === 10) {
+			} else if (n > 1) {
 				return '<i class="fas fa-angle-double-down"></i>';
 			} else {
 				throw new Error(`Unexpected value ${n}`);
@@ -252,10 +252,18 @@ function updateLineGraph(
 	const scopedGeoData = allGeoData[location];
 
 	const nLines = 10;
-	startIndex = Math.max(
-		0,
-		Math.min(startIndex, scopedGeoData.features.length - nLines - 1),
-	);
+	const lastViableIndex = scopedGeoData.features.length - nLines - 1;
+	lineGraphContainer
+		.selectAll(".line-chart-legend-button")
+		.each(function (this: any, d: number) {
+			if (d < 0) {
+				this.disabled = startIndex <= 0;
+			} else if (d > 0) {
+				this.disabled = startIndex >= lastViableIndex;
+			}
+		});
+
+	startIndex = Math.max(0, Math.min(startIndex, lastViableIndex));
 	_datum.startIndex = startIndex;
 
 	const caseType = (accumulation === "per_capita"
@@ -624,7 +632,7 @@ function updateLineGraph(
 		.defined((p: Point) => p.y > EPSILON)
 		.curve(d3.curveMonotoneX);
 
-	chartArea
+	const plottedLines = chartArea
 		.selectAll(".chart-line")
 		.data(lines)
 		.join(
@@ -638,10 +646,11 @@ function updateLineGraph(
 			(exit: any) => exit.remove(),
 		)
 		.attr("d", (l: Line) => pathDrawer(l.points))
-		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.feature));
+		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.feature))
+		.attr("stroke-width", 2);
 
 	const legend = lineGraphContainer.selectAll(".line-chart-legend");
-	// Axes themselves; also a region for catching mouse events
+
 	function getInfoFromXVal(x: XAxisType) {
 		let xVal: XAxisType, xStr: string;
 		if (startFrom === "first_date") {
@@ -674,6 +683,7 @@ function updateLineGraph(
 		return { xVal, xStr };
 	}
 
+	// Axes themselves; also a region for catching mouse events
 	const mainChartArea = chartArea.append("g");
 	mainChartArea
 		.selectAll(".chart-region")
@@ -834,5 +844,27 @@ function updateLineGraph(
 						.join(enterFunc)
 						.call(updateFunc);
 				});
+		})
+		.on("mouseover", (thisLine: Line) => {
+			plottedLines.each(function (this: Node, otherLine: Line) {
+				const plottedLine = d3.select(this);
+
+				if (otherLine === thisLine) {
+					this.parentNode?.insertBefore(this, mainChartArea.node());
+					chartArea
+						.insert("path", () => this)
+						.attr("d", plottedLine.attr("d"))
+						.attr("id", "temp-path-background")
+						.attr("fill-opacity", 0)
+						.attr("stroke", "white")
+						.attr("stroke-width", 2 * plottedLine.attr("stroke-width"));
+				} else {
+					plottedLine.style("opacity", 0.13);
+				}
+			});
+		})
+		.on("mouseout", () => {
+			plottedLines.style("opacity", 1);
+			chartArea.selectAll("#temp-path-background").remove();
 		});
 }
