@@ -4,7 +4,7 @@ export function isPerCapita(caseType) {
     return caseType === "cases_per_capita" || caseType === "deaths_per_capita";
 }
 export const dateStrParser = d3.timeParse("%Y-%m-%d");
-export function getFormatter(count, caseType, smoothAvgDays) {
+export function getFormatter(count, caseType, movingAvgDays) {
     const bigFloatFormatter = d3.format(".3~s");
     const smallFloatFormatter = d3.format(",.3~r");
     const tinyFloatFormatter = d3.format(".2~e");
@@ -16,7 +16,7 @@ export function getFormatter(count, caseType, smoothAvgDays) {
                 ? smallFloatFormatter(t)
                 : bigFloatFormatter(t);
     const intFormatter = (t) => t < 1 ? floatFormatter(t) : d3.format(",.4~s")(t);
-    return count === "net" || (count === "dodd" && smoothAvgDays === 1)
+    return count === "net" || (count === "dodd" && movingAvgDays === 1)
         ? intFormatter
         : floatFormatter;
 }

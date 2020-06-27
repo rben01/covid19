@@ -110,8 +110,8 @@ function moveTooltipTo(x: number, y: number) {
 	tooltip.style("top", `${+y - 30}px`).style("left", `${+x + 10}px`);
 }
 
-function getFormatter(caseType: CaseType, count: CountMethod, smoothAvgDays: number) {
-	return (count === "dodd" && smoothAvgDays > 1) || isPerCapita(caseType)
+function getFormatter(caseType: CaseType, count: CountMethod, movingAvgDays: number) {
+	return (count === "dodd" && movingAvgDays > 1) || isPerCapita(caseType)
 		? numberFormatters.float
 		: numberFormatters.int;
 }
@@ -121,13 +121,13 @@ function getDataOnDate({
 	count,
 	dateKey,
 	caseType,
-	smoothAvgDays,
+	movingAvgDays,
 }: {
 	feature: Feature;
 	count: CountMethod;
 	dateKey: DateString;
 	caseType: CaseType;
-	smoothAvgDays?: number;
+	movingAvgDays?: number;
 }): number | null {
 	if (typeof feature.covidData === "undefined") {
 		return null;
@@ -141,22 +141,22 @@ function getDataOnDate({
 		return null;
 	}
 
-	if (typeof smoothAvgDays === "undefined") {
-		smoothAvgDays = 0;
+	if (typeof movingAvgDays === "undefined") {
+		movingAvgDays = 0;
 	}
-	smoothAvgDays = +smoothAvgDays as number;
+	movingAvgDays = +movingAvgDays as number;
 
 	let value: number;
-	if (count === "dodd" && smoothAvgDays >= 2) {
+	if (count === "dodd" && movingAvgDays >= 2) {
 		let sum = 0;
-		for (let i = index; i > index - smoothAvgDays; --i) {
+		for (let i = index; i > index - movingAvgDays; --i) {
 			const x = data[caseType][i];
 			if (typeof x !== "undefined") {
 				sum += x;
 			}
 		}
 
-		value = sum / smoothAvgDays;
+		value = sum / movingAvgDays;
 		if (isNaN(value)) {
 			return null;
 		}
@@ -168,7 +168,7 @@ function getDataOnDate({
 }
 
 function updateTooltip({ visibility }: { visibility: TooltipVisibility }) {
-	const { feature, count, dateKey, caseType, smoothAvgDays } = tooltip.datum();
+	const { feature, count, dateKey, caseType, movingAvgDays } = tooltip.datum();
 
 	if (typeof feature === "undefined") {
 		return;
@@ -183,10 +183,10 @@ function updateTooltip({ visibility }: { visibility: TooltipVisibility }) {
 		count,
 		dateKey,
 		caseType,
-		smoothAvgDays,
+		movingAvgDays,
 	});
 
-	const formatter = getFormatter(caseType, count, smoothAvgDays);
+	const formatter = getFormatter(caseType, count, movingAvgDays);
 	const countStr = value === null ? "~No data~" : formatter(value);
 
 	tooltip.html(`${dateStr}<br>${location}<br>${countStr}`);
@@ -216,11 +216,11 @@ let prevChoroplethInfo: PrevChoroplethInfo = ({
 function updateMaps({
 	choropleth,
 	dateIndex,
-	smoothAvgDays,
+	movingAvgDays,
 }: {
 	choropleth: any;
 	dateIndex?: number;
-	smoothAvgDays?: number;
+	movingAvgDays?: number;
 }) {
 	const {
 		count,
@@ -304,8 +304,8 @@ function updateMaps({
 	const dateKey = getDateNDaysAfter(minDate, dateIndex);
 	prevChoroplethInfo.dateStr = dateKey;
 
-	if (typeof smoothAvgDays === "undefined") {
-		smoothAvgDays = +choropleth.selectAll(".smooth-avg-slider").node().value;
+	if (typeof movingAvgDays === "undefined") {
+		movingAvgDays = +choropleth.selectAll(".moving-avg-slider").node().value;
 	}
 
 	const { barWidth, height: barHeights } = plotAesthetics.legend;
@@ -395,7 +395,7 @@ function updateMaps({
 						count,
 						dateKey,
 						caseType,
-						smoothAvgDays,
+						movingAvgDays,
 					});
 
 					if (value === 0) {
@@ -414,7 +414,7 @@ function updateMaps({
 						feature: d,
 						caseType,
 						count,
-						smoothAvgDays,
+						movingAvgDays,
 					});
 					updateTooltip({ visibility: "visible" });
 				})
@@ -424,7 +424,7 @@ function updateMaps({
 						Object.assign(tooltip.datum(), {
 							...tooltip.datum(),
 							dateKey: getDateNDaysAfter(minDate, dateIndex),
-							smoothAvgDays,
+							movingAvgDays,
 						});
 						updateTooltip({ visibility: "visible" });
 					}
@@ -527,19 +527,19 @@ function updateMaps({
 		.selectAll(".date-slider")
 		.property("value", dateIndex)
 		.node();
-	const movingAvgSliders = choropleth.selectAll(".smooth-avg-slider");
+	const movingAvgSliders = choropleth.selectAll(".moving-avg-slider");
 
 	// If non-null, apply this slider's moving avg to all other sliders
 	if (
 		count === "dodd" &&
-		(typeof smoothAvgDays === "undefined" || smoothAvgDays === null)
+		(typeof movingAvgDays === "undefined" || movingAvgDays === null)
 	) {
-		smoothAvgDays = choropleth.selectAll(".smooth-avg-slider").node().value;
-	} else if (typeof smoothAvgDays !== "undefined") {
-		smoothAvgDays = +smoothAvgDays;
+		movingAvgDays = choropleth.selectAll(".moving-avg-slider").node().value;
+	} else if (typeof movingAvgDays !== "undefined") {
+		movingAvgDays = +movingAvgDays;
 	}
-	smoothAvgDays = smoothAvgDays as number;
-	movingAvgSliders.property("value", smoothAvgDays);
+	movingAvgDays = movingAvgDays as number;
+	movingAvgSliders.property("value", movingAvgDays);
 
 	const movingAvgRows = choropleth.selectAll(".moving-avg-row");
 	if (count === "dodd") {
@@ -553,8 +553,8 @@ function updateMaps({
 	choropleth.selectAll(".date-span").text(dateStr);
 
 	choropleth
-		.selectAll(".smooth-avg-text")
-		.text(`Moving avg: ${smoothAvgDays} day${smoothAvgDays > 1 ? "s" : ""}`);
+		.selectAll(".moving-avg-text")
+		.text(`Moving avg: ${movingAvgDays} day${movingAvgDays > 1 ? "s" : ""}`);
 
 	if (hasPlayedAnimation && !playbackInfo.isPlaying) {
 		choropleth
@@ -562,7 +562,7 @@ function updateMaps({
 			.text(dateIndex === +dateSliderNode.max ? "Restart" : "Play");
 	}
 
-	Object.assign(tooltip.datum(), { dateKey, smoothAvgDays });
+	Object.assign(tooltip.datum(), { dateKey, movingAvgDays });
 	updateTooltip({ visibility: "nochange" });
 }
 
@@ -574,13 +574,13 @@ const tooltip: {
 		count?: CountMethod;
 		dateKey?: DateString;
 		caseType?: CaseType;
-		smoothAvgDays?: number;
+		movingAvgDays?: number;
 	}) => {
 		feature: Feature;
 		count: CountMethod;
 		dateKey: DateString;
 		caseType: CaseType;
-		smoothAvgDays: number;
+		movingAvgDays: number;
 	};
 	style: any;
 	attr: any;
@@ -789,28 +789,28 @@ function _initializeChoropleth({
 		});
 	const dateSliderNode = dateSliders.node();
 
-	const smoothAvgSliderRows = plotContainers
+	const movingAvgSliderRows = plotContainers
 		.append("div")
 		.classed("input-row", true)
 		.classed("moving-avg-row", true)
 		.append("span");
-	smoothAvgSliderRows
+	movingAvgSliderRows
 		.append("span")
-		.classed("smooth-avg-text", true)
+		.classed("moving-avg-text", true)
 		.classed("slider-text", true);
-	smoothAvgSliderRows
+	movingAvgSliderRows
 		.selectAll()
 		.data(() => [{ choropleth }])
 		.join("input")
-		.classed("smooth-avg-slider", true)
+		.classed("moving-avg-slider", true)
 		.classed("input-slider", true)
 		.attr("type", "range")
 		.attr("min", 1)
 		.attr("max", 7)
 		.property("value", 1)
 		.on("input", function (this: any) {
-			const smoothAvgDays = +this.value;
-			updateMaps({ choropleth, smoothAvgDays });
+			const movingAvgDays = +this.value;
+			updateMaps({ choropleth, movingAvgDays });
 		});
 
 	const buttonsRows = plotContainers
@@ -939,7 +939,7 @@ function _initializeChoropleth({
 	updateMaps({
 		choropleth,
 		dateIndex: Infinity,
-		smoothAvgDays: 5,
+		movingAvgDays: 5,
 	});
 }
 

@@ -170,7 +170,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         .attr("colspan", 4);
     updateLineGraph(lineGraphContainer, 7);
 }
-function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = { refreshColors: false }) {
+function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = { refreshColors: false }) {
     const _datum = lineGraphContainer.datum();
     const { location, count, affliction, accumulation, allGeoData, startFrom } = _datum;
     let startIndex = _datum.startIndex;
@@ -188,7 +188,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         const currentMovingAvg = (feature) => {
             const values = feature.covidData[count][caseType];
             return values
-                .slice(values.length - smoothAvgDays)
+                .slice(values.length - movingAvgDays)
                 .reduce((a, b) => a + b);
         };
         const y1 = currentMovingAvg(f1);
@@ -206,16 +206,16 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
             const covidData = feature.covidData;
             const dates = Object.keys(covidData.date).sort();
             const values = covidData[count][caseType];
-            if (count === "dodd" && smoothAvgDays >= 2) {
-                let sum = values.slice(0, smoothAvgDays - 1).reduce((a, b) => a + b);
+            if (count === "dodd" && movingAvgDays >= 2) {
+                let sum = values.slice(0, movingAvgDays - 1).reduce((a, b) => a + b);
                 let prevValue = 0;
-                for (let i = smoothAvgDays; i < values.length; ++i) {
+                for (let i = movingAvgDays; i < values.length; ++i) {
                     const dateStr = dates[i];
                     const value = values[i];
                     sum -= prevValue;
                     sum += value;
-                    prevValue = values[i - smoothAvgDays + 1];
-                    const avg = sum / smoothAvgDays;
+                    prevValue = values[i - movingAvgDays + 1];
+                    const avg = sum / movingAvgDays;
                     thisLine.push({
                         x: dateStrParser(dateStr),
                         y: avg,
@@ -241,17 +241,17 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
             const covidData = feature.covidData;
             const values = covidData[count][caseType];
             const startIndex = covidData.outbreak_cutoffs[caseType];
-            if (count === "dodd" && smoothAvgDays >= 2) {
+            if (count === "dodd" && movingAvgDays >= 2) {
                 let sum = values
-                    .slice(startIndex, startIndex + smoothAvgDays - 1)
+                    .slice(startIndex, startIndex + movingAvgDays - 1)
                     .reduce((a, b) => a + b);
                 let prevValue = 0;
-                for (let i = Math.max(startIndex, smoothAvgDays); i < values.length; ++i) {
+                for (let i = Math.max(startIndex, movingAvgDays); i < values.length; ++i) {
                     const value = values[i];
                     sum -= prevValue;
                     sum += value;
-                    prevValue = values[i - smoothAvgDays + 1];
-                    const avg = sum / smoothAvgDays;
+                    prevValue = values[i - movingAvgDays + 1];
+                    const avg = sum / movingAvgDays;
                     thisLine.push({
                         x: i,
                         y: avg,
@@ -337,7 +337,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     const xTicks = startFrom === "first_date"
         ? axisXScale.ticks(d3.timeDay.every(7))
         : axisXScale.ticks(10);
-    const yFormatter = getFormatter(count, caseType, smoothAvgDays);
+    const yFormatter = getFormatter(count, caseType, movingAvgDays);
     const yTicks = axisYScale.ticks(15);
     const chartArea = lineGraph.selectAll(".line-chart-area");
     const xAxis = chartArea.selectAll(".line-chart-x-axis");

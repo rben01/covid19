@@ -14,7 +14,7 @@ export const dateStrParser: (_: string) => Date = d3.timeParse("%Y-%m-%d");
 export function getFormatter(
 	count: CountMethod,
 	caseType: CaseType,
-	smoothAvgDays: number,
+	movingAvgDays: number,
 ): (_: number) => string {
 	const bigFloatFormatter = d3.format(".3~s");
 	const smallFloatFormatter = d3.format(",.3~r");
@@ -30,7 +30,7 @@ export function getFormatter(
 	const intFormatter = (t: number) =>
 		t < 1 ? floatFormatter(t) : d3.format(",.4~s")(t);
 
-	return count === "net" || (count === "dodd" && smoothAvgDays === 1)
+	return count === "net" || (count === "dodd" && movingAvgDays === 1)
 		? intFormatter
 		: floatFormatter;
 }
