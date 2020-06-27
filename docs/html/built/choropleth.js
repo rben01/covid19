@@ -433,7 +433,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         ],
         [
             { key: "location", value: "world", name: "World" },
-            { key: "count", value: "net", name: "Total Cases" },
+            { key: "count", value: "net", name: "Total Cases Over Time" },
         ],
     ];
     for (const row of rows) {
