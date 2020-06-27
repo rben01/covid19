@@ -30,6 +30,7 @@ const plotAesthetics = Object.freeze(
 				nSteps: 26,
 				missing: "#dadada",
 				zero: colorScale(0), //"#ddc",
+				border: "#fffa",
 			},
 			map: {
 				pad: 10,
@@ -375,7 +376,7 @@ function updateMaps({
 					.data(scopedGeoData.features)
 					.join("path")
 					.attr("d", geoPath)
-					.attr("stroke", "#fff8")
+					.attr("stroke", plotAesthetics.colors.border)
 					.attr("stroke-width", plotAesthetics.map.borderWidth);
 				// I think this has to go after the map in order for it to catch zoom events (the zoom catcher has to have a greater z-index than the map itself). I'd have to check if this still *has* to go here but nothing is hurt by it going here, so it's not moving
 				mapContainer.call(zoom);

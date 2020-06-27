@@ -11,6 +11,7 @@ const plotAesthetics = Object.freeze((() => {
             nSteps: 26,
             missing: "#dadada",
             zero: colorScale(0),
+            border: "#fffa",
         },
         map: {
             pad: 10,
@@ -254,7 +255,7 @@ function updateMaps({ choropleth, dateIndex, movingAvgDays, }) {
                 .data(scopedGeoData.features)
                 .join("path")
                 .attr("d", geoPath)
-                .attr("stroke", "#fff8")
+                .attr("stroke", plotAesthetics.colors.border)
                 .attr("stroke-width", plotAesthetics.map.borderWidth);
             mapContainer.call(zoom);
         }
