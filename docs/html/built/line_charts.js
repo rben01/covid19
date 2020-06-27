@@ -1,8 +1,7 @@
 import { dateStrParser, EPSILON, getFormatter, MS_PER_DAY } from "./utils.js";
 class Line {
-    constructor(name, code) {
-        this.name = name;
-        this.code = code;
+    constructor(feature) {
+        this.feature = feature;
         this.points = [];
     }
     push(p) {
@@ -19,6 +18,7 @@ const plotAesthetics = (() => {
     };
     const fullWidth = chartWidth + outerMargins.left + outerMargins.right;
     const fullHeight = chartHeight + outerMargins.top + outerMargins.bottom;
+    const scaleFactory = () => d3.scaleOrdinal().range(d3.schemeTableau10);
     const pa = {
         fullWidth,
         fullHeight,
@@ -40,12 +40,17 @@ const plotAesthetics = (() => {
             },
         },
         colors: {
-            scaleFactory: () => d3.scaleOrdinal().range(d3.schemeTableau10),
-            scale: d3.scaleOrdinal().range(d3.schemeTableau10),
+            __scaleFactory: scaleFactory,
+            __scale: scaleFactory(),
+            resetTo: function (features) {
+                this.__scale = this.__scaleFactory();
+                features.forEach(f => this.scale(f));
+            },
+            scale: function (f) {
+                return this.__scale(f.properties.code);
+            },
         },
     };
-    pa.graph.width = pa.fullWidth - pa.graph.outerMargins.left;
-    pa.graph.height = pa.fullHeight - pa.graph.outerMargins.bottom;
     return pa;
 })();
 const dateFormatter = d3.timeFormat("%b %-d");
@@ -170,9 +175,6 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     const { location, count, affliction, accumulation, allGeoData, startFrom } = _datum;
     let startIndex = _datum.startIndex;
     const lineGraph = lineGraphContainer.selectAll(".line-chart");
-    if (refreshColors) {
-        plotAesthetics.colors.scale = plotAesthetics.colors.scaleFactory();
-    }
     const scopedGeoData = allGeoData[location];
     const nLines = 10;
     startIndex = Math.max(0, Math.min(startIndex, scopedGeoData.features.length - nLines - 1));
@@ -193,11 +195,14 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         const y2 = currentMovingAvg(f2);
         return y2 - y1;
     });
+    if (refreshColors) {
+        plotAesthetics.colors.resetTo(sortedFeatures);
+    }
     const topNPlaces = sortedFeatures.slice(startIndex, startIndex + nLines);
     const lines = [];
     if (startFrom === "first_date") {
         for (const feature of topNPlaces) {
-            const thisLine = new Line(feature.properties.name, feature.properties.code);
+            const thisLine = new Line(feature);
             const covidData = feature.covidData;
             const dates = Object.keys(covidData.date).sort();
             const values = covidData[count][caseType];
@@ -232,7 +237,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
     }
     else {
         for (const feature of topNPlaces) {
-            const thisLine = new Line(feature.properties.name, feature.properties.code);
+            const thisLine = new Line(feature);
             const covidData = feature.covidData;
             const values = covidData[count][caseType];
             const startIndex = covidData.outbreak_cutoffs[caseType];
@@ -448,7 +453,7 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         .attr("stroke-width", plotAesthetics.graph.line.strokeWidth)
         .attr("fill-opacity", 0), (update) => update, (exit) => exit.remove())
         .attr("d", (l) => pathDrawer(l.points))
-        .attr("stroke", (l) => plotAesthetics.colors.scale(l.code));
+        .attr("stroke", (l) => plotAesthetics.colors.scale(l.feature));
     const legend = lineGraphContainer.selectAll(".line-chart-legend");
     function getInfoFromXVal(x) {
         let xVal, xStr;
@@ -568,11 +573,10 @@ function updateLineGraph(lineGraphContainer, smoothAvgDays, { refreshColors } = 
         .classed("legend-data-row", true)
         .each(function (line, index) {
         const row = d3.select(this);
-        const { name, code } = line;
         const rowData = [
             { type: "index", datum: `${startIndex + index + 1}.` },
-            { type: "color", datum: plotAesthetics.colors.scale(code) },
-            { type: "name", datum: name },
+            { type: "color", datum: plotAesthetics.colors.scale(line.feature) },
+            { type: "name", datum: line.feature.properties.name },
             {
                 type: "number",
                 datum: yFormatter(line.points[line.points.length - 1].y),

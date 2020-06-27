@@ -17,13 +17,11 @@ type StartFrom = "first_date" | "outbreak";
 type XAxisType = number | Date;
 type Point = { x: XAxisType; y: number };
 class Line {
-	name: string;
-	code: string;
+	feature: Feature;
 	points: Point[];
 
-	constructor(name: string, code: string) {
-		this.name = name;
-		this.code = code;
+	constructor(feature: Feature) {
+		this.feature = feature;
 		this.points = [];
 	}
 
@@ -43,6 +41,8 @@ const plotAesthetics = (() => {
 	};
 	const fullWidth = chartWidth + outerMargins.left + outerMargins.right;
 	const fullHeight = chartHeight + outerMargins.top + outerMargins.bottom;
+	const scaleFactory = () =>
+		d3.scaleOrdinal().range(d3.schemeTableau10) as (_: string) => string;
 	const pa = {
 		fullWidth,
 		fullHeight,
@@ -64,14 +64,17 @@ const plotAesthetics = (() => {
 			},
 		},
 		colors: {
-			scaleFactory: () =>
-				d3.scaleOrdinal().range(d3.schemeTableau10) as (_: string) => string,
-			scale: d3.scaleOrdinal().range(d3.schemeTableau10) as (_: string) => string,
+			__scaleFactory: scaleFactory,
+			__scale: scaleFactory(),
+			resetTo: function (features: Feature[]) {
+				this.__scale = this.__scaleFactory();
+				features.forEach(f => this.scale(f));
+			},
+			scale: function (f: Feature) {
+				return this.__scale(f.properties.code);
+			},
 		},
 	};
-
-	pa.graph.width = pa.fullWidth - pa.graph.outerMargins.left;
-	pa.graph.height = pa.fullHeight - pa.graph.outerMargins.bottom;
 
 	return pa;
 })();
@@ -246,10 +249,6 @@ function updateLineGraph(
 
 	const lineGraph = lineGraphContainer.selectAll(".line-chart");
 
-	if (refreshColors) {
-		plotAesthetics.colors.scale = plotAesthetics.colors.scaleFactory();
-	}
-
 	const scopedGeoData = allGeoData[location];
 
 	const nLines = 10;
@@ -279,13 +278,18 @@ function updateLineGraph(
 			return y2 - y1;
 		});
 
+	if (refreshColors) {
+		// Fix the color mapping ahead of time
+		plotAesthetics.colors.resetTo(sortedFeatures);
+	}
+
 	const topNPlaces = sortedFeatures.slice(startIndex, startIndex + nLines);
 
 	// Construct the lines we will plot
 	const lines: Line[] = [];
 	if (startFrom === "first_date") {
 		for (const feature of topNPlaces) {
-			const thisLine = new Line(feature.properties.name, feature.properties.code);
+			const thisLine = new Line(feature);
 
 			const covidData = feature.covidData;
 			const dates: DateString[] = Object.keys(covidData.date).sort();
@@ -323,7 +327,7 @@ function updateLineGraph(
 		}
 	} else {
 		for (const feature of topNPlaces) {
-			const thisLine = new Line(feature.properties.name, feature.properties.code);
+			const thisLine = new Line(feature);
 			const covidData = feature.covidData;
 			const values = covidData[count][caseType];
 			const startIndex = covidData.outbreak_cutoffs[caseType];
@@ -634,7 +638,7 @@ function updateLineGraph(
 			(exit: any) => exit.remove(),
 		)
 		.attr("d", (l: Line) => pathDrawer(l.points))
-		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.code));
+		.attr("stroke", (l: Line) => plotAesthetics.colors.scale(l.feature));
 
 	const legend = lineGraphContainer.selectAll(".line-chart-legend");
 	// Axes themselves; also a region for catching mouse events
@@ -776,11 +780,10 @@ function updateLineGraph(
 		.classed("legend-data-row", true)
 		.each(function (this: Node, line: Line, index: number) {
 			const row = d3.select(this);
-			const { name, code } = line;
 			const rowData = [
 				{ type: "index", datum: `${startIndex + index + 1}.` },
-				{ type: "color", datum: plotAesthetics.colors.scale(code) },
-				{ type: "name", datum: name },
+				{ type: "color", datum: plotAesthetics.colors.scale(line.feature) },
+				{ type: "name", datum: line.feature.properties.name },
 				{
 					type: "number",
 					datum: yFormatter(line.points[line.points.length - 1].y),
