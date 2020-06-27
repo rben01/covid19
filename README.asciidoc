@@ -259,7 +259,7 @@ Along the bottoms are controls for continuous playback of the data over time as 
 
 
 [[graphs-line]]
-=== {icon-line-graphs} Line Charts
+=== {icon-line-graphs} Line Chart
 
 [[sect-reading-graphs]]
 ==== Reading the Line Chart
@@ -271,11 +271,10 @@ On the last day, there will be less than 24 hours of collected data, so the vert
 The y-axis of the graphs is log scaled.
 On all graphs, minor y-axis gridlines are spaced linearly between major gridlines.
 
-{bullet-top-ten} Ranking and Sorting::
-In each graph, the "`top 10`" locations for the given variable are displayed. You can use the arrows to move to lower- or higher-ranked locations (not yet implemented; coming soon).
-
 {bullet-interaction} Interaction::
 Use the controls at the top to select the data you wish to display. +
+In each graph, the ten locations with the highest numbers for the selected variable are displayed.
+You can use the arrows to display lower- or higher-ranked locations. +
 By default, the legend displays data for the graphed locations on the most recent date for which there is data.
 Hover your mouse over the graph (desktop) or tap a spot on the graph (mobile) to choose a different date to display in the legend.
 [[sect-line-chart]]

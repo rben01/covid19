@@ -87,6 +87,7 @@ type LineGraphContainer = {
 		affliction?: Affliction;
 		accumulation?: Accumulation;
 		startFrom?: StartFrom;
+		startIndex?: number;
 	}) => {
 		allCovidData: AllCovidData;
 		allGeoData: AllGeoData;
@@ -95,6 +96,7 @@ type LineGraphContainer = {
 		affliction: Affliction;
 		accumulation: Accumulation;
 		startFrom: StartFrom;
+		startIndex: number;
 	};
 	[key: string]: any;
 };
@@ -108,6 +110,7 @@ export function initializeLineGraph(
 	const affliction: Affliction = "cases";
 	const accumulation: Accumulation = "per_capita";
 	const startFrom: StartFrom = "first_date";
+	const startIndex = 0;
 
 	const datum = {
 		allCovidData,
@@ -117,6 +120,7 @@ export function initializeLineGraph(
 		affliction,
 		accumulation,
 		startFrom,
+		startIndex,
 	};
 
 	const lineGraphContainer: LineGraphContainer = d3
@@ -127,6 +131,11 @@ export function initializeLineGraph(
 	const checkboxGroup = lineGraphContainer
 		.append("div")
 		.classed("checkbox-table", true);
+	lineGraphContainer
+		.append("div")
+		.classed("line-chart-disclaimer", true)
+		.append("span")
+		.text("* 7-day moving average");
 	const checkboxTable = checkboxGroup.append("table");
 	checkboxTable
 		.append("tr")
@@ -142,7 +151,7 @@ export function initializeLineGraph(
 	}[][] = [
 		[
 			{ key: "location", value: "usa", name: "USA" },
-			{ key: "count", value: "dodd", name: "Daily Increase" },
+			{ key: "count", value: "dodd", name: "Daily Increase*" },
 			{ key: "affliction", value: "cases", name: "Cases" },
 			{ key: "accumulation", value: "per_capita", name: "Per 100k Residents" },
 		],
@@ -153,6 +162,7 @@ export function initializeLineGraph(
 			{ key: "accumulation", value: "total", name: "Total for Location" },
 		],
 	];
+
 	for (const row of rows) {
 		const tr = checkboxTable.append("tr");
 		for (const col of row) {
@@ -168,7 +178,7 @@ export function initializeLineGraph(
 				.attr("type", "radio")
 				.property("name", `${key}-line-chart`)
 				.on("change", function (d: any) {
-					const datum = lineGraph.datum();
+					const datum = lineGraphContainer.datum();
 					datum[key] = value as never; // ?? some TS weirdness;
 					updateLineGraph(lineGraphContainer, 7, { refreshColors: true });
 				});
@@ -185,14 +195,42 @@ export function initializeLineGraph(
 	chartArea.append("g").classed("line-chart-x-axis", true);
 	chartArea.append("g").classed("line-chart-y-axis", true);
 
-	lineGraphContainer
+	const legendContainer = lineGraphContainer
 		.append("div")
-		.classed("line-chart-legend-container", true)
+		.classed("line-chart-legend-container", true);
+
+	legendContainer
+		.append("div")
+		.classed("line-chart-legend-button-container", true)
+		.append("span")
+		.selectAll()
+		.data([-10, -1, 1, 10])
+		.join("button")
+		.classed("line-chart-legend-button", true)
+		.html((n: number) => {
+			if (n == -10) {
+				return '<i class="fas fa-angle-double-up"></i>';
+			} else if (n == -1) {
+				return '<i class="fas fa-chevron-up"></i>';
+			} else if (n == 1) {
+				return '<i class="fas fa-chevron-down"></i>';
+			} else if (n === 10) {
+				return '<i class="fas fa-angle-double-down"></i>';
+			} else {
+				throw new Error(`Unexpected value ${n}`);
+			}
+		})
+		.on("click", function (n: number) {
+			lineGraphContainer.datum().startIndex += n;
+			updateLineGraph(lineGraphContainer, 7, { refreshColors: false });
+		});
+
+	legendContainer
 		.append("table")
 		.classed("line-chart-legend", true)
 		.append("tr")
 		.append("th")
-		.attr("colspan", 3);
+		.attr("colspan", 4);
 
 	updateLineGraph(lineGraphContainer, 7);
 }
@@ -202,14 +240,9 @@ function updateLineGraph(
 	smoothAvgDays: number,
 	{ refreshColors }: { refreshColors: Boolean } = { refreshColors: false },
 ) {
-	const {
-		location,
-		count,
-		affliction,
-		accumulation,
-		allGeoData,
-		startFrom,
-	} = lineGraphContainer.datum();
+	const _datum = lineGraphContainer.datum();
+	const { location, count, affliction, accumulation, allGeoData, startFrom } = _datum;
+	let startIndex = _datum.startIndex;
 
 	const lineGraph = lineGraphContainer.selectAll(".line-chart");
 
@@ -219,38 +252,39 @@ function updateLineGraph(
 
 	const scopedGeoData = allGeoData[location];
 
+	const nLines = 10;
+	startIndex = Math.max(
+		0,
+		Math.min(startIndex, scopedGeoData.features.length - nLines - 1),
+	);
+	_datum.startIndex = startIndex;
+
 	const caseType = (accumulation === "per_capita"
 		? `${affliction}_per_capita`
 		: affliction) as CaseType;
 
+	const sortedFeatures = [...scopedGeoData.features]
+		.filter(f => typeof f.covidData !== "undefined")
+		.sort((f1, f2) => {
+			const currentMovingAvg = (feature: Feature) => {
+				const values = feature.covidData[count][caseType];
+				return values
+					.slice(values.length - smoothAvgDays)
+					.reduce((a, b) => a + b);
+			};
+
+			const y1 = currentMovingAvg(f1);
+			const y2 = currentMovingAvg(f2);
+
+			return y2 - y1;
+		});
+
+	const topNPlaces = sortedFeatures.slice(startIndex, startIndex + nLines);
+
 	// Construct the lines we will plot
-	const nLines = 10;
 	const lines: Line[] = [];
-
-	const topNPlaces: [Feature, number][] = [];
-	let cutoffValue = -Infinity;
-	for (const feature of scopedGeoData.features) {
-		if (typeof feature.covidData === "undefined") {
-			continue;
-		}
-		const values = feature.covidData[count][caseType];
-		const currentValue = values[values.length - 1];
-		if (topNPlaces.length < nLines) {
-			topNPlaces.push([feature, currentValue]);
-			if (currentValue < cutoffValue) {
-				cutoffValue = currentValue;
-			}
-		} else if (currentValue > cutoffValue) {
-			const idxToReplace = topNPlaces.findIndex(
-				([_, value]) => value === cutoffValue,
-			);
-			topNPlaces[idxToReplace] = [feature, currentValue];
-			cutoffValue = Math.min(...topNPlaces.map(([_, value]) => value));
-		}
-	}
-
 	if (startFrom === "first_date") {
-		for (const [feature, _] of topNPlaces) {
+		for (const feature of topNPlaces) {
 			const thisLine = new Line(feature.properties.name, feature.properties.code);
 
 			const covidData = feature.covidData;
@@ -288,7 +322,7 @@ function updateLineGraph(
 			lines.push(thisLine);
 		}
 	} else {
-		for (const [feature, _] of topNPlaces) {
+		for (const feature of topNPlaces) {
 			const thisLine = new Line(feature.properties.name, feature.properties.code);
 			const covidData = feature.covidData;
 			const values = covidData[count][caseType];
@@ -382,7 +416,7 @@ function updateLineGraph(
 			const lineXs = lines.map(line => line.points.map(p => p.x));
 			const minDate = lineXs
 				.map(points => points[0])
-				.reduce((a, b) => (a < b ? a : b));
+				.reduce((a, b) => (a < b && a > EPSILON ? a : b));
 			const maxDate = lineXs
 				.map(points => points[points.length - 1])
 				.reduce((a, b) => (a > b ? a : b));
@@ -663,22 +697,39 @@ function updateLineGraph(
 			const { xVal, xStr: headerStr } = getInfoFromXVal(mouseXVal);
 
 			const values = lines.map(line => {
-				let prevDist = Infinity;
-				let prevY = NaN;
-				for (const point of line.points) {
-					const dist = Math.abs(
-						startFrom === "first_date"
-							? (point.x as Date).getTime() - (xVal as Date).getTime()
-							: (point.x as number) - (xVal as number),
-					);
-					if (dist > prevDist) {
-						return prevY;
+				// Binary search the line for point closest to the mouse
+				const points = line.points;
+				let left = 0,
+					right = points.length - 1;
+				while (left < right - 1) {
+					const middle = Math.floor((left + right) / 2);
+					const thisX = points[middle].x;
+					if (xVal === thisX) {
+						return points[middle].y;
+					} else if (xVal < points[middle].x) {
+						right = middle;
+					} else {
+						left = middle;
 					}
-
-					prevDist = dist;
-					prevY = point.y;
 				}
-				return prevY;
+
+				const [leftDist, rightDist] =
+					startFrom === "first_date"
+						? [left, right].map(i =>
+								Math.abs(
+									(points[i].x as Date).getTime() -
+										(xVal as Date).getTime(),
+								),
+						  )
+						: [left, right].map(i =>
+								Math.abs((points[i].x as number) - (xVal as number)),
+						  );
+
+				if (leftDist < rightDist) {
+					return points[left].y;
+				} else {
+					return points[right].y;
+				}
 			});
 
 			legend
@@ -723,15 +774,16 @@ function updateLineGraph(
 		.data(lines)
 		.join("tr")
 		.classed("legend-data-row", true)
-		.each(function (this: Node, line: Line) {
+		.each(function (this: Node, line: Line, index: number) {
 			const row = d3.select(this);
 			const { name, code } = line;
 			const rowData = [
-				{ type: "color", data: plotAesthetics.colors.scale(code) },
-				{ type: "name", data: name },
+				{ type: "index", datum: `${startIndex + index + 1}.` },
+				{ type: "color", datum: plotAesthetics.colors.scale(code) },
+				{ type: "name", datum: name },
 				{
 					type: "number",
-					data: yFormatter(line.points[line.points.length - 1].y),
+					datum: yFormatter(line.points[line.points.length - 1].y),
 				},
 			];
 			row.selectAll("td")
@@ -740,43 +792,44 @@ function updateLineGraph(
 				.classed("color-cell", true)
 				.each(function (
 					this: Node,
-					d: { type: "color" | "name" | "number"; data: string },
+					d: { type: "color" | "name" | "number" | "index"; datum: string },
 				) {
-					const td = d3.select(this);
+					const legendItemClass = "legend-item";
+					let cellClass: string,
+						_baseEnterFunc: (enter: any) => any,
+						updateFunc: (update: any) => any;
+
 					if (d.type === "color") {
-						const color = d.data;
-						td.selectAll(".legend-color-square")
-							.data([color])
-							.join((enter: any) =>
-								enter
-									.append("div")
-									.classed("legend-color-square", true)
-									.classed("legend-item", true),
-							)
-							.style("background-color", (c: string) => c);
+						cellClass = "legend-color-square";
+						_baseEnterFunc = (enter: any) => enter.append("div");
+						updateFunc = (update: any) =>
+							update.style("background-color", (c: string) => c);
+					} else if (d.type === "index") {
+						cellClass = "legend-index";
+						_baseEnterFunc = (enter: any) => enter.append("span");
+						updateFunc = (update: any) => update.text((t: string) => t);
 					} else if (d.type === "name") {
-						const name = d.data;
-						td.selectAll(".legend-label")
-							.data([name])
-							.join((enter: any) =>
-								enter
-									.append("span")
-									.classed("legend-label", true)
-									.classed("legend-item", true),
-							)
-							.text((t: string) => t);
+						cellClass = "legend-label";
+						_baseEnterFunc = (enter: any) => enter.append("span");
+						updateFunc = (update: any) => update.text((t: string) => t);
 					} else if (d.type === "number") {
-						const value = d.data;
-						td.selectAll(".legend-value")
-							.data([value])
-							.join((enter: any) =>
-								enter
-									.append("span")
-									.classed("legend-value", true)
-									.classed("legend-item", true),
-							)
-							.text((t: string) => t);
+						cellClass = "legend-value";
+						_baseEnterFunc = (enter: any) => enter.append("span");
+						updateFunc = (update: any) => update.text((t: string) => t);
+					} else {
+						throw new Error(`Unexpected type in ${d}`);
 					}
+
+					const enterFunc = (enter: any) =>
+						_baseEnterFunc(enter)
+							.classed(cellClass, true)
+							.classed(legendItemClass, true);
+
+					const td = d3.select(this);
+					td.selectAll(`.${cellClass}`)
+						.data([d.datum])
+						.join(enterFunc)
+						.call(updateFunc);
 				});
 		});
 }

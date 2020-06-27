@@ -85,8 +85,21 @@ span.button-container {
 	display: inline-block;
 }
 
+.line-chart-legend-button-container {
+	margin-left: 37px;
+}
+.line-chart-legend-button {
+	width: 43px;
+	padding: auto;
+}
+
+.line-chart-disclaimer {
+	font-size: 80%;
+	margin-bottom: 10px;
+	margin-top: -14px;
+}
+
 .line-chart-legend {
-	display: inline-block;
 	margin-top: 5.5px;
 	margin-left: 1em;
 }

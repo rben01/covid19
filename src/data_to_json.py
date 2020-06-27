@@ -387,41 +387,6 @@ def data_to_json():
 
     save_file_with_digest("covid_data-{}.json", data)
 
-    # data_str = json.dumps(data)
-    # hasher = hashlib.sha1()
-    # hasher.update(data_str.encode())
-    # digest = hasher.hexdigest()
-    # digest_pattern = f"[a-fA-F0-9]{{{len(digest)}}}"
-
-    # existing_data_file_name = None
-    # for f in DATA_DIR.iterdir():
-    #     if re.match(f"covid_data-{digest_pattern}.json", f.name):
-    #         existing_data_file_name = f.name
-    #         break
-
-    # new_data_file_name = f"covid_data-{digest}.json"
-    # with (DATA_DIR / new_data_file_name).open("w") as f:
-    #     json.dump(data, f, indent=0)
-
-    # with (Paths.DOCS / "html" / "plots.ts").open() as f:
-    #     ts_file_contents = f.read()
-
-    # ts_file_contents = re.sub(
-    #     rf'd3\.json\("\./data/covid_data-{digest_pattern}\.json"\)',
-    #     f'd3.json("./data/{new_data_file_name}")',
-    #     ts_file_contents,
-    # )
-
-    # with (Paths.DOCS / "html" / "plots.ts").open("w") as f:
-    #     f.write(ts_file_contents)
-
-    # if (
-    #     existing_data_file_name is not None
-    #     and existing_data_file_name != new_data_file_name
-    # ):
-    #     print("Deleting", existing_data_file_name, "replacing with", new_data_file_name)
-    #     (DATA_DIR / existing_data_file_name).unlink()
-
     return data
 
 
