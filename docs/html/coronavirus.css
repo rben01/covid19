@@ -76,7 +76,7 @@ span.button-container {
 	border-left-width: 1px;
 }
 
-.line-chart {
+#line-chart-graph {
 	display: inline-block;
 	vertical-align: top;
 }

@@ -37,6 +37,10 @@ class Line {
 	}
 }
 
+function indexToStr(n: number) {
+	return `${n + 1}.`;
+}
+
 const plotAesthetics = (() => {
 	const chartWidth = 500,
 		chartHeight = 500;
@@ -196,7 +200,7 @@ export function initializeLineGraph(
 		}
 	}
 
-	const lineGraph = lineGraphContainer.append("div").classed("line-chart", true);
+	const lineGraph = lineGraphContainer.append("div").attr("id", "line-chart-graph");
 
 	const svg = lineGraph
 		.append("svg")
@@ -242,8 +246,6 @@ export function initializeLineGraph(
 		.append("tr")
 		.append("th")
 		.attr("colspan", 4);
-
-	lineGraphContainer.append("div").classed("line-chart-data-notice-section", true);
 
 	updateLineGraph(lineGraphContainer, 7);
 }
@@ -296,7 +298,7 @@ function updateLineGraph(
 	const { location, count, affliction, accumulation, allGeoData, startFrom } = _datum;
 	let startIndex = _datum.startIndex;
 
-	const lineGraph = lineGraphContainer.selectAll(".line-chart");
+	const lineGraph = lineGraphContainer.selectAll("#line-chart-graph");
 
 	const scopedGeoData = allGeoData[location];
 
@@ -792,7 +794,7 @@ function updateLineGraph(
 		.each(function (this: Node, line: Line, index: number) {
 			const row = d3.select(this);
 			const rowData = [
-				{ type: "index", datum: `${startIndex + index + 1}.` },
+				{ type: "index", datum: indexToStr(startIndex + index) },
 				{ type: "color", datum: plotAesthetics.colors.scale(line.feature) },
 				{ type: "name", datum: line.feature.properties.name },
 				{
@@ -987,19 +989,19 @@ function updateLineGraph(
 			const selectedNewIndicesList = selectedValues.map(
 				([code, _]) => allNewIndicesMap[code],
 			);
-			legendIndexCells.text(
-				(_: any, i: number) => `${selectedNewIndicesList[i] + 1}.`,
+			legendIndexCells.text((_: any, i: number) =>
+				indexToStr(selectedNewIndicesList[i]),
 			);
 
 			const hoverLineX = lineXScale(xVal);
 
 			mainChartArea
-				.selectAll(".line-chart-hover-line")
+				.selectAll("#line-chart-hover-line")
 				.data([0])
 				.join((enter: any) =>
 					enter
 						.insert("line", "rect.chart-region")
-						.classed("line-chart-hover-line", true)
+						.attr("id", "line-chart-hover-line")
 						.attr("stroke", "#444")
 						.attr("stroke-width", 1.5)
 						.attr("stroke-dasharray", "4 4"),
@@ -1016,6 +1018,7 @@ function updateLineGraph(
 			const headerStr = getInfoFromXVal(maxXVal).xStr;
 			legendHeader.text(headerStr);
 			legendValueCells.text((_: any, i: number) => yFormatter(values[i]));
-			mainChartArea.selectAll(".line-chart-hover-line").remove();
+			legendIndexCells.text((_: any, i: number) => indexToStr(i));
+			mainChartArea.selectAll("#line-chart-hover-line").remove();
 		});
 }
