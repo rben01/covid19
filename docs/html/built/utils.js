@@ -20,3 +20,15 @@ export function getFormatter(count, caseType, movingAvgDays) {
         ? intFormatter
         : floatFormatter;
 }
+export function movingAvg(values, movingAvgDays, endIndex) {
+    const startIndex = Math.max(endIndex - movingAvgDays + 1, 0);
+    return (values.slice(startIndex, endIndex + 1).reduce((a, b) => {
+        if (!a) {
+            return b;
+        }
+        if (!b) {
+            return a;
+        }
+        return a + b;
+    }) / movingAvgDays);
+}

@@ -34,3 +34,18 @@ export function getFormatter(
 		? intFormatter
 		: floatFormatter;
 }
+
+export function movingAvg(values: number[], movingAvgDays: number, endIndex: number) {
+	const startIndex = Math.max(endIndex - movingAvgDays + 1, 0);
+	return (
+		values.slice(startIndex, endIndex + 1).reduce((a, b) => {
+			if (!a) {
+				return b;
+			}
+			if (!b) {
+				return a;
+			}
+			return a + b;
+		}) / movingAvgDays
+	);
+}
