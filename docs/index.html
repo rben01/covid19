@@ -217,11 +217,14 @@ If you do not already have <code>conda</code> installed, you can install it from
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="data-sources"><a class="link" href="#data-sources">🚰 Sources</a></h3>
+<div class="paragraph">
+<p>The data sources below&#8201;&#8212;&#8201;which are what&#8217;s used in the graphs below&#8201;&#8212;&#8201;have been aggregated into a single table available <a href="https://raw.githubusercontent.com/rben01/covid19/master/data/data_table.csv">here</a>.
+Refer to <a href="#date-explanation-note">the note below</a> for the interpretation of the dates in this table.</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv"><em>The Washington Post</em>&#8201;&#8212;&#8201;world historical data</a><br>
-<em>The Washington Post appears to have stopped updating this dataset, so the graphs below will only have international data through approximately April 23<sup>rd</sup>. This issue is under investigation. U.S. states&#8217; data comes from a different source and should be up to date.</em></p>
+<p><a href="https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv"><em>The Washington Post</em>&#8201;&#8212;&#8201;world historical data</a><br></p>
 </li>
 <li>
 <p><a href="https://covidtracking.com/api/states/daily.csv">The COVID Tracking Project&#8201;&#8212;&#8201;US states historical data</a></p>
@@ -236,21 +239,6 @@ If you do not already have <code>conda</code> installed, you can install it from
 </div>
 <div class="paragraph">
 <p>In addition, while not in use, <a href="https://coronadatascraper.com/#home">Corona Data Scraper</a> seems like a good source as well.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>The above data&#8201;&#8212;&#8201;which is what&#8217;s used in the graphs below&#8201;&#8212;&#8201;has been aggregated into a single table available <a href="https://raw.githubusercontent.com/rben01/covid19/master/data/data_table.csv">here</a>.
-Refer to <a href="#date-explanation-note">the note below</a> for the interpretation of the dates in this table.</p>
-</div>
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -341,10 +329,10 @@ On all graphs, minor y-axis gridlines are spaced linearly between major gridline
 <dd>
 <p>Use the controls at the top to select the data you wish to display.<br>
 In each graph, the ten locations with the highest numbers for the selected variable are displayed.
-You can use the arrows to display lower- or higher-ranked locations.<br>
-By default, the legend displays data for the graphed locations on the most recent date for which there is data.
+You can use the arrow buttons to display lower- or higher-ranked locations.<br>
+By default, the legend displays data for the graphed locations on the most recent date (usually within the past two days).
 Hover your mouse over the graph (desktop) or tap a spot on the graph (mobile) to choose a different date to display in the legend.
-Hover your mouse over a row in the legend to select an individual region to view in the chart.</p>
+Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an individual region to view in the chart.</p>
 </dd>
 </dl>
 </div>
@@ -360,9 +348,12 @@ Hover your mouse over a row in the legend to select an individual region to view
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-27 17:26:01 -0400
+Last updated 2020-06-28 01:04:26 -0400
 </div>
 </div>
 <script type="module" src="./html/built/plots.js"></script>
+<div class="copyright-notice">
+	<span style="vertical-align: middle;">© Robert Bennett 2020</span>
+</div>
 </body>
 </html>

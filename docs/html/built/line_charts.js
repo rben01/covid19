@@ -168,8 +168,23 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         .append("tr")
         .append("th")
         .attr("colspan", 4);
+    lineGraphContainer.append("div").classed("line-chart-data-notice-section", true);
     updateLineGraph(lineGraphContainer, 7);
 }
+const legendDataNoticeTooltip = d3
+    .select("body")
+    .append("div")
+    .classed("tooltip", true)
+    .attr("id", "line-chart-data-notice-tooltip")
+    .style("display", "hidden");
+const legendNotices = [
+    {
+        location: "usa",
+        code: "NJ",
+        affliction: "deaths",
+        notice: "On June 25, New Jersey announced that they would begin counting probable COVID deaths in addition to confirmed deaths. This caused their reported number of deaths to appear to shoot up by around 1900 cases that day. However, that increase does not reflect a large number of deaths on that day, but merely a change in the counting methodology.",
+    },
+];
 function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = { refreshColors: false }) {
     const _datum = lineGraphContainer.datum();
     const { location, count, affliction, accumulation, allGeoData, startFrom } = _datum;
@@ -210,6 +225,17 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
         plotAesthetics.colors.resetTo(sortedFeatures);
     }
     const topNPlaces = sortedFeatures.slice(startIndex, startIndex + nLines);
+    const noticeDict = {};
+    for (const notice of legendNotices) {
+        if (notice.location === location &&
+            (typeof notice.count === "undefined" || notice.count === count) &&
+            (typeof notice.affliction === "undefined" ||
+                notice.affliction === affliction) &&
+            (typeof notice.accumulation === "undefined" ||
+                notice.accumulation === accumulation)) {
+            noticeDict[notice.code] = notice.notice;
+        }
+    }
     const lines = [];
     if (startFrom === "first_date") {
         for (const feature of topNPlaces) {
@@ -276,6 +302,12 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
                 }
             }
             lines.push(thisLine);
+        }
+    }
+    for (const line of lines) {
+        const code = line.feature.properties.code;
+        if (code in noticeDict) {
+            line.notice = noticeDict[code];
         }
     }
     lines.sort((l1, l2) => l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y);
@@ -614,7 +646,27 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
             else if (d.type === "name") {
                 cellClass = "legend-label";
                 _baseEnterFunc = (enter) => enter.append("span");
-                updateFunc = (update) => update.text((t) => t);
+                updateFunc = (update) => {
+                    update.text((t) => t);
+                    if (typeof line.notice !== "undefined") {
+                        update
+                            .append("span")
+                            .classed("legend-data-notice", true)
+                            .html('<i class="fas fa-info-circle"></i>')
+                            .on("mouseover", function () {
+                            const { pageX, pageY } = d3.event;
+                            legendDataNoticeTooltip
+                                .style("visibility", "visible")
+                                .style("left", `${pageX + 10}px`)
+                                .style("top", `${pageY}px`)
+                                .text(line.notice);
+                        })
+                            .on("mouseout", function () {
+                            legendDataNoticeTooltip.style("visibility", "hidden");
+                        });
+                    }
+                    return update;
+                };
             }
             else if (d.type === "number") {
                 cellClass = "legend-value";
@@ -645,7 +697,8 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
                     .attr("id", "temp-path-background")
                     .attr("fill-opacity", 0)
                     .attr("stroke", "white")
-                    .attr("stroke-width", 2 * plottedLine.attr("stroke-width"));
+                    .attr("stroke-width", 2 *
+                    this.getAttribute("stroke-width"));
             }
             else {
                 plottedLine.style("opacity", 0.13);

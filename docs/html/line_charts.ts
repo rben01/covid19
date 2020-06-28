@@ -19,6 +19,7 @@ type Point = { x: XAxisType; y: number };
 class Line {
 	feature: Feature;
 	points: Point[];
+	notice?: string;
 
 	constructor(feature: Feature) {
 		this.feature = feature;
@@ -235,8 +236,35 @@ export function initializeLineGraph(
 		.append("th")
 		.attr("colspan", 4);
 
+	lineGraphContainer.append("div").classed("line-chart-data-notice-section", true);
+
 	updateLineGraph(lineGraphContainer, 7);
 }
+
+const legendDataNoticeTooltip = d3
+	.select("body")
+	.append("div")
+	.classed("tooltip", true)
+	.attr("id", "line-chart-data-notice-tooltip")
+	.style("display", "hidden");
+
+type LegendNotice = {
+	location: WorldLocation;
+	code: string;
+	count?: CountMethod;
+	affliction?: Affliction;
+	accumulation?: Accumulation;
+	notice: string;
+};
+const legendNotices: LegendNotice[] = [
+	{
+		location: "usa",
+		code: "NJ",
+		affliction: "deaths",
+		notice:
+			"On June 25, New Jersey announced that they would begin counting probable COVID deaths in addition to confirmed deaths. This caused their reported number of deaths to appear to shoot up by around 1900 cases that day. However, that increase does not reflect a large number of deaths on that day, but merely a change in the counting methodology.",
+	},
+];
 
 function updateLineGraph(
 	lineGraphContainer: LineGraphContainer,
@@ -292,6 +320,20 @@ function updateLineGraph(
 	}
 
 	const topNPlaces = sortedFeatures.slice(startIndex, startIndex + nLines);
+
+	const noticeDict: { [k: string]: string } = {};
+	for (const notice of legendNotices) {
+		if (
+			notice.location === location &&
+			(typeof notice.count === "undefined" || notice.count === count) &&
+			(typeof notice.affliction === "undefined" ||
+				notice.affliction === affliction) &&
+			(typeof notice.accumulation === "undefined" ||
+				notice.accumulation === accumulation)
+		) {
+			noticeDict[notice.code] = notice.notice;
+		}
+	}
 
 	// Construct the lines we will plot
 	const lines: Line[] = [];
@@ -370,6 +412,13 @@ function updateLineGraph(
 			}
 
 			lines.push(thisLine);
+		}
+	}
+
+	for (const line of lines) {
+		const code = line.feature.properties.code;
+		if (code in noticeDict) {
+			line.notice = noticeDict[code];
 		}
 	}
 
@@ -683,7 +732,7 @@ function updateLineGraph(
 		return { xVal, xStr };
 	}
 
-	// Axes themselves; also a region for catching mouse events
+	// Axes themselves; also a region for catching mouse events, which we use to adjust the date of the data displayed in the legend
 	const mainChartArea = chartArea.append("g");
 	mainChartArea
 		.selectAll(".chart-region")
@@ -783,6 +832,7 @@ function updateLineGraph(
 	const headerStr = getInfoFromXVal(maxXVal).xStr;
 	legend.selectAll("tr th").text(headerStr);
 
+	// Add the legend and all data associated with it to the graph
 	legend
 		.selectAll("tr.legend-data-row")
 		.data(lines)
@@ -824,7 +874,31 @@ function updateLineGraph(
 					} else if (d.type === "name") {
 						cellClass = "legend-label";
 						_baseEnterFunc = (enter: any) => enter.append("span");
-						updateFunc = (update: any) => update.text((t: string) => t);
+						updateFunc = (update: any) => {
+							update.text((t: string) => t);
+							if (typeof line.notice !== "undefined") {
+								update
+									.append("span")
+									.classed("legend-data-notice", true)
+									.html('<i class="fas fa-info-circle"></i>')
+									.on("mouseover", function () {
+										const { pageX, pageY } = d3.event;
+
+										legendDataNoticeTooltip
+											.style("visibility", "visible")
+											.style("left", `${pageX + 10}px`)
+											.style("top", `${pageY}px`)
+											.text(line.notice);
+									})
+									.on("mouseout", function () {
+										legendDataNoticeTooltip.style(
+											"visibility",
+											"hidden",
+										);
+									});
+							}
+							return update;
+						};
 					} else if (d.type === "number") {
 						cellClass = "legend-value";
 						_baseEnterFunc = (enter: any) => enter.append("span");
@@ -846,7 +920,7 @@ function updateLineGraph(
 				});
 		})
 		.on("mouseover", (thisLine: Line) => {
-			plottedLines.each(function (this: Node, otherLine: Line) {
+			plottedLines.each(function (this: Element, otherLine: Line) {
 				const plottedLine = d3.select(this);
 
 				if (otherLine === thisLine) {
@@ -857,7 +931,13 @@ function updateLineGraph(
 						.attr("id", "temp-path-background")
 						.attr("fill-opacity", 0)
 						.attr("stroke", "white")
-						.attr("stroke-width", 2 * plottedLine.attr("stroke-width"));
+						.attr(
+							"stroke-width",
+							2 *
+								((this.getAttribute(
+									"stroke-width",
+								) as unknown) as number),
+						);
 				} else {
 					plottedLine.style("opacity", 0.13);
 				}

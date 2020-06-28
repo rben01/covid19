@@ -123,6 +123,16 @@ span.button-container {
 	margin-left: 1em;
 }
 
+.copyright-notice {
+	height: 2em;
+	margin-left: 20px;
+	margin-top: 7px;
+}
+
+.legend-data-notice {
+	margin-left: 1em;
+}
+
 input[type="range"] {
 	-webkit-appearance: none;
 	-moz-apperance: none;
