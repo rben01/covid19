@@ -350,12 +350,15 @@ function updateMaps({ choropleth, dateIndex, movingAvgDays, }) {
             const formatter = y < 1 ? smallNumberTickFormatter : bigNumberTickFormatter;
             return `${formatter(y)}`;
         });
-        const titlePrefixStr = count === "dodd" ? "Increase in" : "Total";
+        let titlePrefixStr = count === "dodd" ? "Increase in" : "Total";
         let caseTypeStr = caseType;
         let titleSuffixStr = "";
         if (isPerCapita(caseType)) {
             caseTypeStr = caseTypeStr.replace("_per_capita", "");
             titleSuffixStr = " Per 100,000 People";
+        }
+        else if (count === "dodd") {
+            titlePrefixStr += " Total ";
         }
         caseTypeStr = caseTypeStr.replace(/^./, (c) => c.toUpperCase());
         const titleStr = `${titlePrefixStr} ${caseTypeStr}${titleSuffixStr}`;
@@ -456,10 +459,10 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
     const plotContainers = choropleth
         .selectAll()
         .data([
-        "cases",
         "cases_per_capita",
-        "deaths",
+        "cases",
         "deaths_per_capita",
+        "deaths",
     ].map(caseType => ({ caseType })))
         .join("div")
         .classed("plot-container", true);
@@ -680,7 +683,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
     updateMaps({
         choropleth,
         dateIndex: Infinity,
-        movingAvgDays: 5,
+        movingAvgDays: 7,
     });
 }
 export function initializeChoropleths(allCovidData, allGeoData) {

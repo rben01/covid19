@@ -504,12 +504,14 @@ function updateMaps({
 				});
 
 			// Add title
-			const titlePrefixStr = count === "dodd" ? "Increase in" : "Total";
+			let titlePrefixStr = count === "dodd" ? "Increase in" : "Total";
 			let caseTypeStr: string = caseType;
 			let titleSuffixStr = "";
 			if (isPerCapita(caseType)) {
 				caseTypeStr = caseTypeStr.replace("_per_capita", "");
 				titleSuffixStr = " Per 100,000 People";
+			} else if (count === "dodd") {
+				titlePrefixStr += " Total ";
 			}
 			caseTypeStr = caseTypeStr.replace(/^./, (c: string) => c.toUpperCase());
 
@@ -656,10 +658,10 @@ function _initializeChoropleth({
 		.selectAll()
 		.data(
 			([
-				"cases",
 				"cases_per_capita",
-				"deaths",
+				"cases",
 				"deaths_per_capita",
+				"deaths",
 			] as CaseType[]).map(caseType => ({ caseType })),
 		)
 		.join("div")
@@ -940,7 +942,7 @@ function _initializeChoropleth({
 	updateMaps({
 		choropleth,
 		dateIndex: Infinity,
-		movingAvgDays: 5,
+		movingAvgDays: 7,
 	});
 }
 
