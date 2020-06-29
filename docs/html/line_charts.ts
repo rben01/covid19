@@ -1018,7 +1018,7 @@ function updateLineGraph(
 			const headerStr = getInfoFromXVal(maxXVal).xStr;
 			legendHeader.text(headerStr);
 			legendValueCells.text((_: any, i: number) => yFormatter(values[i]));
-			legendIndexCells.text((_: any, i: number) => indexToStr(i));
+			legendIndexCells.text((_: any, i: number) => indexToStr(startIndex + i));
 			mainChartArea.selectAll("#line-chart-hover-line").remove();
 		});
 }

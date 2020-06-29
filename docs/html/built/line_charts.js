@@ -740,7 +740,7 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
         const headerStr = getInfoFromXVal(maxXVal).xStr;
         legendHeader.text(headerStr);
         legendValueCells.text((_, i) => yFormatter(values[i]));
-        legendIndexCells.text((_, i) => indexToStr(i));
+        legendIndexCells.text((_, i) => indexToStr(startIndex + i));
         mainChartArea.selectAll("#line-chart-hover-line").remove();
     });
 }
