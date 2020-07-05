@@ -55,7 +55,7 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 
 // Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	d3.json("./data/covid_data-fad5105e465f166e6907716785b28700445cd7e5.json"),
+	d3.json("./data/covid_data-dac9976df685eb9cb6e7af47c8effbc49a3d7eaa.json"),
 	d3.json("./data/geo_data-be6715bfac29cf1d59f8c05b805ce8db5b42283f.json"),
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
