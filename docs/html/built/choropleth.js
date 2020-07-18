@@ -50,6 +50,10 @@ const plotAesthetics = Object.freeze((() => {
     });
     return pa;
 })());
+const clipPathIDs = {
+    usa: "clip-path-usa",
+    world: "clip-path-world",
+};
 let PlaybackInfo = (() => {
     class PlaybackInfo {
         constructor() {
@@ -214,6 +218,7 @@ function updateMaps({ choropleth, dateIndex, movingAvgDays, }) {
             svg.attr("width", plotAesthetics.width[location]).attr("height", plotAesthetics.height[location]);
         }
         const mainPlotArea = svg.selectAll("g.main-plot-area");
+        mainPlotArea.attr("clip-path", `url(#${clipPathIDs[location]})`);
         const mapContainer = mainPlotArea
             .selectAll(".map-container")
             .data([
@@ -538,15 +543,16 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
             .attr("stop-opacity", 1);
     });
     const mainPlotAreas = svg.append("g").classed("main-plot-area", true);
-    const clipPathID = `plot-clip-${location}-${count}`;
-    defs.append("clipPath")
-        .attr("id", clipPathID)
-        .append("rect")
-        .attr("x", plotAesthetics.map.originX)
-        .attr("y", plotAesthetics.map.originY)
-        .attr("width", plotAesthetics.mapWidth[location])
-        .attr("height", plotAesthetics.mapHeight[location]);
-    mainPlotAreas.attr("clip-path", `url(#${clipPathID})`);
+    for (const location of WORLD_LOCATIONS) {
+        defs.append("clipPath")
+            .attr("id", clipPathIDs[location])
+            .append("rect")
+            .attr("x", plotAesthetics.map.originX)
+            .attr("y", plotAesthetics.map.originY)
+            .attr("width", plotAesthetics.mapWidth[location])
+            .attr("height", plotAesthetics.mapHeight[location]);
+    }
+    mainPlotAreas.attr("clip-path", `url(#${clipPathIDs[location]})`);
     const { playbackInfo } = datum;
     const dateSliderRows = plotContainers
         .append("div")
