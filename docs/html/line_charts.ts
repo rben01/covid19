@@ -76,10 +76,9 @@ const plotAesthetics = (() => {
 			},
 		},
 		colors: {
-			__scaleFactory: scaleFactory,
 			__scale: scaleFactory(),
 			resetTo: function (features: Feature[]) {
-				this.__scale = this.__scaleFactory();
+				this.__scale = scaleFactory();
 				features.forEach(f => this.scale(f));
 			},
 			scale: function (f: Feature) {
@@ -454,12 +453,6 @@ function updateLineGraph(
 				line.notice = noticeDict[code];
 			}
 		}
-
-		// Sort descending by latest data point
-		allLines.sort(
-			(l1, l2) =>
-				l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y,
-		);
 
 		lineGraphCache.prevParams = {
 			location,
