@@ -1,8 +1,7 @@
 import { COUNT_METHODS, WORLD_LOCATIONS, } from "./types.js";
 import { dateStrParser, isPerCapita, MS_PER_DAY } from "./utils.js";
 const plotAesthetics = Object.freeze((() => {
-    const scaleBound = 1;
-    const colorScale = (t) => d3.interpolateRdBu(scaleBound + t * (1 - 2 * scaleBound));
+    const colorScale = (t) => d3.interpolateYlOrRd(t);
     const pa = {
         width: { usa: 500, world: 500 },
         height: { usa: 325, world: 300 },
@@ -442,7 +441,7 @@ function _initializeChoropleth({ allCovidData, allGeoData, }) {
         ],
         [
             { key: "location", value: "world", name: "World" },
-            { key: "count", value: "net", name: "Total Cases Over Time" },
+            { key: "count", value: "net", name: "Total Over Time" },
         ],
     ];
     for (const row of rows) {

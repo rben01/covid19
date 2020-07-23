@@ -104,7 +104,7 @@ export function initializeLineGraph(allCovidData, allGeoData) {
         ],
         [
             { key: "location", value: "world", name: "World" },
-            { key: "count", value: "net", name: "Total Cases Over Time" },
+            { key: "count", value: "net", name: "Total Over Time" },
             { key: "affliction", value: "deaths", name: "Deaths" },
             { key: "accumulation", value: "total", name: "Total for Location" },
         ],

@@ -19,9 +19,7 @@ import { dateStrParser, isPerCapita, MS_PER_DAY } from "./utils.js";
 
 const plotAesthetics = Object.freeze(
 	(() => {
-		const scaleBound = 1;
-		const colorScale = (t: number) =>
-			d3.interpolateRdBu(scaleBound + t * (1 - 2 * scaleBound)); // d3.interpolateMagma(t * 0.8 + 0.2) as string;
+		const colorScale = (t: number) => d3.interpolateYlOrRd(t);
 		const pa = {
 			width: { usa: 500, world: 500 },
 			height: { usa: 325, world: 300 },
@@ -640,7 +638,7 @@ function _initializeChoropleth({
 		],
 		[
 			{ key: "location", value: "world", name: "World" },
-			{ key: "count", value: "net", name: "Total Cases Over Time" },
+			{ key: "count", value: "net", name: "Total Over Time" },
 		],
 	];
 	for (const row of rows) {
