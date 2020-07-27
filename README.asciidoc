@@ -79,6 +79,7 @@ ifndef::env-github[]
 :bullet-interaction: icon:mouse[{bullet-opts}]
 endif::[]
 // Icons for sections
+:icon-appendix: 🗃
 :icon-setup: 🛠
 :icon-data: 💾
 :icon-sources: 🚰
@@ -147,38 +148,6 @@ This page contains graphs of the spread of coronavirus throughout the world and 
 While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistic.
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.
 ****
-
-[[sect-setup]]
-== {icon-setup} Setup
-
-. Clone the {github-repo}[GitHub repo]:
-+
-[source,bash]
-----
-git clone https://github.com/rben01/covid19.git
-cd covid19
-----
-
-. Create the conda environment:
-+
---
-[source,bash]
-conda env create -f environment.yml
-
-NOTE: If you do not already have `conda` installed, you can install it from https://www.anaconda.com/distribution/[here].
---
-
-. Activate the environment:
-[source,bash]
-conda activate covid
-
-. Finally, run the graphing script:
-[source,bash]
-python src/case_tracker.py
-
-. The script has a command line interface; check it out:
-[source,bash]
-python src/case_tracker.py --help
 
 [[sect-data]]
 == {icon-data} Data
@@ -282,3 +251,37 @@ Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an
 <div class="plot-placeholder" style="width:1px;height:748px;"></div>
 <div id="line-charts-section"></div>
 ++++
+
+[[sect-setup]]
+== {icon-appendix} Appendix
+
+=== {icon-setup} Running Locally
+
+. Clone the {github-repo}[GitHub repo]:
++
+[source,bash]
+----
+git clone https://github.com/rben01/covid19.git
+cd covid19
+----
+
+. Create the conda environment:
++
+--
+[source,bash]
+conda env create -f environment.yml
+
+NOTE: If you do not already have `conda` installed, you can install it from https://www.anaconda.com/distribution/[here].
+--
+
+. Activate the environment:
+[source,bash]
+conda activate covid
+
+. Finally, run the graphing script:
+[source,bash]
+python src/case_tracker.py
+
+. The script has a command line interface; check it out:
+[source,bash]
+python src/case_tracker.py --help

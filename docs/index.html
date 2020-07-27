@@ -104,7 +104,6 @@
 <div id="toc" class="toc2">
 <div id="toctitle">Contents</div>
 <ul class="sectlevel1">
-<li><a href="#sect-setup">🛠 Setup</a></li>
 <li><a href="#sect-data">💾 Data</a>
 <ul class="sectlevel2">
 <li><a href="#data-sources">🚰 Sources</a></li>
@@ -127,6 +126,11 @@
 </li>
 </ul>
 </li>
+<li><a href="#sect-setup">🗃 Appendix</a>
+<ul class="sectlevel2">
+<li><a href="#_running_locally">🛠 Running Locally</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -143,72 +147,6 @@
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.</p>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="sect-setup"><a class="link" href="#sect-setup">🛠 Setup</a></h2>
-<div class="sectionbody">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Clone the <a href="https://github.com/rben01/covid19">GitHub repo</a>:</p>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">git clone https://github.com/rben01/covid19.git
-cd covid19</code></pre>
-</div>
-</div>
-</li>
-<li>
-<p>Create the conda environment:</p>
-<div class="openblock">
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">conda env create -f environment.yml</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-If you do not already have <code>conda</code> installed, you can install it from <a href="https://www.anaconda.com/distribution/">here</a>.
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-</li>
-<li>
-<p>Activate the environment:</p>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">conda activate covid</code></pre>
-</div>
-</div>
-</li>
-<li>
-<p>Finally, run the graphing script:</p>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py</code></pre>
-</div>
-</div>
-</li>
-<li>
-<p>The script has a command line interface; check it out:</p>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py --help</code></pre>
-</div>
-</div>
-</li>
-</ol>
 </div>
 </div>
 </div>
@@ -345,10 +283,79 @@ Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="sect-setup"><a class="link" href="#sect-setup">🗃 Appendix</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_running_locally"><a class="link" href="#_running_locally">🛠 Running Locally</a></h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Clone the <a href="https://github.com/rben01/covid19">GitHub repo</a>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">git clone https://github.com/rben01/covid19.git
+cd covid19</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the conda environment:</p>
+<div class="openblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">conda env create -f environment.yml</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you do not already have <code>conda</code> installed, you can install it from <a href="https://www.anaconda.com/distribution/">here</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>Activate the environment:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">conda activate covid</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Finally, run the graphing script:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>The script has a command line interface; check it out:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">python src/case_tracker.py --help</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-27 19:21:54 -0400
+Last updated 2020-07-27 19:27:51 -0400
 </div>
 </div>
 <script type="module" src="./html/built/plots.js"></script>
