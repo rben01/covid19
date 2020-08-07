@@ -46,9 +46,11 @@ const plotAesthetics = (() => {
         },
         colors: {
             __scale: scaleFactory(),
-            resetTo: function (features) {
+            resetTo: function (lines) {
                 this.__scale = scaleFactory();
-                features.forEach(f => this.scale(f));
+                for (const line of lines) {
+                    this.scale(line.feature);
+                }
             },
             scale: function (f) {
                 return this.__scale(f.properties.code);
@@ -235,9 +237,6 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
             const y2 = currentMovingAvg(f2);
             return y2 - y1;
         });
-        if (refreshColors) {
-            plotAesthetics.colors.resetTo(sortedFeatures);
-        }
         const noticeDict = {};
         for (const notice of legendNotices) {
             if (notice.location === location &&
@@ -319,6 +318,7 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
                 allLines.push(thisLine);
             }
         }
+        allLines.sort((l1, l2) => l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y);
         for (const line of allLines) {
             const code = line.feature.properties.code;
             if (code in noticeDict) {
@@ -333,6 +333,9 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
             startFrom,
         };
         lineGraphCache.allLines = allLines;
+    }
+    if (refreshColors) {
+        plotAesthetics.colors.resetTo(allLines);
     }
     const selectedLines = allLines.slice(startIndex, startIndex + nLines);
     const [minYVal, maxYVal] = (() => {

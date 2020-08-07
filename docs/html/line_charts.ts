@@ -77,9 +77,11 @@ const plotAesthetics = (() => {
 		},
 		colors: {
 			__scale: scaleFactory(),
-			resetTo: function (features: Feature[]) {
+			resetTo: function (lines: Line[]) {
 				this.__scale = scaleFactory();
-				features.forEach(f => this.scale(f));
+				for (const line of lines) {
+					this.scale(line.feature);
+				}
 			},
 			scale: function (f: Feature) {
 				return this.__scale(f.properties.code);
@@ -346,11 +348,6 @@ function updateLineGraph(
 				return y2 - y1;
 			});
 
-		if (refreshColors) {
-			// Fix the color mapping ahead of time
-			plotAesthetics.colors.resetTo(sortedFeatures);
-		}
-
 		const noticeDict: { [k: string]: string } = {};
 		for (const notice of legendNotices) {
 			if (
@@ -366,6 +363,7 @@ function updateLineGraph(
 		}
 
 		// Construct the lines we will plot
+		// TODO: make this so I can actully tell what is going on at a glance
 		allLines = [];
 		if (startFrom === "first_date") {
 			for (const feature of sortedFeatures) {
@@ -447,6 +445,12 @@ function updateLineGraph(
 			}
 		}
 
+		// Sort descending by latest data point
+		allLines.sort(
+			(l1, l2) =>
+				l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y,
+		);
+
 		for (const line of allLines) {
 			const code = line.feature.properties.code;
 			if (code in noticeDict) {
@@ -462,6 +466,11 @@ function updateLineGraph(
 			startFrom,
 		};
 		lineGraphCache.allLines = allLines;
+	}
+
+	if (refreshColors) {
+		// Fix the color mapping ahead of time
+		plotAesthetics.colors.resetTo(allLines);
 	}
 
 	const selectedLines = allLines.slice(startIndex, startIndex + nLines);
