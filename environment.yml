@@ -10,17 +10,17 @@ dependencies:
   - notebook
   - jupyter
   - pandas>=1.0
-  - matplotlib
-  - seaborn
-  - bokeh=2.0.1
-  - selenium
-  - firefox
-  - geckodriver
+  # - matplotlib
+  # - seaborn
+  # - bokeh=2.0.1
+  # - selenium
+  # - firefox
+  # - geckodriver
   - requests
   - geopandas>=0.7
-  - descartes
-  - cmocean
-  - ffmpeg
-  - pillow
+  # - descartes
+  # - cmocean
+  # - ffmpeg
+  # - pillow
   - flake8
   - black
