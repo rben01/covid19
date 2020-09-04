@@ -9,8 +9,8 @@ import pandas as pd
 from IPython.display import display  # noqa E401
 
 from constants import CaseTypes, Columns, Locations, Paths
-from plot_timeline_interactive import GEO_DATA_DIR
 
+GEO_DATA_DIR = Paths.DATA / "Geo"
 CODE = "code"
 
 
