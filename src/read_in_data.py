@@ -127,8 +127,8 @@ class SaveFormats(enum.Enum):
                 # "totalTestResultsIncrease",
             ],
             var_name=Columns.CASE_TYPE,
-            value_name=Columns.CASE_COUNT,
-        )
+            value_name="_value",
+        ).rename(columns={"_value": Columns.CASE_COUNT})
 
         df[Columns.CASE_COUNT] = df[Columns.CASE_COUNT].fillna(0).astype(int)
 
@@ -189,8 +189,8 @@ class SaveFormats(enum.Enum):
             id_vars=[Columns.COUNTRY, "countryIso", Columns.DATE, "updated", "source"],
             value_vars=[CaseTypes.CONFIRMED, CaseTypes.DEATHS],
             var_name=Columns.CASE_TYPE,
-            value_name=Columns.CASE_COUNT,
-        )
+            value_name="_value",
+        ).rename(columns={"_value": Columns.CASE_COUNT})
         df[Columns.CASE_COUNT] = df[Columns.CASE_COUNT].fillna(0).astype(int)
 
         df[Columns.STATE] = ""  # NA preferred except it doesn't play nice with groupby
