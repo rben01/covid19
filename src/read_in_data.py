@@ -106,7 +106,7 @@ class SaveFormats(enum.Enum):
             }
         )
         for col in [Columns.DATE, "dateChecked"]:
-            df[col] = pd.to_datetime(df[col])
+            df[col] = pd.to_datetime(df[col], errors="coerce")
 
         df[Columns.DATE] = self._adjust_dates(df[Columns.DATE])
 
