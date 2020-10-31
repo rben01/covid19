@@ -34,7 +34,7 @@ function assignData(allCovidData, allGeoData) {
     });
 }
 Promise.all([
-    d3.json("./data/covid_data-e42e51c49ef1e4e3c68792eaa5b9fe12c7c7a83e.json"),
+    d3.json("./data/covid_data-11d91bbd86a642f7ea203648cf539b32025930cc.json"),
     d3.json("./data/geo_data-be6715bfac29cf1d59f8c05b805ce8db5b42283f.json"),
 ]).then(objects => {
     const allCovidData = objects[0];
