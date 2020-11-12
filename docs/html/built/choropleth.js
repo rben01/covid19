@@ -53,24 +53,21 @@ const clipPathIDs = {
     usa: "clip-path-usa",
     world: "clip-path-world",
 };
-let PlaybackInfo = (() => {
-    class PlaybackInfo {
-        constructor() {
-            this.isPlaying = false;
-            this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
-            this.timerElapsedTimeProptn = 0;
-        }
-        get baseIntervalMS() {
-            return 1000;
-        }
-        get currentIntervalMS() {
-            return this.baseIntervalMS / PlaybackInfo.speeds[this.selectedIndex];
-        }
+class PlaybackInfo {
+    constructor() {
+        this.isPlaying = false;
+        this.selectedIndex = PlaybackInfo.speeds.indexOf(PlaybackInfo.defaultSpeed);
+        this.timerElapsedTimeProptn = 0;
     }
-    PlaybackInfo.speeds = [0.25, 0.5, 1, 2, 4];
-    PlaybackInfo.defaultSpeed = 1;
-    return PlaybackInfo;
-})();
+    get baseIntervalMS() {
+        return 1000;
+    }
+    get currentIntervalMS() {
+        return this.baseIntervalMS / PlaybackInfo.speeds[this.selectedIndex];
+    }
+}
+PlaybackInfo.speeds = [0.25, 0.5, 1, 2, 4];
+PlaybackInfo.defaultSpeed = 1;
 const dateFormatter = d3.timeFormat("%Y-%m-%d");
 const tooltipDateFormatter = d3.timeFormat("%b %-d");
 function getDateNDaysAfter(startDate, n) {
