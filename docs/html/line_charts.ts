@@ -446,10 +446,13 @@ function updateLineGraph(
 		}
 
 		// Sort descending by latest data point
-		allLines.sort(
-			(l1, l2) =>
-				l2.points[l2.points.length - 1].y - l1.points[l1.points.length - 1].y,
-		);
+		allLines = allLines
+			.filter(l => l.points.length > 0)
+			.sort((l1, l2) => {
+				const y1 = l1.points[l1.points.length - 1].y;
+				const y2 = l2.points[l2.points.length - 1].y;
+				return y2 - y1;
+			});
 
 		for (const line of allLines) {
 			const code = line.feature.properties.code;
