@@ -667,7 +667,7 @@ function updateLineGraph(
 		xTickLabels
 			.text((date: Date) => {
 				const dayOfMonth = date.getDate();
-				return dayOfMonth % 7 == 1 && dayOfMonth < 28
+				return dayOfMonth % 14 == 1 && dayOfMonth < 28
 					? dateFormatter(date)
 					: "";
 			})

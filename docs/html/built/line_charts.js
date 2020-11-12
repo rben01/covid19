@@ -477,7 +477,7 @@ function updateLineGraph(lineGraphContainer, movingAvgDays, { refreshColors } = 
         xTickLabels
             .text((date) => {
             const dayOfMonth = date.getDate();
-            return dayOfMonth % 7 == 1 && dayOfMonth < 28
+            return dayOfMonth % 14 == 1 && dayOfMonth < 28
                 ? dateFormatter(date)
                 : "";
         })
