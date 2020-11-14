@@ -149,50 +149,6 @@ While this document discusses the effects of coronavirus from a statistical stan
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.
 ****
 
-[[sect-data]]
-== {icon-data} Data
-
-[[data-sources]]
-=== {icon-sources} Sources
-
-The data sources below -- which are what's used in the graphs below -- have been aggregated into a single table available {raw-gh-content-url}/{data-table-path}[here].
-Refer to <<date-explanation-note,the note below>> for the interpretation of the dates in this table.
-
-
-* https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv[__The Washington Post__ -- world historical data] +
-* https://covidtracking.com/api/states/daily.csv[The COVID Tracking Project -- US states historical data]
-* https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population[Wikipedia -- List of Countries by Population]
-* https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population[Wikipedia -- List of US States by Population]
-
-In addition, while not in use, https://coronadatascraper.com/#home[Corona Data Scraper] seems like a good source as well.
-
-
-[[data-notes]]
-=== {icon-notes} Notes
-
-{bullet-data-quality} Data Quality::
-These graphs only convey accurate information when the data feeding them is good; https://xkcd.com/2295[garbage in, garbage out].
-In particular, the number of confirmed cases in a given region is reflective of both that region's true number of cases _and_ their testing capabilities.
-A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region's testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
-Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
-For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.
-This is also not to mention those who died because of coronavirus, but not _from_ it; there are many who would otherwise have received medical care but, due to the burden placed on the world's healthcare infrastructure by coronavirus or reluctance to go to a hospital because of the risk of catching coronavirus, have not been able to.
-+
-[example]
---
-For a more in-depth picture of the difficulties of data collection vis-à-vis pandemic modeling, see FiveThirtyEight's https://fivethirtyeight.com/features/a-comic-strip-tour-of-the-wild-world-of-pandemic-modeling/[A Comic Strip Tour Of The Wild World Of Pandemic Modeling]
---
-
-{bullet-updates} Data Updates::
-Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
-Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data. +
-On assumption these graphs make is that the population within a region is constant over time -- any changes in a region's population are ignored when computing per-capita numbers.
-This assumption is problematic.
-For instance, early on, many New Yorkers left the state for elsewhere in the U.S.
-If a region's true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
-Correspondingly, if a region's true population increases (people immigrate), then its per-capita numbers will be artificially inflated.
-
-
 [[sect-graphs]]
 == {icon-graphs} Graphs
 
@@ -251,6 +207,51 @@ Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an
 <div class="plot-placeholder" style="width:1px;height:748px;"></div>
 <div id="line-charts-section"></div>
 ++++
+
+[[sect-data]]
+== {icon-data} About the Data
+
+[[data-sources]]
+=== {icon-sources} Sources
+
+The data sources below -- which are what's used in the graphs below -- have been aggregated into a single table available {raw-gh-content-url}/{data-table-path}[here].
+Refer to <<date-explanation-note,the note below>> for the interpretation of the dates in this table.
+
+
+* https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv[__The Washington Post__ -- world historical data] +
+* https://covidtracking.com/api/states/daily.csv[The COVID Tracking Project -- US states historical data]
+* https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population[Wikipedia -- List of Countries by Population]
+* https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population[Wikipedia -- List of US States by Population]
+
+In addition, while not in use, https://coronadatascraper.com/#home[Corona Data Scraper] seems like a good source as well.
+
+
+[[data-notes]]
+=== {icon-notes} Notes
+
+{bullet-data-quality} Data Quality::
+These graphs only convey accurate information when the data feeding them is good; https://xkcd.com/2295[garbage in, garbage out].
+In particular, the number of confirmed cases in a given region is reflective of both that region's true number of cases _and_ their testing capabilities.
+A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region's testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases. +
+Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
+For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.
+This is also not to mention those who died because of coronavirus, but not _from_ it; there are many who would otherwise have received medical care but, due to the burden placed on the world's healthcare infrastructure by coronavirus or reluctance to go to a hospital because of the risk of catching coronavirus, have not been able to.
++
+[example]
+--
+For a more in-depth picture of the difficulties of data collection vis-à-vis pandemic modeling, see FiveThirtyEight's https://fivethirtyeight.com/features/a-comic-strip-tour-of-the-wild-world-of-pandemic-modeling/[A Comic Strip Tour Of The Wild World Of Pandemic Modeling]
+--
+
+{bullet-updates} Data Updates::
+Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
+Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data. +
+On assumption these graphs make is that the population within a region is constant over time -- any changes in a region's population are ignored when computing per-capita numbers.
+This assumption is problematic.
+For instance, early on, many New Yorkers left the state for elsewhere in the U.S.
+If a region's true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
+Correspondingly, if a region's true population increases (people immigrate), then its per-capita numbers will be artificially inflated.
+
+
 
 [[sect-setup]]
 == {icon-appendix} Appendix

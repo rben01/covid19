@@ -104,12 +104,6 @@
 <div id="toc" class="toc2">
 <div id="toctitle">Contents</div>
 <ul class="sectlevel1">
-<li><a href="#sect-data">💾 Data</a>
-<ul class="sectlevel2">
-<li><a href="#data-sources">🚰 Sources</a></li>
-<li><a href="#data-notes">📓 Notes</a></li>
-</ul>
-</li>
 <li><a href="#sect-graphs">📊 Graphs</a>
 <ul class="sectlevel2">
 <li><a href="#graphs-timeline-interactive-us">🗺 Maps of Coronavirus Prevalence</a>
@@ -124,6 +118,12 @@
 <li><a href="#sect-line-chart">Chart</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a href="#sect-data">💾 About the Data</a>
+<ul class="sectlevel2">
+<li><a href="#data-sources">🚰 Sources</a></li>
+<li><a href="#data-notes">📓 Notes</a></li>
 </ul>
 </li>
 <li><a href="#sect-setup">🗃 Appendix</a>
@@ -146,70 +146,6 @@
 <p>While this document discusses the effects of coronavirus from a statistical standpoint, its intent is not to reduce those affected by coronavirus to mere statistic.
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.</p>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="sect-data"><a class="link" href="#sect-data">💾 Data</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="data-sources"><a class="link" href="#data-sources">🚰 Sources</a></h3>
-<div class="paragraph">
-<p>The data sources below&#8201;&#8212;&#8201;which are what&#8217;s used in the graphs below&#8201;&#8212;&#8201;have been aggregated into a single table available <a href="https://raw.githubusercontent.com/rben01/covid19/master/data/data_table.csv">here</a>.
-Refer to <a href="#date-explanation-note">the note below</a> for the interpretation of the dates in this table.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv"><em>The Washington Post</em>&#8201;&#8212;&#8201;world historical data</a><br></p>
-</li>
-<li>
-<p><a href="https://covidtracking.com/api/states/daily.csv">The COVID Tracking Project&#8201;&#8212;&#8201;US states historical data</a></p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population">Wikipedia&#8201;&#8212;&#8201;List of Countries by Population</a></p>
-</li>
-<li>
-<p><a href="https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population">Wikipedia&#8201;&#8212;&#8201;List of US States by Population</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>In addition, while not in use, <a href="https://coronadatascraper.com/#home">Corona Data Scraper</a> seems like a good source as well.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="data-notes"><a class="link" href="#data-notes">📓 Notes</a></h3>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><span class="icon"><i class="fa fa-check-circle fa-fw"></i></span> Data Quality</dt>
-<dd>
-<p>These graphs only convey accurate information when the data feeding them is good; <a href="https://xkcd.com/2295">garbage in, garbage out</a>.
-In particular, the number of confirmed cases in a given region is reflective of both that region&#8217;s true number of cases <em>and</em> their testing capabilities.
-A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region&#8217;s testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases.<br>
-Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
-For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.
-This is also not to mention those who died because of coronavirus, but not <em>from</em> it; there are many who would otherwise have received medical care but, due to the burden placed on the world&#8217;s healthcare infrastructure by coronavirus or reluctance to go to a hospital because of the risk of catching coronavirus, have not been able to.</p>
-<div class="exampleblock">
-<div class="content">
-<div class="paragraph">
-<p>For a more in-depth picture of the difficulties of data collection vis-à-vis pandemic modeling, see FiveThirtyEight&#8217;s <a href="https://fivethirtyeight.com/features/a-comic-strip-tour-of-the-wild-world-of-pandemic-modeling/">A Comic Strip Tour Of The Wild World Of Pandemic Modeling</a></p>
-</div>
-</div>
-</div>
-</dd>
-<dt class="hdlist1"><span class="icon"><i class="fa fa-sync-alt fa-fw"></i></span> Data Updates</dt>
-<dd>
-<p>Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
-Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data.<br>
-On assumption these graphs make is that the population within a region is constant over time&#8201;&#8212;&#8201;any changes in a region&#8217;s population are ignored when computing per-capita numbers.
-This assumption is problematic.
-For instance, early on, many New Yorkers left the state for elsewhere in the U.S.
-If a region&#8217;s true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
-Correspondingly, if a region&#8217;s true population increases (people immigrate), then its per-capita numbers will be artificially inflated.</p>
-</dd>
-</dl>
 </div>
 </div>
 </div>
@@ -279,6 +215,70 @@ Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an
 <h4 id="sect-line-chart"><a class="link" href="#sect-line-chart">Chart</a></h4>
 <div class="plot-placeholder" style="width:1px;height:748px;"></div>
 <div id="line-charts-section"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sect-data"><a class="link" href="#sect-data">💾 About the Data</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="data-sources"><a class="link" href="#data-sources">🚰 Sources</a></h3>
+<div class="paragraph">
+<p>The data sources below&#8201;&#8212;&#8201;which are what&#8217;s used in the graphs below&#8201;&#8212;&#8201;have been aggregated into a single table available <a href="https://raw.githubusercontent.com/rben01/covid19/master/data/data_table.csv">here</a>.
+Refer to <a href="#date-explanation-note">the note below</a> for the interpretation of the dates in this table.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.washingtonpost.com/graphics/2020/world/mapping-spread-new-coronavirus/data/clean/world-daily-historical.csv"><em>The Washington Post</em>&#8201;&#8212;&#8201;world historical data</a><br></p>
+</li>
+<li>
+<p><a href="https://covidtracking.com/api/states/daily.csv">The COVID Tracking Project&#8201;&#8212;&#8201;US states historical data</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population">Wikipedia&#8201;&#8212;&#8201;List of Countries by Population</a></p>
+</li>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population">Wikipedia&#8201;&#8212;&#8201;List of US States by Population</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, while not in use, <a href="https://coronadatascraper.com/#home">Corona Data Scraper</a> seems like a good source as well.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-notes"><a class="link" href="#data-notes">📓 Notes</a></h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><span class="icon"><i class="fa fa-check-circle fa-fw"></i></span> Data Quality</dt>
+<dd>
+<p>These graphs only convey accurate information when the data feeding them is good; <a href="https://xkcd.com/2295">garbage in, garbage out</a>.
+In particular, the number of confirmed cases in a given region is reflective of both that region&#8217;s true number of cases <em>and</em> their testing capabilities.
+A rapid initial increase in confirmed cases is likely more indicative of early testing initiatives than the true rate of spread, and as the true number of true cases outpaces a region&#8217;s testing capabilities, the reported number of confirmed cases will be an increasingly low estimate of the true number of cases.<br>
+Similarly, the number of deaths attributed to COVID may fall short of the true number of deaths COVID has caused.
+For instance, on April 6, 2020, New York announced that they no longer had the capacity to perform post mortem coronavirus tests, which means New Yorkers who die of COVID without having been diagnosed with COVID will not be recorded as having died from it.
+This is also not to mention those who died because of coronavirus, but not <em>from</em> it; there are many who would otherwise have received medical care but, due to the burden placed on the world&#8217;s healthcare infrastructure by coronavirus or reluctance to go to a hospital because of the risk of catching coronavirus, have not been able to.</p>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>For a more in-depth picture of the difficulties of data collection vis-à-vis pandemic modeling, see FiveThirtyEight&#8217;s <a href="https://fivethirtyeight.com/features/a-comic-strip-tour-of-the-wild-world-of-pandemic-modeling/">A Comic Strip Tour Of The Wild World Of Pandemic Modeling</a></p>
+</div>
+</div>
+</div>
+</dd>
+<dt class="hdlist1"><span class="icon"><i class="fa fa-sync-alt fa-fw"></i></span> Data Updates</dt>
+<dd>
+<p>Due to changing quality and up-to-dateness, the data sources used for these graphs are subject to change.
+Additionally, while data sources are expected to update periodically with new, current data, they may also amend their past data as they get more accurate historical data.<br>
+On assumption these graphs make is that the population within a region is constant over time&#8201;&#8212;&#8201;any changes in a region&#8217;s population are ignored when computing per-capita numbers.
+This assumption is problematic.
+For instance, early on, many New Yorkers left the state for elsewhere in the U.S.
+If a region&#8217;s true population decreases (its residents emigrate), then its per-capita numbers will be artificially deflated.
+Correspondingly, if a region&#8217;s true population increases (people immigrate), then its per-capita numbers will be artificially inflated.</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
@@ -355,7 +355,7 @@ If you do not already have <code>conda</code> installed, you can install it from
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-11-14 01:03:35 -0500
+Last updated 2020-11-14 13:50:26 -0500
 </div>
 </div>
 <script type="module" src="./html/built/plots.js"></script>
