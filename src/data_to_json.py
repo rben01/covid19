@@ -266,7 +266,7 @@ def save_file_with_digest(filename_stub, data):
 
 
 def data_to_json():
-    df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE)
+    df: pd.DataFrame = pd.read_csv(Paths.DATA_TABLE, low_memory=False)
     for c in df:
         if "per cap." in c.lower():
             df[c] *= 100000

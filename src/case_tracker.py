@@ -337,7 +337,7 @@ def read_data_table(*, as_text=False) -> Union[pd.DataFrame, str, None]:
             with open(DATA_TABLE_PATH) as f:
                 return f.read()
 
-        return pd.read_csv(DATA_TABLE_PATH)
+        return pd.read_csv(DATA_TABLE_PATH, low_memory=False)
     except FileNotFoundError:
         return None
 
