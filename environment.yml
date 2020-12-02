@@ -10,8 +10,8 @@ dependencies:
   - notebook
   - jupyter
   - pandas>=1.0
-  # - matplotlib
-  # - seaborn
+  - matplotlib
+  - seaborn
   # - bokeh=2.0.1
   # - selenium
   # - firefox
