@@ -645,10 +645,13 @@ function _initializeChoropleth({
 		const tr = checkboxTable.append("tr");
 		for (const col of row) {
 			const { key, value, name } = col;
-			tr.append("td").text(name);
+			const id = `line-chart-input_${key}-${value}`.replace(/[^-\w_]+/g, "-");
+
+			tr.append("td").append("label").attr("for", id).text(name);
 			tr.append("td")
 				.append("input")
 				.property("checked", value === datum[key])
+				.attr("id", id)
 				.attr("type", "radio")
 				.property("name", `${key}-choropleth`)
 				.on("change", function (d: any) {
@@ -921,29 +924,32 @@ function _initializeChoropleth({
 			({ speed }: { speed: number }) => speed === PlaybackInfo.defaultSpeed,
 		);
 
-	speedButtons.on("click", function (
-		{
-			speed,
-			playbackInfo,
-		}: {
-			speed: number;
-			playbackInfo: PlaybackInfo;
+	speedButtons.on(
+		"click",
+		function (
+			{
+				speed,
+				playbackInfo,
+			}: {
+				speed: number;
+				playbackInfo: PlaybackInfo;
+			},
+			i: number,
+		) {
+			const wasPlaying = playbackInfo.isPlaying;
+			// Order matters here; calculations in haltPlayback require the old value of selectedIndex
+			if (wasPlaying) {
+				haltPlayback(playbackInfo);
+			}
+			playbackInfo.selectedIndex = i;
+			speedButtons.each(function (this: Node, d: any) {
+				d3.select(this).property("disabled", d.speed === speed);
+			});
+			if (wasPlaying) {
+				startPlayback(playbackInfo);
+			}
 		},
-		i: number,
-	) {
-		const wasPlaying = playbackInfo.isPlaying;
-		// Order matters here; calculations in haltPlayback require the old value of selectedIndex
-		if (wasPlaying) {
-			haltPlayback(playbackInfo);
-		}
-		playbackInfo.selectedIndex = i;
-		speedButtons.each(function (this: Node, d: any) {
-			d3.select(this).property("disabled", d.speed === speed);
-		});
-		if (wasPlaying) {
-			startPlayback(playbackInfo);
-		}
-	});
+	);
 
 	updateMaps({
 		choropleth,
