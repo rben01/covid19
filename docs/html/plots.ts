@@ -20,12 +20,13 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 				allCovidData[location].data[feature.properties.code];
 			feature.covidData = covidData;
 
-			if (typeof covidData === "undefined") {
+			if (covidData === undefined) {
 				return;
 			}
 
+			const nDates = Object.keys(covidData.date).length;
 			feature.covidData.dodd = (() => {
-				const dodd = {
+				const dodd: { [key in CaseType]: number[] } = {
 					cases: [],
 					cases_per_capita: [],
 					deaths: [],
@@ -36,10 +37,10 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 					CaseType,
 					number[],
 				][]) {
-					for (let i = 0; i < Object.keys(covidData.date).length; ++i) {
+					for (let i = 0; i < nDates; ++i) {
 						const diff =
 							covidData.net[caseType][i] - covidData.net[caseType][i - 1];
-						if (!diff) {
+						if (isNaN(diff)) {
 							data.push(0);
 						} else {
 							data.push(diff);
@@ -55,15 +56,24 @@ function assignData(allCovidData: AllCovidData, allGeoData: AllGeoData) {
 
 // Use the custom digest of the data file to only pull from the web anew, ignoring browser cache, when data has actually updated
 Promise.all([
-	d3.json("./data/covid_data-a1da471655187b3ec1d3350c53170289afcbbd63.json"),
+	d3.json("./data/covid_data-0199efefa01d2152d94d1ed1708c094a9c076bc4.json"),
 	d3.json("./data/geo_data-be6715bfac29cf1d59f8c05b805ce8db5b42283f.json"),
 ]).then(objects => {
 	const allCovidData: AllCovidData = objects[0];
 	const allGeoData: AllGeoData = objects[1];
 
-	assignData(allCovidData, allGeoData);
+	d3.selectAll(".initial-plot-area").style("min-height", null);
+	// const startMS = new Date().getTime();
+	// function logElapsedMS() {
+	// 	console.log(new Date().getTime() - startMS);
+	// }
 
-	d3.selectAll(".plot-placeholder").remove();
+	// logElapsedMS();
+	assignData(allCovidData, allGeoData);
+	// logElapsedMS();
+
 	initializeChoropleths(allCovidData, allGeoData);
+	// logElapsedMS();
 	initializeLineGraph(allCovidData, allGeoData);
+	// logElapsedMS();
 });

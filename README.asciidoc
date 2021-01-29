@@ -175,8 +175,7 @@ Along the bottoms are controls for continuous playback of the data over time as 
 ==== Chart
 
 ++++
-<div class="plot-placeholder" style="width:1px;height:1024px;"></div>
-<div id="map-plots"></div>
+<div id="map-plots" class="initial-plot-area" style="min-height:1000px;min-width:1px;"></div>
 ++++
 
 
@@ -204,8 +203,7 @@ Hover your mouse over (desktop) or tap (mobile) a row in the legend to select an
 ==== Chart
 
 ++++
-<div class="plot-placeholder" style="width:1px;height:748px;"></div>
-<div id="line-charts-section"></div>
+<div id="line-charts-section" class="initial-plot-area" style="min-height:740px;min-width:1px;"></div>
 ++++
 
 [[sect-data]]
