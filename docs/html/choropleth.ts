@@ -360,14 +360,18 @@ function updateMaps({
 			mapContainer
 				.selectAll(".dummy-rect")
 				.data([0])
-				.join((enter: any) => enter.append("rect").classed("dummy-rect", true))
-				.attr("x", 0)
-				.attr("y", 0)
+				.join((enter: any) =>
+					enter
+						.append("rect")
+						.classed("dummy-rect", true)
+						.attr("x", 0)
+						.attr("y", 0)
+						.attr("fill-opacity", 0)
+						.attr("stroke", "#ccc")
+						.attr("stroke-width", 1),
+				)
 				.attr("width", plotAesthetics.mapWidth[location])
-				.attr("height", plotAesthetics.mapHeight[location])
-				.attr("fill-opacity", 0)
-				.attr("stroke", "#ccc")
-				.attr("stroke-width", 1);
+				.attr("height", plotAesthetics.mapHeight[location]);
 
 			if (didChangeLocation) {
 				mapContainer.call(zoom.transform, d3.zoomIdentity);
@@ -749,7 +753,8 @@ function _initializeChoropleth({
 		.attr("x2", "0%")
 		.attr("y1", "100%")
 		.attr("y2", "0%");
-	d3.range(plotAesthetics.colors.nSteps).forEach((i: number) => {
+
+	for (let i = 0; i < plotAesthetics.colors.nSteps; ++i) {
 		const percent = (100 * i) / (plotAesthetics.colors.nSteps - 1);
 		const proptn = percent / 100;
 
@@ -758,7 +763,7 @@ function _initializeChoropleth({
 			.attr("offset", `${percent}%`)
 			.attr("stop-color", plotAesthetics.colors.scale(proptn))
 			.attr("stop-opacity", 1);
-	});
+	}
 
 	const mainPlotAreas = svg.append("g").classed("main-plot-area", true);
 	for (const location of WORLD_LOCATIONS) {
