@@ -149,6 +149,11 @@ While this document discusses the effects of coronavirus from a statistical stan
 Unfortunately, graphs cannot exhibit the personal and societal impacts of a disaster; they can only show the numerical outcomes.
 ****
 
+[NOTE]
+--
+link:https://covidtracking.com/analysis-updates/covid-tracking-project-end-march-7[The COVID Tracking Project will stop releasing their daily data update on March 7, 2021^]. Since this site relies on that data, this site will also stop updating on that date.
+--
+
 [[sect-graphs]]
 == {icon-graphs} Graphs
 
