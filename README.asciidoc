@@ -172,6 +172,7 @@ Because the range of values in each quadrants is different, each quadrant's colo
 {bullet-interaction} Interaction::
 At the top is a menu for selecting which data you would like to view, and below are the maps themselves.
 On desktop, zoom by holding the shift key and scrolling over the graph.
+(Due to what I can only assume is a Safari bug, shift+scroll doesn't in Safari. It should work fine in other browsers, though.)
 Once you've zoomed in, you can drag to pan and can reset the view by double-clicking on the graph.
 On mobile, use two fingers to zoom and pan.
 Hovering your cursor over a region (desktop) or tapping it (mobile) will show its data for the selected date.

@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 *.pyc
+.venv
 data/WaPo
 twistd.pid
 docs/figures/Geo/DayOverDayDiffs/
